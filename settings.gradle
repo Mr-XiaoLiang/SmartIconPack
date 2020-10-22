@@ -1,0 +1,4 @@
+include ':iconKit'
+include ':iconCore'
+include ':app'
+rootProject.name = "SmartIconPack"
