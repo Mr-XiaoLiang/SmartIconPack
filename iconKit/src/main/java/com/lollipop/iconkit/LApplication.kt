@@ -13,6 +13,10 @@ open class LApplication: IconApplication() {
 
     override fun onCreate() {
         super.onCreate()
+        initMainPage()
+    }
+
+    open protected fun initMainPage() {
         IconPackCore.init(this, object: MainPageProvider {
             override fun createRenderer(): MainPageRenderer {
                 return MainActivity()
