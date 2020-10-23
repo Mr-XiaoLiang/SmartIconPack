@@ -2,7 +2,9 @@ package com.lollipop.iconkit.fragment
 
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.lollipop.iconcore.listener.*
 
@@ -13,13 +15,16 @@ import com.lollipop.iconcore.listener.*
 abstract class BaseTabFragment: Fragment(),
     BackPressedListener,
     BackPressedProvider,
-    OnWindowInsetsProvider {
+    OnWindowInsetsProvider,
+    OnWindowInsetsListener {
 
     abstract val tabIcon: Int
 
     abstract val tabTitle: Int
 
     abstract val tabColorId: Int
+
+    open val layoutId = 0
 
     private var lifecycleHelper: FragmentLifecycleHelper = FragmentLifecycleHelper()
 
@@ -31,6 +36,14 @@ abstract class BaseTabFragment: Fragment(),
         supportLifecycle(this)
         super.onCreate(savedInstanceState)
         lifecycleHelper.onCreate(this, savedInstanceState)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        if (layoutId != 0) {
+            return inflater.inflate(layoutId, container, false)
+        }
+        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -66,6 +79,12 @@ abstract class BaseTabFragment: Fragment(),
     override fun onAttach(context: Context) {
         super.onAttach(context)
         lifecycleHelper.onAttach(context)
+        if (context is OnWindowInsetsProvider) {
+            context.addOnWindowInsetsProvider(windowInsetsProviderHelper)
+        }
+        if (context is BackPressedProvider) {
+            context.addBackPressedListener(backPressedProviderHelper)
+        }
     }
 
     override fun onDetach() {
@@ -107,6 +126,10 @@ abstract class BaseTabFragment: Fragment(),
 
     override fun removeOnWindowInsetsProvider(listener: OnWindowInsetsListener) {
         windowInsetsProviderHelper.removeOnWindowInsetsProvider(listener)
+    }
+
+    override fun onInsetsChange(root: View, left: Int, top: Int, right: Int, bottom: Int) {
+        windowInsetsProviderHelper.onInsetsChange(root, left, top, right, bottom)
     }
 
 }

@@ -16,6 +16,10 @@
 
     <color name="radioTextColor">#424242</color>
 
+    <color name="tabHomeSelectedColor">#EF9A9A</color>
+    <color name="tabIconSelectedColor">#80CBC4</color>
+    <color name="tabAboutSelectedColor">#B39DDB</color>
+
     <color name="tabUnselectedColor">#DDFFFFFF</color>
 
     <color name="curtainCard">#D8D8D8</color>
