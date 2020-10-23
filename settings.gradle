@@ -1,3 +1,4 @@
+include ':ltabview'
 include ':iconKit'
 include ':iconCore'
 include ':app'

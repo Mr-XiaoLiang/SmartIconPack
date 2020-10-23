@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/iconCore" />
             <option value="$PROJECT_DIR$/iconKit" />
+            <option value="$PROJECT_DIR$/ltabview" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

@@ -11,39 +11,39 @@ import com.lollipop.iconcore.provider.MainPageRenderer
  */
 class MainActivity: MainPageRenderer{
 
-    override fun onCreate(activity: Activity, savedInstanceState: Bundle?) {
-        activity.setContentView(R.layout.activity_main)
+    override fun onCreate(target: Activity, savedInstanceState: Bundle?) {
+        target.setContentView(R.layout.activity_main)
     }
 
-    override fun onStart(activity: Activity) {
+    override fun onStart(target: Activity) {
         
     }
 
-    override fun onStop(activity: Activity) {
+    override fun onStop(target: Activity) {
         
     }
 
-    override fun onResume(activity: Activity) {
+    override fun onResume(target: Activity) {
         
     }
 
-    override fun onPause(activity: Activity) {
+    override fun onPause(target: Activity) {
         
     }
 
-    override fun onRestart(activity: Activity) {
+    override fun onRestart(target: Activity) {
         
     }
 
-    override fun onDestroy(activity: Activity) {
+    override fun onDestroy(target: Activity) {
         
     }
 
-    override fun onSaveInstanceState(activity: Activity, outState: Bundle) {
+    override fun onSaveInstanceState(target: Activity, outState: Bundle) {
         
     }
 
-    override fun onRestoreInstanceState(activity: Activity, savedInstanceState: Bundle) {
+    override fun onRestoreInstanceState(target: Activity, savedInstanceState: Bundle) {
         
     }
 
