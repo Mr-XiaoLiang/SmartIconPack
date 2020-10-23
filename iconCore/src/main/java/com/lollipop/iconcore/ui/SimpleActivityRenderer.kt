@@ -27,6 +27,10 @@ open class SimpleActivityRenderer: MainPageRenderer, LayoutContainer {
             LayoutInflater.from(activity).inflate(resId, null))
     }
 
+    protected fun <T: View> find(id: Int): T? {
+        return activityView?.findViewById(id)
+    }
+
     override fun onCreate(target: IconPackActivity, savedInstanceState: Bundle?) {
 
     }
