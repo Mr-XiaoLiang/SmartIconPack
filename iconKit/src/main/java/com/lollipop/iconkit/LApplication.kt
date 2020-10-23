@@ -9,19 +9,15 @@ import com.lollipop.iconcore.ui.IconApplication
  * @author lollipop
  * @date 10/22/20 16:29
  */
-open class LApplication: IconApplication() {
+open class LApplication: IconApplication(), MainPageProvider {
 
     override fun onCreate() {
         super.onCreate()
-        initMainPage()
+        IconPackCore.init(this)
     }
 
-    open protected fun initMainPage() {
-        IconPackCore.init(this, object: MainPageProvider {
-            override fun createRenderer(): MainPageRenderer {
-                return MainActivity()
-            }
-        })
+    override fun createRenderer(): MainPageRenderer {
+        return MainActivity()
     }
 
 }

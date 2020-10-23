@@ -1,50 +1,36 @@
 package com.lollipop.iconkit
 
-import android.app.Activity
 import android.os.Bundle
-import com.lollipop.iconcore.provider.MainPageRenderer
+import com.lollipop.iconcore.ui.IconPackActivity
+import com.lollipop.iconcore.ui.SimpleActivityRenderer
+import com.lollipop.iconkit.fragment.BaseTabFragment
 
 /**
  * @author lollipop
  * @date 10/22/20 20:34
  * 主页
  */
-class MainActivity: MainPageRenderer{
+open class MainActivity: SimpleActivityRenderer() {
 
-    override fun onCreate(target: Activity, savedInstanceState: Bundle?) {
-        target.setContentView(R.layout.activity_main)
+    private val fragmentList = ArrayList<BaseTabFragment>()
+
+    override fun onCreate(target: IconPackActivity, savedInstanceState: Bundle?) {
+        super.onCreate(target, savedInstanceState)
+        setContentView(target, R.layout.activity_main)
+        initView()
     }
 
-    override fun onStart(target: Activity) {
-        
+    protected open fun customizeFragment(): Array<BaseTabFragment> {
+        return arrayOf()
     }
 
-    override fun onStop(target: Activity) {
-        
-    }
-
-    override fun onResume(target: Activity) {
-        
-    }
-
-    override fun onPause(target: Activity) {
-        
-    }
-
-    override fun onRestart(target: Activity) {
-        
-    }
-
-    override fun onDestroy(target: Activity) {
-        
-    }
-
-    override fun onSaveInstanceState(target: Activity, outState: Bundle) {
-        
-    }
-
-    override fun onRestoreInstanceState(target: Activity, savedInstanceState: Bundle) {
-        
+    private fun initView() {
+        val customizeFragment = customizeFragment()
+        if (customizeFragment.isEmpty()) {
+//            fragmentList.add()
+        } else {
+            fragmentList.addAll(customizeFragment)
+        }
     }
 
 }

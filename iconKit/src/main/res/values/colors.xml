@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#546e7a</color>
+    <color name="colorPrimaryDark">#29434e</color>
+    <color name="colorPrimaryLight">#819ca9</color>
+    <color name="colorAccent">#df9fb4</color>
+    <color name="colorPrimaryText">#ffffff</color>
+    <color name="windowBackground">#546e7a</color>
+    <color name="contentBackground">#ffffff</color>
+
+    <color name="toolbarIcon">#DDFFFFFF</color>
+    <color name="toolbarTitle">#FFFFFF</color>
+
+    <color name="fabIcon">#DDFFFFFF</color>
+    <color name="fabBackground">#df9fb4</color>
+
+    <color name="radioTextColor">#424242</color>
+
+    <color name="tabUnselectedColor">#DDFFFFFF</color>
+
+    <color name="curtainCard">#D8D8D8</color>
+
+    <color name="linePlatBackground">#F6F6F6</color>
+
+    <color name="splitLine">#919191</color>
+
+    <color name="curtainText">#353936</color>
+    <color name="curtainTextSecondary">#585C59</color>
+</resources>

@@ -14,7 +14,7 @@ object IconPackCore {
 
     private var isInit = false
 
-    fun init(context: Context, provider: MainPageProvider) {
+    fun init(context: Context, provider: MainPageProvider = (context as MainPageProvider)) {
         if (isInit) {
             return
         }
