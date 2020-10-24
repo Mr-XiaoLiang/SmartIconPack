@@ -22,6 +22,14 @@ open class BaseFragment: Fragment(),
 
     private var lifecycleHelper: FragmentLifecycleHelper = FragmentLifecycleHelper()
 
+    private val windowInsetsProviderHelper: WindowInsetsProviderHelper by lazy {
+        WindowInsetsProviderHelper()
+    }
+
+    private val backPressedProviderHelper: BackPressedProviderHelper by lazy {
+        BackPressedProviderHelper()
+    }
+
     protected fun supportLifecycle(fragment: Fragment) {
         lifecycleHelper.bindFragment(fragment)
     }
@@ -42,6 +50,7 @@ open class BaseFragment: Fragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        windowInsetsProviderHelper.call(this)
         lifecycleHelper.onViewCreated(view, savedInstanceState)
     }
 
@@ -68,16 +77,18 @@ open class BaseFragment: Fragment(),
     override fun onDestroy() {
         super.onDestroy()
         lifecycleHelper.onDestroy()
+        windowInsetsProviderHelper.destroy()
+        backPressedProviderHelper.destroy()
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         lifecycleHelper.onAttach(context)
         if (context is OnWindowInsetsProvider) {
-            context.addOnWindowInsetsProvider(windowInsetsProviderHelper)
+            context.addOnWindowInsetsProvider(this)
         }
         if (context is BackPressedProvider) {
-            context.addBackPressedListener(backPressedProviderHelper)
+            context.addBackPressedListener(this)
         }
     }
 
@@ -92,14 +103,6 @@ open class BaseFragment: Fragment(),
 
     fun removeLifecycleListener(listener: FragmentLifecycleListener) {
         lifecycleHelper.removeLifecycleListener(listener)
-    }
-
-    private val windowInsetsProviderHelper: WindowInsetsProviderHelper by lazy {
-        WindowInsetsProviderHelper()
-    }
-
-    private val backPressedProviderHelper: BackPressedProviderHelper by lazy {
-        BackPressedProviderHelper()
     }
 
     override fun onBackPressed(): Boolean {

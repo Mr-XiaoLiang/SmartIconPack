@@ -37,7 +37,7 @@ class IconPackActivity: AppCompatActivity(), BackPressedProvider, OnWindowInsets
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
-        window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+//        window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
         super.onCreate(savedInstanceState)
     }
 
@@ -101,9 +101,9 @@ class IconPackActivity: AppCompatActivity(), BackPressedProvider, OnWindowInsets
                         or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
 
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
-                or WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
 
@@ -119,10 +119,10 @@ class IconPackActivity: AppCompatActivity(), BackPressedProvider, OnWindowInsets
                         systemInsets.right, systemInsets.bottom)
                 WindowInsets.CONSUMED
             } else {
-                windowInsetsProviderHelper.onInsetsChange(group,
+                onWindowInsetsChange(group,
                         insets.systemWindowInsetLeft, insets.systemWindowInsetTop,
                         insets.systemWindowInsetRight, insets.systemWindowInsetBottom)
-                onWindowInsetsChange(group,
+                windowInsetsProviderHelper.onInsetsChange(group,
                         insets.systemWindowInsetLeft, insets.systemWindowInsetTop,
                         insets.systemWindowInsetRight, insets.systemWindowInsetBottom)
                 insets.consumeSystemWindowInsets()

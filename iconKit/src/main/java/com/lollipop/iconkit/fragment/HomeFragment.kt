@@ -2,12 +2,12 @@ package com.lollipop.iconkit.fragment
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import com.lollipop.iconcore.listener.WindowInsetsHelper
 import com.lollipop.iconcore.ui.IconHelper
-import com.lollipop.iconcore.ui.IconImageView
+import com.lollipop.iconcore.util.IconGroup
 import com.lollipop.iconkit.R
+import com.lollipop.iconkit.util.log
 import kotlinx.android.synthetic.main.kit_fragment_home.*
 
 /**
@@ -24,31 +24,34 @@ class HomeFragment: BaseTabFragment() {
     override val layoutId: Int
         get() = R.layout.kit_fragment_home
 
-    private var iconHelper: IconHelper? = null
+    private var iconHelper = IconHelper.newHelper {
+        IconHelper.DefaultXmlMap.readFromResource(it, R.xml.appfilter)
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        iconHelper = IconHelper(context)
+        iconHelper.loadAppInfo(context)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        log("iconInfo { allAppCount:${iconHelper.allAppCount} , supportedCount:${iconHelper.supportedCount} }")
 
+        IconGroup(pageRoot).autoFit(iconHelper.supportedCount) { icon, index ->
+            val iconPack = iconHelper.getAppInfo(index).iconPack
+            if (iconPack.isEmpty()) {
+                icon.loadIcon(0)
+            } else {
+                icon.loadIcon(iconPack[0])
+            }
+        }
     }
 
     override fun onInsetsChange(root: View, left: Int, top: Int, right: Int, bottom: Int) {
         super.onInsetsChange(root, left, top, right, bottom)
-        previewIcon1?.changeViewMargin(left, top, 0, bottom)
-        previewIcon4?.changeViewMargin(0, 0, right, 0)
+        log("onInsetsChange($root, $left, $top, $right, $bottom)")
+        WindowInsetsHelper.setMargin(previewIcon1, left, top, 0, bottom)
+        WindowInsetsHelper.setMargin(previewIcon4, 0, 0, right, 0)
     }
-
-    private fun View.changeViewMargin(left: Int, top: Int, right: Int, bottom: Int) {
-        val lp = layoutParams?:return
-        if (lp is ViewGroup.MarginLayoutParams) {
-            lp.setMargins(left, top, right, bottom)
-            layoutParams = lp
-        }
-    }
-
 
 }

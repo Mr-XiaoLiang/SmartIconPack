@@ -1,16 +1,20 @@
 package com.lollipop.iconkit
 
 import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.lollipop.iconcore.listener.WindowInsetsHelper
 import com.lollipop.iconcore.ui.IconPackActivity
 import com.lollipop.iconcore.ui.SimpleActivityRenderer
 import com.lollipop.iconkit.fragment.AboutFragment
 import com.lollipop.iconkit.fragment.BaseTabFragment
 import com.lollipop.iconkit.fragment.HomeFragment
 import com.lollipop.iconkit.fragment.IconFragment
+import com.lollipop.iconkit.util.log
 import liang.lollipop.ltabview.LTabHelper
 import liang.lollipop.ltabview.LTabView
 
@@ -22,6 +26,7 @@ import liang.lollipop.ltabview.LTabView
 open class MainActivity: SimpleActivityRenderer() {
 
     private val fragmentList = ArrayList<BaseTabFragment>()
+    private var tabGroupInsetsHelper: WindowInsetsHelper? = null
 
     override fun onCreate(target: IconPackActivity, savedInstanceState: Bundle?) {
         super.onCreate(target, savedInstanceState)
@@ -74,6 +79,14 @@ open class MainActivity: SimpleActivityRenderer() {
         build.onSelected {
             pageGroup.currentItem = it
         }
+        tabGroupInsetsHelper = WindowInsetsHelper(tabView)
+        tabGroupInsetsHelper?.baseMarginFromNow()
+    }
+
+    override fun onInsetsChange(root: View, left: Int, top: Int, right: Int, bottom: Int) {
+//        tabGroupInsetsHelper?.updateByMargin(root, left, top, right, bottom)
+        tabGroupInsetsHelper?.setInsetsByMargin(left, 0, right, bottom)
+        log("onInsetsChange: ", root, left, top, right, bottom)
     }
 
     private class FragmentAdapter(activity: IconPackActivity,

@@ -23,6 +23,7 @@ open class SimpleActivityRenderer: MainPageRenderer,
     protected fun setContentView(activity: IconPackActivity, view: View) {
         activityView = view
         activity.setContentView(activityView)
+        activity.initRootGroup(view)
     }
 
     protected fun setContentView(activity: IconPackActivity, resId: Int) {

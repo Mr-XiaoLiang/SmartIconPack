@@ -41,4 +41,11 @@ class WindowInsetsProviderHelper: OnWindowInsetsProvider, OnWindowInsetsListener
         windowInsetsListenerList.clear()
     }
 
+    fun call(listener: OnWindowInsetsListener) {
+        rootView?.get()?.let { root ->
+            listener.onInsetsChange(root, lastWindowInsets.left, lastWindowInsets.top,
+                    lastWindowInsets.right, lastWindowInsets.bottom)
+        }
+    }
+
 }

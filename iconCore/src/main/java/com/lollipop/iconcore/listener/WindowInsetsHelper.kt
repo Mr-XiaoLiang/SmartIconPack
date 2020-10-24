@@ -12,6 +12,18 @@ import android.view.ViewGroup
  */
 class WindowInsetsHelper (private val self: View) {
 
+    companion object {
+        fun setMargin(self: View?, left: Int, top: Int, right: Int, bottom: Int) {
+            self?:return
+            val layoutParams = self.layoutParams
+            if (layoutParams is ViewGroup.MarginLayoutParams) {
+                layoutParams.setMargins(
+                        left, top, right, bottom)
+                self.layoutParams = layoutParams
+            }
+        }
+    }
+
     private var rootParent: View? = null
 
     private val tempLocalArray = IntArray(2)
