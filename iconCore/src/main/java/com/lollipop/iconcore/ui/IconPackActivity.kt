@@ -22,14 +22,14 @@ class IconPackActivity: AppCompatActivity(), BackPressedProvider, OnWindowInsets
 
     private val windowInsetsProviderHelper = WindowInsetsProviderHelper()
 
-    private var mainpagerenderer: MainPageRenderer? = null
+    private var mainPageRenderer: MainPageRenderer? = null
 
     fun bindRenderer(renderer: MainPageRenderer) {
-        this.mainpagerenderer = renderer
+        this.mainPageRenderer = renderer
     }
 
     private fun unbindRenderer() {
-        this.mainpagerenderer = null
+        this.mainPageRenderer = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,47 +43,50 @@ class IconPackActivity: AppCompatActivity(), BackPressedProvider, OnWindowInsets
 
     override fun onStart() {
         super.onStart()
-        mainpagerenderer?.onStart(this)
+        mainPageRenderer?.onStart(this)
     }
 
     override fun onStop() {
         super.onStop()
-        mainpagerenderer?.onStop(this)
+        mainPageRenderer?.onStop(this)
     }
 
     override fun onResume() {
         super.onResume()
-        mainpagerenderer?.onResume(this)
+        mainPageRenderer?.onResume(this)
     }
 
     override fun onPause() {
         super.onPause()
-        mainpagerenderer?.onPause(this)
+        mainPageRenderer?.onPause(this)
     }
 
     override fun onRestart() {
         super.onRestart()
-        mainpagerenderer?.onRestart(this)
+        mainPageRenderer?.onRestart(this)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mainpagerenderer?.onDestroy(this)
+        mainPageRenderer?.onDestroy(this)
         backPressedProviderHelper.destroy()
         unbindRenderer()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        mainpagerenderer?.onSaveInstanceState(this, outState)
+        mainPageRenderer?.onSaveInstanceState(this, outState)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        mainpagerenderer?.onRestoreInstanceState(this, savedInstanceState)
+        mainPageRenderer?.onRestoreInstanceState(this, savedInstanceState)
     }
 
     override fun onBackPressed() {
+        if (mainPageRenderer?.onBackPressed() == true) {
+            return
+        }
         if (backPressedProviderHelper.onBackPressed()) {
             return
         }
@@ -108,6 +111,9 @@ class IconPackActivity: AppCompatActivity(), BackPressedProvider, OnWindowInsets
         group.setOnApplyWindowInsetsListener { _, insets ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 val systemInsets = insets.getInsets(WindowInsets.Type.systemBars())
+                onWindowInsetsChange(group,
+                        systemInsets.left, systemInsets.top,
+                        systemInsets.right, systemInsets.bottom)
                 windowInsetsProviderHelper.onInsetsChange(group,
                         systemInsets.left, systemInsets.top,
                         systemInsets.right, systemInsets.bottom)
@@ -116,10 +122,17 @@ class IconPackActivity: AppCompatActivity(), BackPressedProvider, OnWindowInsets
                 windowInsetsProviderHelper.onInsetsChange(group,
                         insets.systemWindowInsetLeft, insets.systemWindowInsetTop,
                         insets.systemWindowInsetRight, insets.systemWindowInsetBottom)
+                onWindowInsetsChange(group,
+                        insets.systemWindowInsetLeft, insets.systemWindowInsetTop,
+                        insets.systemWindowInsetRight, insets.systemWindowInsetBottom)
                 insets.consumeSystemWindowInsets()
             }
         }
 
+    }
+
+    private fun onWindowInsetsChange(root: View, left: Int, top: Int, right: Int, bottom: Int) {
+        mainPageRenderer?.onInsetsChange(root, left, top, right, bottom)
     }
 
     override fun addBackPressedListener(listener: BackPressedListener) {

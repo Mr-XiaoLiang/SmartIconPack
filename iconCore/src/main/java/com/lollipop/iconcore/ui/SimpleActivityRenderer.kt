@@ -3,6 +3,8 @@ package com.lollipop.iconcore.ui
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import com.lollipop.iconcore.listener.BackPressedListener
+import com.lollipop.iconcore.listener.OnWindowInsetsListener
 import com.lollipop.iconcore.provider.MainPageRenderer
 import kotlinx.android.extensions.LayoutContainer
 
@@ -10,7 +12,8 @@ import kotlinx.android.extensions.LayoutContainer
  * @author lollipop
  * @date 10/23/20 19:01
  */
-open class SimpleActivityRenderer: MainPageRenderer, LayoutContainer {
+open class SimpleActivityRenderer: MainPageRenderer,
+        LayoutContainer, OnWindowInsetsListener, BackPressedListener {
 
     private var activityView: View? = null
 
@@ -65,6 +68,14 @@ open class SimpleActivityRenderer: MainPageRenderer, LayoutContainer {
 
     override fun onRestoreInstanceState(target: IconPackActivity, savedInstanceState: Bundle) {
 
+    }
+
+    override fun onInsetsChange(root: View, left: Int, top: Int, right: Int, bottom: Int) {
+
+    }
+
+    override fun onBackPressed(): Boolean {
+        return false
     }
 
 }

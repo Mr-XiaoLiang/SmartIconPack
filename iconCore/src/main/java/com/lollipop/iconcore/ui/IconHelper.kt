@@ -186,8 +186,9 @@ class IconHelper(private val context: Context, private val customizeMap: Drawabl
                 when (eventType) {
                     XmlPullParser.START_TAG -> {
                         if (CATEGORY == tagName) {
-                            iconGroup = iconMap[tagName] ?:ArrayList()
-                            iconMap[tagName] = iconGroup
+                            val name = xml.getAttributeValue(null, ATTR_NAME)
+                            iconGroup = iconMap[name] ?:ArrayList()
+                            iconMap[name] = iconGroup
                         } else if (ITEM == tagName) {
                             val name = xml.getAttributeValue(null, ATTR_NAME)
                             val pkg = xml.getAttributeValue(null, ATTR_PKG)
