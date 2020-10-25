@@ -71,6 +71,17 @@
             android:layout_marginLeft="@dimen/left_space"
             app:layout_constraintLeft_toLeftOf="parent"/>
 
+        <ImageView
+            android:id="@+id/supportQuantityIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_baseline_donut_small_24"
+            android:scaleType="fitCenter"
+            app:tint="@color/supportQuantityIcon"
+            app:layout_constraintTop_toTopOf="@id/supportQuantityText"
+            app:layout_constraintBottom_toBottomOf="@id/supportQuantityText"
+            app:layout_constraintLeft_toLeftOf="@id/appName"/>
+
         <TextView
             android:textColor="@color/curtainText"
             android:id="@+id/supportQuantityText"
@@ -79,7 +90,8 @@
             android:textSize="@dimen/title_size"
             android:text="@string/support_quantity"
             app:layout_constraintTop_toBottomOf="@id/appName"
-            app:layout_constraintLeft_toLeftOf="@id/appName"
+            app:layout_constraintLeft_toRightOf="@id/supportQuantityIcon"
+            android:layout_marginLeft="@dimen/mini_space"
             android:layout_marginTop="@dimen/home_space"/>
 
         <TextView
@@ -115,26 +127,31 @@
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:progressDrawable="@drawable/progressbar_round"/>
 
-        <View
-            android:id="@+id/splitLine1"
-            android:layout_width="0px"
-            android:layout_height="1dp"
-            app:layout_constraintTop_toBottomOf="@id/supportQuantityProgress"
-            app:layout_constraintLeft_toLeftOf="@id/appName"
-            app:layout_constraintRight_toRightOf="parent"
-            android:background="@color/splitLine"
-            android:layout_marginTop="@dimen/home_space"/>
-
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/versionBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             app:layout_constraintLeft_toLeftOf="@id/appName"
-            app:layout_constraintTop_toBottomOf="@id/splitLine1"
-            android:layout_marginTop="20dp"
-            android:paddingLeft="@dimen/left_space">
+            app:layout_constraintTop_toBottomOf="@id/supportQuantityProgress"
+            android:layout_marginTop="@dimen/home_space">
+
+            <ImageView
+                android:id="@+id/versionIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_baseline_info_24"
+                android:scaleType="fitCenter"
+                app:tint="@color/versionIcon"
+                app:layout_constraintTop_toTopOf="@id/versionTitle"
+                app:layout_constraintBottom_toBottomOf="@id/versionTitle"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:layout_marginLeft="@dimen/left_space"/>
+
             <TextView
+                app:layout_constraintLeft_toRightOf="@id/versionIcon"
+                android:layout_marginLeft="@dimen/mini_space"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="@dimen/mini_space"
                 android:id="@+id/versionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -142,13 +159,18 @@
                 android:textColor="@color/curtainText"/>
 
             <TextView
+                app:layout_constraintLeft_toLeftOf="@id/versionTitle"
+                app:layout_constraintTop_toBottomOf="@id/versionTitle"
+                android:layout_marginTop="@dimen/mini_space"
                 android:textColor="@color/curtainTextSecondary"
                 android:id="@+id/versionSummary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/summary_size"
                 android:text="@string/summary_version"/>
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

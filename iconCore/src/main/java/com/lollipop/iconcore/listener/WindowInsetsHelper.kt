@@ -10,7 +10,7 @@ import android.view.ViewGroup
  * @date 2020/5/13 23:05
  * 窗口的Insets变化时的辅助处理器
  */
-class WindowInsetsHelper (private val self: View) {
+class WindowInsetsHelper (private val self: View, private val ignoreRootGroup: Boolean = false) {
 
     companion object {
         fun setMargin(self: View?, left: Int, top: Int, right: Int, bottom: Int) {
@@ -38,6 +38,10 @@ class WindowInsetsHelper (private val self: View) {
     private var insetsCallback: (WindowInsetsHelper.(Rect) -> Unit)? = null
 
     init {
+        // 准备就绪后发起一次布局排班
+        self.post {
+            self.requestLayout()
+        }
         if (self.isAttachedToWindow) {
             rootParent = findRootParent(self)
         }
@@ -53,17 +57,38 @@ class WindowInsetsHelper (private val self: View) {
         self.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             if (pendingInsetsList.isNotEmpty()) {
                 val pending = pendingInsetsList.removeAt(0)
+                pendingTask.updateInfo(pending)
+                pendingTask.run()
+            }
+
+        }
+    }
+
+    private val pendingTask = PendingTask(this)
+
+    private class PendingTask(private val windowInsetsHelper: WindowInsetsHelper): Runnable {
+
+        private var pendingInfo: PendingInsets? = null
+
+        fun updateInfo(info: PendingInsets) {
+            pendingInfo = info
+        }
+
+        override fun run() {
+            pendingInfo?.let { pending ->
                 if (pending.isPadding) {
-                    updateByPadding(pending.target,
-                            pending.left, pending.top,
-                            pending.right, pending.bottom)
+                    windowInsetsHelper.updateByPadding(pending.target,
+                        pending.left, pending.top,
+                        pending.right, pending.bottom)
                 } else {
-                    updateByMargin(pending.target,
-                            pending.left, pending.top,
-                            pending.right, pending.bottom)
+                    windowInsetsHelper.updateByMargin(pending.target,
+                        pending.left, pending.top,
+                        pending.right, pending.bottom)
                 }
             }
+            pendingInfo = null
         }
+
     }
 
     fun updateByPadding(view: View, left: Int, top: Int, right: Int, bottom: Int) {
@@ -142,8 +167,12 @@ class WindowInsetsHelper (private val self: View) {
     private fun getLocationInRoot(intArray: IntArray) {
         val selfLoc = IntArray(2)
         self.getLocationInWindow(selfLoc)
+        selfLoc[0] -= self.translationX.toInt()
+        selfLoc[1] -= self.translationY.toInt()
         val rootLoc = IntArray(2) { 0 }
         rootParent?.getLocationInWindow(rootLoc)
+        rootLoc[0] -= rootParent?.translationX?.toInt()?:0
+        rootLoc[1] -= rootParent?.translationY?.toInt()?:0
         intArray[0] = selfLoc[0] - rootLoc[0]
         intArray[1] = selfLoc[1] - rootLoc[1]
     }
@@ -159,7 +188,7 @@ class WindowInsetsHelper (private val self: View) {
      * 检查是否时同一个宿主
      */
     private fun checkParent(view: View): Boolean {
-        rootParent?:return false
+        rootParent?:return ignoreRootGroup
         val parent = findRootParent(view)
         return parent == rootParent
     }

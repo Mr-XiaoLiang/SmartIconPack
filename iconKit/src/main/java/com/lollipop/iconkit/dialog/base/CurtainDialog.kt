@@ -25,7 +25,6 @@ class CurtainDialog private constructor(
     View.OnClickListener,
     ValueAnimator.AnimatorUpdateListener,
     Animator.AnimatorListener,
-    OnWindowInsetsListener,
     BackPressedProvider,
     BackPressedListener,
     InnerDialogProvider.Callback {
@@ -111,10 +110,6 @@ class CurtainDialog private constructor(
     private var once = false
     private var innerDialogProvider: InnerDialogProvider? = null
 
-    private val windowInsetsHelper: WindowInsetsHelper by lazy {
-        WindowInsetsHelper(contentGroup)
-    }
-
     private val backPressedProviderHelper: BackPressedProviderHelper by lazy {
         BackPressedProviderHelper()
     }
@@ -148,15 +143,18 @@ class CurtainDialog private constructor(
                     parent.removeView(dialogView)
                 }
             }
-            innerDialogProvider?.let { provider ->
-                provider.onCreate()
-                val contentView = provider.createContentView(contentGroup)
+            innerDialogProvider?.onCreate()
+            val contentView = innerDialogProvider?.createContentView(contentGroup)
+            if (contentView != null) {
                 contentGroup.addView(contentView)
-                provider.onViewCreated(contentView)
             }
             rootGroup.addView(dialogView)
-            windowInsetsHelper.baseMarginFromNow()
-            onWindowInsetsProvider?.addOnWindowInsetsProvider(this)
+            innerDialogProvider?.let { provider ->
+                if (contentView != null) {
+                    provider.onViewCreated(contentView)
+                }
+                onWindowInsetsProvider?.addOnWindowInsetsProvider(provider)
+            }
         }
         dialogView.post {
             innerDialogProvider?.onStart()
@@ -180,6 +178,9 @@ class CurtainDialog private constructor(
     }
 
     private fun removeView() {
+        this.innerDialogProvider?.let {
+            onWindowInsetsProvider?.removeOnWindowInsetsProvider(it)
+        }
         innerDialogProvider?.onDestroy()
         backPressedProviderHelper.destroy()
         if (dialogView.isAttachedToWindow) {
@@ -189,7 +190,6 @@ class CurtainDialog private constructor(
                 }
             }
         }
-        onWindowInsetsProvider?.removeOnWindowInsetsProvider(this)
     }
 
     private fun doAnimation(open: Boolean) {
@@ -259,10 +259,6 @@ class CurtainDialog private constructor(
         if (pullCurtain) {
             dialogView.visibility = View.VISIBLE
         }
-    }
-
-    override fun onInsetsChange(root: View, left: Int, top: Int, right: Int, bottom: Int) {
-        windowInsetsHelper.updateByMargin(root, left, top, right, bottom)
     }
 
     override fun addBackPressedListener(listener: BackPressedListener) {

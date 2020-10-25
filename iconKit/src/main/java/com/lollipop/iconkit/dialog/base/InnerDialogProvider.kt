@@ -5,13 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.lollipop.iconcore.listener.BackPressedListener
+import com.lollipop.iconcore.listener.OnWindowInsetsListener
 
 /**
  * @author lollipop
  * @date 2020/5/14 22:58
  * 内部Dialog的呈现器
  */
-open class InnerDialogProvider: BackPressedListener {
+open class InnerDialogProvider: BackPressedListener, OnWindowInsetsListener {
 
     private var callback: Callback? = null
 
@@ -77,6 +78,10 @@ open class InnerDialogProvider: BackPressedListener {
         val curtainDialog = CurtainDialog.with(activity)
         curtainDialog.bindProvider(this)
         curtainDialog.show()
+    }
+
+    override fun onInsetsChange(root: View, left: Int, top: Int, right: Int, bottom: Int) {
+
     }
 
 }

@@ -84,8 +84,7 @@ open class MainActivity: SimpleActivityRenderer() {
     }
 
     override fun onInsetsChange(root: View, left: Int, top: Int, right: Int, bottom: Int) {
-//        tabGroupInsetsHelper?.updateByMargin(root, left, top, right, bottom)
-        tabGroupInsetsHelper?.setInsetsByMargin(left, 0, right, bottom)
+        tabGroupInsetsHelper?.updateByMargin(root, left, top, right, bottom)
         log("onInsetsChange: ", root, left, top, right, bottom)
     }
 
