@@ -2,6 +2,7 @@ package com.lollipop.smarticonpack
 
 import android.content.Context
 import com.lollipop.iconcore.ui.IconHelper
+import com.lollipop.iconcore.util.UpdateInfoManager
 import com.lollipop.iconkit.LApplication
 import com.lollipop.iconkit.LIconKit
 
@@ -25,6 +26,11 @@ class SmartApplication: LApplication() {
 
             override fun createRequestPageMap(context: Context): IconHelper.DrawableMap {
                 return LIconKit.createDefXmlMapFromResource(context, R.xml.drawable)
+            }
+
+            override fun createUpdateInfoProvider(context: Context):
+                    UpdateInfoManager.UpdateInfoProvider {
+                return LIconKit.readUpdateInfoByXml(context, R.xml.updates)
             }
         })
     }

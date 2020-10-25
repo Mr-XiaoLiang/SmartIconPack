@@ -9,7 +9,7 @@
     <color name="colorPrimaryText">#ffffff</color>
     <color name="windowBackground">#546e7a</color>
     <color name="contentBackground">#ffffff</color>
-
+    <color name="dialogBackground">#88000000</color>
     <color name="tabBackground">#546e7a</color>
 
     <color name="toolbarIcon">#DDFFFFFF</color>
@@ -27,8 +27,6 @@
     <color name="tabUnselectedColor">#DDFFFFFF</color>
 
     <color name="curtainCard">#D8D8D8</color>
-
-    <color name="linePlatBackground">#F6F6F6</color>
 
     <color name="splitLine">#919191</color>
 

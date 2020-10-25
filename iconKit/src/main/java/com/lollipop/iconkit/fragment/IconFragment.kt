@@ -14,7 +14,7 @@ class IconFragment: BaseTabFragment() {
     override val tabColorId: Int
         get() = R.color.tabIconSelectedColor
     override val layoutId: Int
-        get() = R.layout.kit_fragment_icon
+        get() = R.layout.kit_bottom_dialog
 
 
 }

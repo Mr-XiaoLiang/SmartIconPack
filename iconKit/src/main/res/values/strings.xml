@@ -5,4 +5,5 @@
     <string name="about">关于</string>
     <string name="support_quantity">覆盖率</string>
     <string name="support_quantity_help">当前设备已安装应用的图标覆盖率</string>
+    <string name="summary_version">点击查看版本更新内容</string>
 </resources>

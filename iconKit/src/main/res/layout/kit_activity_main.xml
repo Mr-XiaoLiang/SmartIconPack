@@ -21,12 +21,12 @@
         android:background="@color/tabBackground">
         <liang.lollipop.ltabview.LTabView
             android:id="@+id/tabView"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginStart="@dimen/tab_bar_left"
+            android:layout_marginEnd="@dimen/tab_bar_right"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="6dp"
-            android:layout_marginBottom="6dp"/>
+            android:layout_height="@dimen/tab_bar_height"
+            android:layout_marginTop="@dimen/tab_bar_top"
+            android:layout_marginBottom="@dimen/tab_bar_bottom"/>
     </FrameLayout>
 
 </LinearLayout>

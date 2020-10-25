@@ -10,12 +10,10 @@ import androidx.core.content.PermissionChecker
 import com.lollipop.iconcore.listener.WindowInsetsHelper
 import com.lollipop.iconcore.ui.IconHelper
 import com.lollipop.iconcore.ui.IconView
-import com.lollipop.iconcore.util.IconGroup
-import com.lollipop.iconcore.util.lifecycleBinding
-import com.lollipop.iconcore.util.onEnd
-import com.lollipop.iconcore.util.onStart
+import com.lollipop.iconcore.util.*
 import com.lollipop.iconkit.LIconKit
 import com.lollipop.iconkit.R
+import com.lollipop.iconkit.dialog.UpdateInfoDialog
 import kotlinx.android.synthetic.main.kit_fragment_home.*
 
 /**
@@ -76,17 +74,38 @@ class HomeFragment: BaseTabFragment() {
         supportQuantityProgress.progress = (100F * supportedCount / allAppCount).toInt()
 
         val checkSelfPermission = PermissionChecker.checkSelfPermission(
-                context!!, Manifest.permission.READ_EXTERNAL_STORAGE)
+            context!!, Manifest.permission.READ_EXTERNAL_STORAGE
+        )
         if (checkSelfPermission != PermissionChecker.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_READ_SDCARD)
+            requestPermissions(
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                REQUEST_READ_SDCARD
+            )
         } else {
             setHeadWallpaper()
         }
+
+        versionTitle.text = versionName()
+        versionBtn.setOnClickListener {
+            activity?.let { activity ->
+                val updateInfoProvider = LIconKit.createUpdateInfoProvider(activity)
+                if (updateInfoProvider != null) {
+                    UpdateInfoDialog(UpdateInfoManager(updateInfoProvider)).show(activity)
+                }
+            }
+        }
+    }
+
+    private fun versionName(): String {
+        return context?.let {
+            it.packageManager.getPackageInfo(it.packageName, 0).versionName
+        } ?: "Unknown"
     }
 
     private class IconChangeCallback(
-            private val iconGroup: IconGroup,
-            private val iconFit: (icon: IconView, index: Int) -> Unit): View.OnClickListener {
+        private val iconGroup: IconGroup,
+        private val iconFit: (icon: IconView, index: Int) -> Unit
+    ): View.OnClickListener {
 
         private var isIntAnimation = false
 
@@ -144,7 +163,11 @@ class HomeFragment: BaseTabFragment() {
 
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_READ_SDCARD) {
             val index = permissions.indexOf(Manifest.permission.READ_EXTERNAL_STORAGE)

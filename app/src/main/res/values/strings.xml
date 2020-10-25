@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">智能图标包模板</string>
+
+    <string name="home">主页</string>
+    <string name="icon">图标</string>
+    <string name="about">关于</string>
+    <string name="support_quantity">覆盖率</string>
+    <string name="support_quantity_help">当前设备已安装应用的图标覆盖率</string>
 </resources>

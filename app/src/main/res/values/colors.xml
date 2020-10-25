@@ -11,7 +11,7 @@
     <color name="colorPrimaryText">#ffffff</color>
     <color name="windowBackground">#546e7a</color>
     <color name="contentBackground">#ffffff</color>
-
+    <color name="dialogBackground">#88000000</color>
     <color name="tabBackground">#36464E</color>
 
     <color name="toolbarIcon">#DDFFFFFF</color>

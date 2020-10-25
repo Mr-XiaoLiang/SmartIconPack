@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="dialog_corner_radius">0dp</dimen>
+    <dimen name="dialog_elevation">16dp</dimen>
+    <dimen name="dialog_margin_left">0dp</dimen>
+    <dimen name="dialog_margin_right">0dp</dimen>
+    <dimen name="dialog_margin_bottom">0dp</dimen>
+    <dimen name="header_height">300dp</dimen>
+    <dimen name="preview_icon_size">52dp</dimen>
+    <dimen name="app_name_size">26sp</dimen>
+    <dimen name="home_space">20dp</dimen>
+    <dimen name="title_size">20sp</dimen>
+    <dimen name="left_space">10dp</dimen>
+    <dimen name="top_space">10dp</dimen>
+    <dimen name="summary_size">14sp</dimen>
+    <dimen name="progress_bar_height">24dp</dimen>
+    <dimen name="right_space">10dp</dimen>
+    <dimen name="mini_space">5dp</dimen>
+    <dimen name="tab_bar_height">48dp</dimen>
+    <dimen name="tab_bar_left">10dp</dimen>
+    <dimen name="tab_bar_right">10dp</dimen>
+    <dimen name="tab_bar_top">6dp</dimen>
+    <dimen name="tab_bar_bottom">6dp</dimen>
+</resources>
