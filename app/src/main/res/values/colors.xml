@@ -1,10 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="black">#000000</color>
+
+    <color name="colorPrimary">#FF018786</color>
+    <color name="colorPrimaryDark">#026C6B</color>
+    <color name="colorPrimaryLight">#819ca9</color>
+    <color name="colorAccent">#df9fb4</color>
+    <color name="colorAccentDark">#BC8597</color>
+    <color name="colorAccentLight">#F4B2C7</color>
+    <color name="colorPrimaryText">#ffffff</color>
+    <color name="windowBackground">#546e7a</color>
+    <color name="contentBackground">#ffffff</color>
+
+    <color name="tabBackground">#36464E</color>
+
+    <color name="toolbarIcon">#DDFFFFFF</color>
+    <color name="toolbarTitle">#FFFFFF</color>
+
+    <color name="fabIcon">#DDFFFFFF</color>
+    <color name="fabBackground">#df9fb4</color>
+
+    <color name="radioTextColor">#424242</color>
+
+    <color name="tabHomeSelectedColor">#EF9A9A</color>
+    <color name="tabIconSelectedColor">#80CBC4</color>
+    <color name="tabAboutSelectedColor">#B39DDB</color>
+
+    <color name="tabUnselectedColor">#DDFFFFFF</color>
+
+    <color name="curtainCard">#D8D8D8</color>
+
+    <color name="splitLine">#919191</color>
+
+    <color name="curtainText">#353936</color>
+    <color name="curtainTextSecondary">#585C59</color>
 </resources>

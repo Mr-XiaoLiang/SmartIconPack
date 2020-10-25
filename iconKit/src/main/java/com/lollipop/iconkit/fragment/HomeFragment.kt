@@ -14,6 +14,7 @@ import com.lollipop.iconcore.util.IconGroup
 import com.lollipop.iconcore.util.lifecycleBinding
 import com.lollipop.iconcore.util.onEnd
 import com.lollipop.iconcore.util.onStart
+import com.lollipop.iconkit.LIconKit
 import com.lollipop.iconkit.R
 import kotlinx.android.synthetic.main.kit_fragment_home.*
 
@@ -36,7 +37,7 @@ class HomeFragment: BaseTabFragment() {
     }
 
     private var iconHelper = IconHelper.newHelper {
-        IconHelper.DefaultXmlMap.readFromResource(it, R.xml.appfilter)
+        LIconKit.createHomePageMap(it)
     }
 
     override fun onAttach(context: Context) {

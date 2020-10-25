@@ -3,20 +3,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/rootGroup"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/windowBackground">
 
     <androidx.viewpager2.widget.ViewPager2
         android:layout_width="match_parent"
         android:layout_height="0px"
         android:id="@+id/pageGroup"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:background="@color/contentBackground"/>
 
     <FrameLayout
         android:id="@+id/tabGroup"
         android:elevation="6dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryDark">
+        android:background="@color/tabBackground">
         <liang.lollipop.ltabview.LTabView
             android:id="@+id/tabView"
             android:layout_marginStart="10dp"
