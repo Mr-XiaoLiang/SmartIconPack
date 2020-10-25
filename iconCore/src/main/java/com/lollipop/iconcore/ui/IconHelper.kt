@@ -4,6 +4,8 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ResolveInfo
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.Xml
 import org.xmlpull.v1.XmlPullParser
@@ -23,6 +25,7 @@ class IconHelper(private val customizeMap: DrawableMapProvider? = null) {
         private val EMPTY_ICON_ID = IntArray(0)
         private val EMPTY_COMPONENT = ComponentName("", "")
         private val EMPTY_ICON = IconInfo("", EMPTY_COMPONENT, 0)
+        private val EMPTY_APP_INFO = AppInfo("", "", ColorDrawable(Color.BLACK), EMPTY_ICON_ID)
         fun findDrawableId(context: Context, name: String): Int {
             return context.resources.getIdentifier(
                     name, "drawable", context.packageName)
@@ -81,6 +84,9 @@ class IconHelper(private val customizeMap: DrawableMapProvider? = null) {
         }
 
     fun getAppInfo(index: Int): AppInfo {
+        if (index < 0 || index >= allAppCount) {
+            return EMPTY_APP_INFO
+        }
         if (index < supportedCount) {
             return getSupportedInfo(index)
         }

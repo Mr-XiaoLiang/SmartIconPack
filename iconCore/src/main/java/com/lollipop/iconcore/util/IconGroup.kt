@@ -20,6 +20,14 @@ class IconGroup(private val viewGroup: ViewGroup) {
 
     private val iconIndexList = ArrayList<Int>()
 
+    private val iconShownMap = SparseArray<Int>()
+
+    private val random: Random by lazy {
+        Random()
+    }
+
+    private var allIconCount = 0
+
     val iconCount: Int
         get() {
             return iconIndexList.size
@@ -48,26 +56,48 @@ class IconGroup(private val viewGroup: ViewGroup) {
     }
 
     fun autoFit(allCount: Int, fit: (icon: IconView, index: Int) -> Unit) {
+        allIconCount = allCount
+        iconShownMap.clear()
         if (iconCount < allCount) {
-            val map = SparseArray<Int>()
-            val random = Random()
             for (index in 0 until (min(iconCount, allCount))) {
-                val randomIndex = randomIndex(allCount, map, random)
-                fit(getChildAt(index), randomIndex)
+                val randomIndex = randomIndex(allCount, iconShownMap, random)
+                val child = getChildAt(index)
+                child.iconIndex = randomIndex
+                fit(child, randomIndex)
             }
         } else {
             for (index in 0 until iconCount) {
+                val child = getChildAt(index)
                 if (index < allCount) {
-                    fit(getChildAt(index), index)
+                    fit(child, index)
+                    child.iconIndex = index
+                    iconShownMap[index] = 1
                 } else {
-                    getChildAt(index).loadIcon(0)
+                    child.loadIcon(0)
+                    child.iconIndex = -1
                 }
             }
         }
     }
 
+    fun changeIcon(view: IconView, fit: (icon: IconView, index: Int) -> Unit) {
+        if (allIconCount == 0) {
+            return
+        }
+        val randomIndex = randomIndex(allIconCount, iconShownMap, random)
+        fit(view, randomIndex)
+        iconShownMap[view.iconIndex] = 0
+        view.iconIndex = randomIndex
+    }
+
+    fun forEach(run: (icon: IconView) -> Unit) {
+        for (index in iconIndexList.indices) {
+            run(getChildAt(index))
+        }
+    }
+
     private fun randomIndex(max: Int, map: SparseArray<Int>, random: Random): Int {
-        while (max > map.size()) {
+        while (max > iconCount) {
             val nextInt = random.nextInt(max)
             if (map.get(nextInt, 0) == 0) {
                 map.put(nextInt, 1)

@@ -27,6 +27,8 @@ class IconImageView(context: Context, attr: AttributeSet?, defStyle: Int):
         setImageResource(resources.getIdentifier(iconName, "drawable", context.packageName))
     }
 
+    override var iconIndex = -1
+
     fun load(icon: IconHelper.IconInfo, def: Int = 0) {
         if (icon.resId == 0) {
             if (def != 0) {

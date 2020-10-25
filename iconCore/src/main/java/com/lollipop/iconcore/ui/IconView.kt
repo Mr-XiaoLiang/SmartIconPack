@@ -16,4 +16,9 @@ interface IconView {
      */
     fun loadIcon(iconName: String)
 
+    /**
+     * icon的显示序号，用于辅助展示icon
+     */
+    var iconIndex: Int
+
 }
