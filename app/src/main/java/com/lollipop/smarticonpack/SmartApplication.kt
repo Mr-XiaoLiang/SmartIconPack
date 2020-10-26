@@ -2,6 +2,7 @@ package com.lollipop.smarticonpack
 
 import android.content.Context
 import com.lollipop.iconcore.ui.IconHelper
+import com.lollipop.iconcore.util.ExternalLinkManager
 import com.lollipop.iconcore.util.UpdateInfoManager
 import com.lollipop.iconkit.LApplication
 import com.lollipop.iconkit.LIconKit
@@ -29,8 +30,13 @@ class SmartApplication: LApplication() {
             }
 
             override fun createUpdateInfoProvider(context: Context):
-                    UpdateInfoManager.UpdateInfoProvider {
+                    UpdateInfoManager.UpdateInfoProvider? {
                 return LIconKit.readUpdateInfoByXml(context, R.xml.updates)
+            }
+
+            override fun createLinkInfoProvider(context: Context):
+                    ExternalLinkManager.ExternalLinkProvider? {
+                return LIconKit.readLinkInfoByXml(context, R.xml.links)
             }
         })
     }

@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.Xml
+import com.lollipop.iconcore.util.findDrawableId
 import org.xmlpull.v1.XmlPullParser
 import java.io.Closeable
 import java.util.*
@@ -25,10 +26,9 @@ class IconHelper(private val customizeMap: DrawableMapProvider? = null) {
         private val EMPTY_ICON_ID = IntArray(0)
         private val EMPTY_COMPONENT = ComponentName("", "")
         private val EMPTY_ICON = IconInfo("", EMPTY_COMPONENT, 0)
-        private val EMPTY_APP_INFO = AppInfo("", "", ColorDrawable(Color.BLACK), EMPTY_ICON_ID)
+        private val EMPTY_APP_INFO = AppInfo("", EMPTY_COMPONENT, ColorDrawable(Color.BLACK), EMPTY_ICON_ID)
         fun findDrawableId(context: Context, name: String): Int {
-            return context.resources.getIdentifier(
-                    name, "drawable", context.packageName)
+            return context.findDrawableId(name)
         }
 
         fun parseComponent(info: String): ComponentName {
@@ -67,6 +67,8 @@ class IconHelper(private val customizeMap: DrawableMapProvider? = null) {
 
     private val notSupportList = ArrayList<AppInfo>()
     private val supportedList = ArrayList<AppInfo>()
+    private var iconList = ArrayList<IconInfo>()
+    private var drawableMap: DrawableMap? = null
 
     val allAppCount: Int
         get() {
@@ -82,6 +84,18 @@ class IconHelper(private val customizeMap: DrawableMapProvider? = null) {
         get() {
             return supportedList.size
         }
+
+    val iconCount: Int
+        get() {
+            return iconList.size
+        }
+
+    fun getIconInfo(index: Int): IconInfo {
+        if (index < 0 || index >= iconCount) {
+            return EMPTY_ICON
+        }
+        return iconList[index]
+    }
 
     fun getAppInfo(index: Int): AppInfo {
         if (index < 0 || index >= allAppCount) {
@@ -102,8 +116,12 @@ class IconHelper(private val customizeMap: DrawableMapProvider? = null) {
     }
 
     fun loadAppInfo(context: Context) {
+        if (drawableMap == null) {
+            drawableMap = customizeMap?.getDrawableMap(context)
+        }
         supportedList.clear()
         notSupportList.clear()
+        iconList.clear()
         val pm = context.packageManager
         val mainIntent = Intent(Intent.ACTION_MAIN)
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER)
@@ -112,10 +130,10 @@ class IconHelper(private val customizeMap: DrawableMapProvider? = null) {
         Collections.sort(appList, ResolveInfo.DisplayNameComparator(pm))
         for (appInfo in appList){
             val pkgName = appInfo.activityInfo.packageName
-            val clsName = appInfo.activityInfo.name
-            val iconPack = getIconByPkg(context, pkgName, clsName.fullName(pkgName))
+            val clsName = appInfo.activityInfo.name.fullName(pkgName)
+            val iconPack = getIconByPkg(context, pkgName, clsName)
             val app = AppInfo(
-                    appInfo.loadLabel(pm), pkgName,
+                    appInfo.loadLabel(pm), ComponentName(pkgName, clsName),
                     appInfo.loadIcon(pm), iconPack)
             if (iconPack.isEmpty()) {
                 notSupportList.add(app)
@@ -123,10 +141,30 @@ class IconHelper(private val customizeMap: DrawableMapProvider? = null) {
                 supportedList.add(app)
             }
         }
+        val deduplicationList = ArrayList<Int>()
+        val map = drawableMap
+        if (map == null) {
+            for (app in supportedList) {
+                val iconPack = app.iconPack
+                if (iconPack.isEmpty()) {
+                    continue
+                }
+                for (icon in iconPack) {
+                    if (icon != 0 && deduplicationList.indexOf(icon) < 0) {
+                        deduplicationList.add(icon)
+                        iconList.add(IconInfo(app.name, app.pkg, icon))
+                    }
+                }
+            }
+        } else {
+            for (index in 0 until map.iconCount) {
+                iconList.add(map[index])
+            }
+        }
     }
 
     private fun getIconByPkg(context: Context, pkg: String, cls: String): IntArray {
-        val customize = customizeMap?.getDrawableMap(context)
+        val customize = drawableMap
         if (customize != null) {
             return customize.getDrawableName(pkg, cls)
         }
@@ -159,9 +197,9 @@ class IconHelper(private val customizeMap: DrawableMapProvider? = null) {
         operator fun get(index: Int): IconInfo
     }
 
-    class IconInfo(val name: String, val pkg: ComponentName, val resId: Int)
+    class IconInfo(val name: CharSequence, val pkg: ComponentName, val resId: Int)
 
-    class AppInfo(val name: CharSequence, val pkg: String,
+    class AppInfo(val name: CharSequence, val pkg: ComponentName,
                   val srcIcon: Drawable, val iconPack: IntArray)
 
     class DefaultXmlMap(context: Context, xml: XmlPullParser): DrawableMap {

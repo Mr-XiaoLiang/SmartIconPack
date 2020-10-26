@@ -3,6 +3,7 @@ package com.lollipop.iconcore.ui
 import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
+import com.lollipop.iconcore.util.findDrawableId
 
 /**
  * @author lollipop
@@ -24,7 +25,7 @@ class IconImageView(context: Context, attr: AttributeSet?, defStyle: Int):
     }
 
     override fun loadIcon(iconName: String) {
-        setImageResource(resources.getIdentifier(iconName, "drawable", context.packageName))
+        setImageResource(context.findDrawableId(iconName))
     }
 
     override var iconIndex = -1

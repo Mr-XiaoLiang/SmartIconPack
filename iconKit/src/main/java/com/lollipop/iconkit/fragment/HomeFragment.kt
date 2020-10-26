@@ -4,9 +4,17 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.WallpaperManager
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.PermissionChecker
+import com.google.android.material.snackbar.Snackbar
 import com.lollipop.iconcore.listener.WindowInsetsHelper
 import com.lollipop.iconcore.ui.IconHelper
 import com.lollipop.iconcore.ui.IconView
@@ -94,6 +102,8 @@ class HomeFragment: BaseTabFragment() {
                 }
             }
         }
+
+        bindLinkInfo(linkGroup, ExternalLinkManager(LIconKit.createLinkInfoProvider(context!!)))
     }
 
     private fun versionName(): String {
@@ -186,6 +196,65 @@ class HomeFragment: BaseTabFragment() {
         super.onInsetsChange(root, left, top, right, bottom)
         WindowInsetsHelper.setMargin(previewIcon1, left, top, 0, bottom)
         WindowInsetsHelper.setMargin(previewIcon4, 0, 0, right, 0)
+    }
+
+    private fun bindLinkInfo(group: ViewGroup, linkManager: ExternalLinkManager) {
+        if (linkManager.linkCount < 1) {
+            return
+        }
+        for (index in 0 until linkManager.linkCount) {
+            val holder = LinkItemHolder.create(group)
+            holder.bind(linkManager.getLink(index))
+            group.addView(holder.itemView)
+        }
+    }
+
+    private class LinkItemHolder private constructor(val itemView: View) {
+        companion object {
+            fun create(group: ViewGroup): LinkItemHolder {
+                return LinkItemHolder(
+                    LayoutInflater.from(group.context)
+                        .inflate(R.layout.kit_item_link, group, false)
+                )
+            }
+        }
+
+        fun bind(info: ExternalLinkManager.LinkInfo) {
+            val titleView: TextView = itemView.findViewById(R.id.titleView)
+            val summaryView: TextView = itemView.findViewById(R.id.summaryView)
+            val iconView: ImageView = itemView.findViewById(R.id.iconView)
+
+            OvalOutlineProvider.bind(iconView)
+
+            titleView.text = info.title
+            summaryView.text = info.summary
+            iconView.setImageResource(info.icon)
+            iconView.outlineProvider
+            itemView.setOnClickListener {
+                try {
+                    when(ExternalLinkManager.getLinkType(info.url)) {
+                        ExternalLinkManager.LINK_TYPE_APP -> {
+                            it.context.startActivity(info.url)
+                        }
+                        ExternalLinkManager.LINK_TYPE_STORE -> {
+                            val uri = Uri.parse("market://details?id=${it.context.packageName}")
+                            val intent = Intent(Intent.ACTION_VIEW, uri)
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            it.context.startActivity(intent)
+                        }
+                        ExternalLinkManager.LINK_TYPE_WEB -> {
+                            val webUrl = ExternalLinkManager.getWebUrl(info.url)
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(webUrl))
+                            it.context.startActivity(intent)
+                        }
+                    }
+                } catch (e: Throwable) {
+                    e.printStackTrace()
+                    Snackbar.make(it, R.string.open_link_error, Snackbar.LENGTH_SHORT).show()
+                }
+            }
+        }
+
     }
 
 }

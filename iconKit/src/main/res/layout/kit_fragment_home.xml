@@ -60,6 +60,7 @@
             android:id="@+id/previewIcon4"/>
 
         <TextView
+            android:textStyle="bold"
             android:textColor="@color/colorPrimary"
             android:id="@+id/appName"
             android:layout_width="wrap_content"
@@ -127,13 +128,27 @@
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:progressDrawable="@drawable/progressbar_round"/>
 
+        <Space
+            android:id="@+id/contentAnchor"
+            android:layout_width="1px"
+            android:layout_height="1px"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"/>
+
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:background="@drawable/bg_version_info"
             android:id="@+id/versionBtn"
-            android:layout_width="match_parent"
+            android:layout_width="0px"
             android:layout_height="wrap_content"
             app:layout_constraintLeft_toLeftOf="@id/appName"
             app:layout_constraintTop_toBottomOf="@id/supportQuantityProgress"
-            android:layout_marginTop="@dimen/home_space">
+            app:layout_constraintRight_toLeftOf="@id/contentAnchor"
+            android:layout_marginTop="@dimen/home_space"
+            android:layout_marginRight="@dimen/right_space"
+            android:paddingTop="@dimen/top_space"
+            android:paddingBottom="@dimen/bottom_space">
 
             <ImageView
                 android:id="@+id/versionIcon"
@@ -142,18 +157,19 @@
                 android:src="@drawable/ic_baseline_info_24"
                 android:scaleType="fitCenter"
                 app:tint="@color/versionIcon"
-                app:layout_constraintTop_toTopOf="@id/versionTitle"
-                app:layout_constraintBottom_toBottomOf="@id/versionTitle"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 android:layout_marginLeft="@dimen/left_space"/>
 
             <TextView
                 app:layout_constraintLeft_toRightOf="@id/versionIcon"
-                android:layout_marginLeft="@dimen/mini_space"
+                android:layout_marginLeft="@dimen/left_space"
                 app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="@dimen/mini_space"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_marginRight="@dimen/right_space"
                 android:id="@+id/versionTitle"
-                android:layout_width="wrap_content"
+                android:layout_width="0px"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/title_size"
                 android:textColor="@color/curtainText"/>
@@ -161,16 +177,27 @@
             <TextView
                 app:layout_constraintLeft_toLeftOf="@id/versionTitle"
                 app:layout_constraintTop_toBottomOf="@id/versionTitle"
+                app:layout_constraintRight_toRightOf="@id/versionTitle"
                 android:layout_marginTop="@dimen/mini_space"
                 android:textColor="@color/curtainTextSecondary"
                 android:id="@+id/versionSummary"
-                android:layout_width="wrap_content"
+                android:layout_width="0px"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/summary_size"
                 android:text="@string/summary_version"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-
+        <LinearLayout
+            android:orientation="vertical"
+            android:id="@+id/linkGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/versionBtn"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="@dimen/home_space"
+            android:layout_marginBottom="@dimen/home_bottom"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

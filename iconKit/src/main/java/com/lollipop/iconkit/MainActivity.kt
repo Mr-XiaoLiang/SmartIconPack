@@ -2,7 +2,6 @@ package com.lollipop.iconkit
 
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -10,11 +9,8 @@ import androidx.viewpager2.widget.ViewPager2
 import com.lollipop.iconcore.listener.WindowInsetsHelper
 import com.lollipop.iconcore.ui.IconPackActivity
 import com.lollipop.iconcore.ui.SimpleActivityRenderer
-import com.lollipop.iconkit.fragment.AboutFragment
-import com.lollipop.iconkit.fragment.BaseTabFragment
-import com.lollipop.iconkit.fragment.HomeFragment
-import com.lollipop.iconkit.fragment.IconFragment
-import com.lollipop.iconkit.util.log
+import com.lollipop.iconkit.fragment.*
+import com.lollipop.iconcore.util.log
 import liang.lollipop.ltabview.LTabHelper
 import liang.lollipop.ltabview.LTabView
 
@@ -45,6 +41,7 @@ open class MainActivity: SimpleActivityRenderer() {
         if (customizeFragment.isEmpty()) {
             fragmentList.add(HomeFragment())
             fragmentList.add(IconFragment())
+            fragmentList.add(RequestFragment())
             fragmentList.add(AboutFragment())
         } else {
             fragmentList.addAll(customizeFragment)

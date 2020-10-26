@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <View
+        android:id="@+id/backgroundView"
+        android:layout_width="0px"
+        android:layout_height="0px"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintDimensionRatio="2:3"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <com.lollipop.iconcore.ui.IconImageView
+        android:id="@+id/iconView"
+        android:layout_width="0px"
+        android:layout_height="0px"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_baseline_apps_24"
+        app:layout_constraintWidth_percent="0.6"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintLeft_toLeftOf="@id/backgroundView"
+        app:layout_constraintRight_toRightOf="@id/backgroundView"
+        app:layout_constraintTop_toTopOf="@id/backgroundView"
+        app:layout_constraintBottom_toBottomOf="@id/backgroundView"/>
+
+    <TextView
+        android:id="@+id/nameView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/iconView"
+        app:layout_constraintLeft_toLeftOf="@id/backgroundView"
+        app:layout_constraintRight_toRightOf="@id/backgroundView"
+        app:layout_constraintBottom_toBottomOf="@id/backgroundView"
+        android:maxLines="2"
+        android:textSize="@dimen/summary_size"
+        android:textColor="@color/curtainTextSecondary"
+        android:gravity="center"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

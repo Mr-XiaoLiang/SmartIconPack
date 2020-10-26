@@ -23,6 +23,7 @@
     <color name="tabHomeSelectedColor">#EF9A9A</color>
     <color name="tabIconSelectedColor">#80CBC4</color>
     <color name="tabAboutSelectedColor">#B39DDB</color>
+    <color name="tabRequestSelectedColor">#80A6DF</color>
 
     <color name="tabUnselectedColor">#DDFFFFFF</color>
 

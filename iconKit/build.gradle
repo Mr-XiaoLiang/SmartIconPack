@@ -38,6 +38,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     compile project(path: ':iconCore')
     implementation project(path: ':ltabview')
     implementation 'liang.lollipop.rvbannerlib:rvbannerlib:1.1.0'

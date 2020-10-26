@@ -2,6 +2,7 @@ package com.lollipop.iconkit
 
 import android.content.Context
 import com.lollipop.iconcore.ui.IconHelper
+import com.lollipop.iconcore.util.ExternalLinkManager
 import com.lollipop.iconcore.util.UpdateInfoManager
 
 /**
@@ -32,11 +33,16 @@ object LIconKit {
         return iconMapCreator?.createUpdateInfoProvider(context)
     }
 
+    fun createLinkInfoProvider(context: Context): ExternalLinkManager.ExternalLinkProvider? {
+        return iconMapCreator?.createLinkInfoProvider(context)
+    }
+
     interface IconMapCreator {
         fun createHomePageMap(context: Context): IconHelper.DrawableMap
         fun createAppsPageMap(context: Context): IconHelper.DrawableMap
         fun createRequestPageMap(context: Context): IconHelper.DrawableMap
-        fun createUpdateInfoProvider(context: Context): UpdateInfoManager.UpdateInfoProvider
+        fun createUpdateInfoProvider(context: Context): UpdateInfoManager.UpdateInfoProvider?
+        fun createLinkInfoProvider(context: Context): ExternalLinkManager.ExternalLinkProvider?
     }
 
     fun createDefXmlMapFromResource(context: Context, resId: Int): IconHelper.DrawableMap {
@@ -53,6 +59,10 @@ object LIconKit {
 
     fun readUpdateInfoByJson(json: String): UpdateInfoManager.UpdateInfoProvider {
         return UpdateInfoManager.DefJsonInfoProvider(json)
+    }
+
+    fun readLinkInfoByXml(context: Context, resId: Int): ExternalLinkManager.ExternalLinkProvider {
+        return ExternalLinkManager.DefXmlInfoProvider.readFromResource(context, resId)
     }
 
 }

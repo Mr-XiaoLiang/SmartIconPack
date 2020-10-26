@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<links>
+
+    <link
+        title="为图标包评分吧"
+        summary="如果你喜欢这个图标包，请给个好评吧！"
+        icon="ic_launcher_round"
+        url="store"/>
+
+    <link
+        title="开发者的个人网站"
+        summary="前往开发者的个人小站看看吧"
+        icon="pikachu"
+        url="https://lollipoppp.com/"/>
+
+    <link
+        title="项目开源地址"
+        summary="你可以非商用的下载、分析、使用全部源代码"
+        icon="github"
+        url="https://github.com/Mr-XiaoLiang/SmartIconPack"/>
+
+    <!--  这是打开第三方应用的示例  -->
+    <link
+        title="打开应用设置"
+        summary="打开当前应用的设置界面"
+        icon="ic_launcher_round"
+        url="action(android.settings.APPLICATION_DETAILS_SETTINGS)">
+        <arg type="data">package:com.lollipop.smarticonpack</arg>
+    </link>
+
+<!--    <link  -->
+<!--        title="某个应用"  -->
+<!--        summary="某个应用界面的示例"  -->
+<!--        icon="ic_launcher_round"  -->
+<!--        url="ComponentInfo{com.google.android.apps.messaging/com.google.android.apps.messaging.ui.ConversationListActivity}">  -->
+<!--        <arg name="argName1">arg value</arg>  -->
+<!--        <arg name="argName2">arg value</arg>  -->
+<!--    </link>  -->
+
+</links>

@@ -1,6 +1,22 @@
 package com.lollipop.iconkit.fragment
 
+import android.content.Context
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.lollipop.iconcore.ui.IconHelper
+import com.lollipop.iconcore.util.delay
+import com.lollipop.iconkit.LIconKit
 import com.lollipop.iconkit.R
+import com.lollipop.iconcore.util.doAsync
+import com.lollipop.iconcore.util.onUI
+import com.lollipop.iconkit.dialog.PreviewIconDialog
+import kotlinx.android.synthetic.main.kit_fragment_icon.*
 
 /**
  * @author lollipop
@@ -14,7 +30,89 @@ class IconFragment: BaseTabFragment() {
     override val tabColorId: Int
         get() = R.color.tabIconSelectedColor
     override val layoutId: Int
-        get() = R.layout.kit_bottom_dialog
+        get() = R.layout.kit_fragment_icon
 
+    private val iconHelper = IconHelper(IconHelper.DrawableMapProvider {
+        LIconKit.createAppsPageMap(it)
+    })
+
+    private val previewIconDialog = PreviewIconDialog()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        addBackPressedListener(previewIconDialog)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val column = resources.getInteger(R.integer.app_list_column)
+        appList.layoutManager = GridLayoutManager(
+            view.context, column, RecyclerView.VERTICAL, false)
+        appList.adapter = IconAdapter(iconHelper) { view, icon ->
+            previewIconDialog.show(view, icon)
+        }
+        doAsync {
+            iconHelper.loadAppInfo(context!!)
+            delay(appList.animate().duration) {
+                appList.adapter?.notifyItemRangeInserted(0, iconHelper.iconCount)
+            }
+        }
+        appList.post {
+            previewIconDialog.attach(activity!!)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        previewIconDialog.onDestroy()
+    }
+
+    private class IconAdapter(
+        private val iconHelper: IconHelper,
+        private val onClick: (View, Int) -> Unit): RecyclerView.Adapter<IconHolder>() {
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IconHolder {
+            return IconHolder.create(parent) { view, index ->
+                onClick(view, iconHelper.getIconInfo(index).resId)
+            }
+        }
+
+        override fun onBindViewHolder(holder: IconHolder, position: Int) {
+            holder.bind(iconHelper.getIconInfo(position))
+        }
+
+        override fun getItemCount(): Int {
+            return iconHelper.iconCount
+        }
+    }
+
+    private class IconHolder
+        private constructor(
+            view: View,
+            private val onClick: (View, Int) -> Unit): RecyclerView.ViewHolder(view) {
+
+        companion object {
+            fun create(group: ViewGroup, onClick: (View, Int) -> Unit): IconHolder {
+                return IconHolder(
+                    LayoutInflater.from(group.context)
+                        .inflate(R.layout.kit_item_icon, group, false), onClick)
+            }
+        }
+
+        private val iconView: ImageView = itemView.findViewById(R.id.iconView)
+        private val nameView: TextView = itemView.findViewById(R.id.nameView)
+
+        init {
+            itemView.setOnClickListener {
+                onClick(iconView, adapterPosition)
+            }
+        }
+
+        fun bind(iconInfo: IconHelper.IconInfo) {
+            iconView.setImageResource(iconInfo.resId)
+            nameView.text = iconInfo.name
+        }
+
+    }
 
 }

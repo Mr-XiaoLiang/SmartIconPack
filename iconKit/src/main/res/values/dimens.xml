@@ -8,7 +8,7 @@
     <dimen name="header_height">300dp</dimen>
     <dimen name="preview_icon_size">52dp</dimen>
     <dimen name="app_name_size">26sp</dimen>
-    <dimen name="home_space">20dp</dimen>
+    <dimen name="home_space">24dp</dimen>
     <dimen name="title_size">20sp</dimen>
     <dimen name="left_space">10dp</dimen>
     <dimen name="top_space">10dp</dimen>
@@ -21,4 +21,10 @@
     <dimen name="tab_bar_right">10dp</dimen>
     <dimen name="tab_bar_top">6dp</dimen>
     <dimen name="tab_bar_bottom">6dp</dimen>
+    <dimen name="bottom_space">10dp</dimen>
+    <dimen name="home_bottom">30dp</dimen>
+    <dimen name="link_title">18sp</dimen>
+    <dimen name="link_summary">14sp</dimen>
+    
+    <integer name="app_list_column">5</integer>
 </resources>

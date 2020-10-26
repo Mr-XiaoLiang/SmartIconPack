@@ -1,4 +1,4 @@
-package com.lollipop.iconkit.util
+package com.lollipop.iconcore.util
 
 import android.app.Activity
 import android.content.Context
@@ -14,7 +14,6 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.core.content.ContextCompat
-import java.util.*
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
@@ -349,4 +348,17 @@ fun Int.range(min: Int, max: Int): Int {
         return max
     }
     return this
+}
+
+fun Context.findDrawableId(name: String): Int {
+    var icon = findId(name, "drawable")
+    if (icon != 0) {
+        return icon
+    }
+    icon = findId(name, "mipmap")
+    return icon
+}
+
+fun Context.findId(name: String, type: String): Int {
+    return resources.getIdentifier(name, type, packageName)
 }

@@ -2,8 +2,10 @@
     <string name="app_name">LIconPackKit</string>
     <string name="home">主页</string>
     <string name="icon">图标</string>
+    <string name="request">适配</string>
     <string name="about">关于</string>
     <string name="support_quantity">覆盖率</string>
     <string name="support_quantity_help">当前设备已安装应用的图标覆盖率</string>
     <string name="summary_version">点击查看版本更新内容</string>
+    <string name="open_link_error">找不到可以打开的应用</string>
 </resources>

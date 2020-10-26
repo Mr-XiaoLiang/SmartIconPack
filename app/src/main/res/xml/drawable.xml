@@ -50,10 +50,10 @@
     <item drawable="ic_settings" name="设置" />
 
     <category title="All"/>
-    <item drawable="cm_gallery" name="CM图库" />
+    <item drawable="cm_gallery" name="CM 图库" />
     <item drawable="cm_music" name="CM 音乐" />
     <item drawable="moto_camera" name="Motorola 相机" />
-    <item drawable="cm_calendar" name="CM_日历" />
+    <item drawable="cm_calendar" name="CM 日历" />
     <item drawable="cm_browser" name="CM 浏览器 旧" />
     <item drawable="cm_browser_new" name="CM 浏览器" />
     <item drawable="cm_massage" name="CM 信息 旧" />

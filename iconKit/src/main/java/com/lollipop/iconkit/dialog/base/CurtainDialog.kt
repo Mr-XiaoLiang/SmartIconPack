@@ -66,7 +66,7 @@ class CurtainDialog private constructor(
             )
         }
 
-        private fun findGroup(rootGroup: View?): ViewGroup? {
+        fun findGroup(rootGroup: View?): ViewGroup? {
             rootGroup ?: return null
             if (rootGroup is CoordinatorLayout) {
                 return rootGroup
