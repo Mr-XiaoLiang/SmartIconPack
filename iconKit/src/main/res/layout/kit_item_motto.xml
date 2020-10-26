@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textSize="@dimen/motto_size"
+    android:textColor="@color/curtainTextSecondary"
+    android:paddingTop="@dimen/top_space"
+    android:paddingBottom="@dimen/bottom_space"
+    android:paddingStart="@dimen/left_space"
+    android:paddingEnd="@dimen/right_space"
+    android:gravity="center"
+    android:id="@+id/mottoValueView"/>

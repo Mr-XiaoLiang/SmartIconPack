@@ -3,6 +3,7 @@ package com.lollipop.smarticonpack
 import android.content.Context
 import com.lollipop.iconcore.ui.IconHelper
 import com.lollipop.iconcore.util.ExternalLinkManager
+import com.lollipop.iconcore.util.MakerInfoManager
 import com.lollipop.iconcore.util.UpdateInfoManager
 import com.lollipop.iconkit.LApplication
 import com.lollipop.iconkit.LIconKit
@@ -37,6 +38,16 @@ class SmartApplication: LApplication() {
             override fun createLinkInfoProvider(context: Context):
                     ExternalLinkManager.ExternalLinkProvider? {
                 return LIconKit.readLinkInfoByXml(context, R.xml.links)
+            }
+
+            override fun createMakerInfoProvider(context: Context): MakerInfoManager.MakerInfoProvider? {
+                return object: MakerInfoManager.MakerInfoProvider {
+                    override val icon = R.drawable.pikachu
+                    override val name = R.string.maker_name
+                    override val signature = R.string.maker_sign
+                    override val mottoArray = R.array.maker_motto
+                    override val background = R.drawable.header
+                }
             }
         })
     }

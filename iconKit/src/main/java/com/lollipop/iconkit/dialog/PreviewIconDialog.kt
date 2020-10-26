@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewManager
 import com.lollipop.iconcore.listener.BackPressedListener
 import com.lollipop.iconcore.ui.IconImageView
-import com.lollipop.iconcore.util.log
 import com.lollipop.iconkit.R
 import com.lollipop.iconkit.dialog.base.CurtainDialog
 

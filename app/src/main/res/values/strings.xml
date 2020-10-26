@@ -6,4 +6,10 @@
     <string name="about">关于</string>
     <string name="support_quantity">覆盖率</string>
     <string name="support_quantity_help">当前设备已安装应用的图标覆盖率</string>
+    <string name="maker_name">Lollipop</string>
+    <string name="maker_sign">一个喜欢Android的初学者</string>
+    <string-array name="maker_motto">
+        <item>必须很努力</item>
+        <item>才能看起来毫不费力</item>
+    </string-array>
 </resources>

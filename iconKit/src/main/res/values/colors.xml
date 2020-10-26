@@ -36,4 +36,6 @@
     <color name="supportQuantityIcon">#00B591</color>
     <color name="versionIcon">#E49800</color>
     <color name="preview_background">#FAFAFA</color>
+    <color name="maker_name">#353936</color>
+    <color name="maker_signature">#353936</color>
 </resources>

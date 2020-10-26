@@ -25,6 +25,7 @@
     <dimen name="home_bottom">30dp</dimen>
     <dimen name="link_title">18sp</dimen>
     <dimen name="link_summary">14sp</dimen>
-    
+    <dimen name="motto_size">16sp</dimen>
+
     <integer name="app_list_column">5</integer>
 </resources>

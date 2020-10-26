@@ -1,8 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#00f">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:layout_width="0px"
+        android:layout_height="0px"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/headerBottom"
+        android:id="@+id/headerImageView"
+        android:scaleType="centerCrop"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="@dimen/header_height"
+        android:id="@+id/headerBottom"
+        android:background="@color/splitLine"/>
+
+    <ImageView
+        android:layout_width="0px"
+        android:layout_height="0px"
+        app:layout_constraintWidth_percent="0.2"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintTop_toTopOf="@id/headerBottom"
+        app:layout_constraintBottom_toBottomOf="@id/headerBottom"
+        android:layout_marginLeft="@dimen/left_space"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:id="@+id/makerLogo"
+        android:scaleType="centerCrop"
+        android:background="@color/curtainCard"/>
+
+    <TextView
+        android:layout_width="0px"
+        android:layout_height="wrap_content"
+        android:id="@+id/makerName"
+        app:layout_constraintLeft_toRightOf="@id/makerLogo"
+        app:layout_constraintBottom_toBottomOf="@id/headerBottom"
+        android:layout_marginLeft="@dimen/left_space"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginRight="@dimen/right_space"
+        android:textColor="@color/maker_name"
+        android:textStyle="bold"
+        android:layout_marginBottom="@dimen/mini_space"
+        android:text="@string/app_name"
+        android:textSize="@dimen/title_size"/>
+
+    <TextView
+        android:layout_width="0px"
+        android:layout_height="wrap_content"
+        android:id="@+id/makerSignature"
+        app:layout_constraintLeft_toRightOf="@id/makerLogo"
+        app:layout_constraintTop_toBottomOf="@id/headerBottom"
+        android:layout_marginLeft="@dimen/left_space"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginRight="@dimen/right_space"
+        android:textColor="@color/maker_signature"
+        android:layout_marginTop="@dimen/mini_space"
+        android:text="@string/app_name"
+        android:textSize="@dimen/summary_size"/>
+
+    <ImageView
+        android:id="@+id/supporterLogo"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/supporterName"
+        android:layout_marginBottom="@dimen/bottom_space"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_supporter_logo"
+        app:tint="@color/curtainText"/>
+    <TextView
+        android:id="@+id/supporterName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/supporterLogo"
+        app:layout_constraintLeft_toRightOf="@id/supporterLogo"
+        app:layout_constraintRight_toRightOf="parent"
+        android:text="Lollipop "
+        android:textStyle="italic"
+        android:textSize="@dimen/title_size"
+        android:layout_marginLeft="@dimen/mini_space"
+        android:textColor="@color/curtainText"/>
+
+    <TextView
+        android:id="@+id/powerBy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintRight_toRightOf="@id/supporterLogo"
+        app:layout_constraintBottom_toTopOf="@id/supporterLogo"
+        android:text="@string/power_by"
+        android:layout_marginBottom="@dimen/mini_space"
+        android:textColor="@color/curtainText"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/mottoList"
+        android:layout_width="0px"
+        android:layout_height="0px"
+        app:layout_constraintTop_toBottomOf="@id/makerLogo"
+        app:layout_constraintBottom_toTopOf="@id/powerBy"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintWidth_percent="0.6"
+        android:layout_marginTop="@dimen/top_space"
+        android:layout_marginBottom="@dimen/bottom_space"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
