@@ -39,6 +39,16 @@ class PreviewIconDialog: BackPressedListener,
             return dialogView?.findViewById(R.id.iconView)
         }
 
+    private val leftPanel: View?
+        get() {
+            return dialogView?.findViewById(R.id.leftPanel)
+        }
+
+    private val rightPanel: View?
+        get() {
+            return dialogView?.findViewById(R.id.rightPanel)
+        }
+
     private var progress = 0F
 
     private val animator = ValueAnimator().apply {
@@ -88,6 +98,12 @@ class PreviewIconDialog: BackPressedListener,
             translationX = 0F
             translationY = 0F
         }
+        leftPanel?.let {
+            it.translationX = it.width.toFloat() * -1
+        }
+        rightPanel?.let {
+            it.translationX = it.width.toFloat()
+        }
         preview.loadIcon(icon)
         initInfo(view, preview)
         view.visibility = View.INVISIBLE
@@ -118,12 +134,11 @@ class PreviewIconDialog: BackPressedListener,
         targetLoc[1] += target.height / 2
         intArray[0] = targetLoc[0] - selfLoc[0]
         intArray[1] = targetLoc[1] - selfLoc[1]
-//        log("[${selfLoc[0]}, ${selfLoc[1]}]  [${targetLoc[0]}, ${targetLoc[1]}]")
-//        log("[${selfLoc[0]}, ${selfLoc[1]}] ${self.width} * ${self.height}  ${self.translationX} * ${self.translationY} ")
     }
 
     private fun dismiss() {
         doAnimation(false)
+        closePanel()
     }
 
     private fun doAnimation(isShow: Boolean) {
@@ -155,6 +170,34 @@ class PreviewIconDialog: BackPressedListener,
         background.alpha = progress
     }
 
+    private fun closePanel() {
+        val left = leftPanel?:return
+        left.animate()?.apply {
+            cancel()
+            translationX(left.width.toFloat() * -1)
+            start()
+        }
+        val right = rightPanel?:return
+        right.animate()?.apply {
+            cancel()
+            translationX(right.width.toFloat())
+            start()
+        }
+    }
+
+    private fun openPanel() {
+        leftPanel?.animate()?.apply {
+            cancel()
+            translationX(0F)
+            start()
+        }
+        rightPanel?.animate()?.apply {
+            cancel()
+            translationX(0F)
+            start()
+        }
+    }
+
     override fun onAnimationUpdate(animation: ValueAnimator?) {
         if (animation == animator) {
             progress = animation.animatedValue as Float
@@ -169,9 +212,14 @@ class PreviewIconDialog: BackPressedListener,
     }
 
     override fun onAnimationEnd(animation: Animator?) {
-        if (animation == animator && progress < 0.1F) {
-            dialogView?.visibility = View.INVISIBLE
-            targetView?.visibility = View.VISIBLE
+        if (animation == animator) {
+            if (progress < 0.1F) {
+                dialogView?.visibility = View.INVISIBLE
+                targetView?.visibility = View.VISIBLE
+            }
+            if (progress > 0.9F) {
+                openPanel()
+            }
         }
     }
 

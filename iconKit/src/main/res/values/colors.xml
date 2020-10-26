@@ -35,4 +35,5 @@
     <color name="curtainTextSecondary">#585C59</color>
     <color name="supportQuantityIcon">#00B591</color>
     <color name="versionIcon">#E49800</color>
+    <color name="preview_background">#FAFAFA</color>
 </resources>

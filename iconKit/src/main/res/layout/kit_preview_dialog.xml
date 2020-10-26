@@ -10,7 +10,28 @@
         android:id="@+id/backgroundView"
         android:background="@color/dialogBackground"/>
 
+    <View
+        android:layout_width="0px"
+        android:layout_height="0px"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iconView"
+        app:layout_constraintBottom_toBottomOf="@id/iconView"
+        app:layout_constraintWidth_percent="0.5"
+        android:id="@+id/leftPanel"
+        android:background="@color/preview_background"/>
+
+    <View
+        android:layout_width="0px"
+        android:layout_height="0px"
+        app:layout_constraintLeft_toRightOf="@id/leftPanel"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iconView"
+        app:layout_constraintBottom_toBottomOf="@id/iconView"
+        android:id="@+id/rightPanel"
+        android:background="@color/preview_background"/>
+
     <com.lollipop.iconcore.ui.IconImageView
+        android:elevation="6dp"
         android:id="@+id/iconView"
         android:layout_width="0px"
         android:layout_height="0px"
