@@ -35,8 +35,7 @@ class XmlBuilder private constructor(private val tag: String) {
                 builder.addChild(ITEM)
                     .addAttr(IconHelper.ATTR_NAME, info.name.toString())
                     .addAttr(IconHelper.ATTR_COMPONENT, info.pkg.toString())
-                    .addAttr(IconHelper.ATTR_DRAWABLE,
-                        info.pkg.packageName.replace(".", "_"))
+                    .addAttr(IconHelper.ATTR_DRAWABLE, info.drawableName)
             }
             return builder
         }

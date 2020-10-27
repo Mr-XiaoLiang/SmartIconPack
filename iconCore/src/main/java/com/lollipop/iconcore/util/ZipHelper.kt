@@ -8,6 +8,7 @@ import java.time.temporal.Temporal
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import kotlin.collections.ArrayList
 
 /**
  * @author lollipop
@@ -52,6 +53,13 @@ class ZipHelper private constructor (private var zipFile: File) {
 
     fun addFile(file: File): ZipHelper {
         fileList.addLast(FileEntry.create(file))
+        return this
+    }
+
+    fun addFiles(files: List<File>): ZipHelper {
+        for (file in files) {
+            addFile(file)
+        }
         return this
     }
 

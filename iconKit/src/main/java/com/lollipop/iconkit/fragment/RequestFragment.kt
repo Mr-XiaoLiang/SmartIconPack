@@ -124,8 +124,16 @@ class RequestFragment : BaseTabFragment() {
             val cacheDir = cont.cacheDir
             val xmlFile = File(cacheDir, "request.xml")
             builder.writeTo(xmlFile)
+
+            val iconSaveHelper = IconSaveHelper(220)
+            for (icon in selectedApp) {
+                iconSaveHelper.add(icon.app.srcIcon, icon.app.drawableName)
+            }
+            iconSaveHelper.saveTo(cacheDir)
+
             ZipHelper.zipTo(cacheDir, "Request_${selectedApp.size}")
                 .addFile(xmlFile)
+                .addFiles(iconSaveHelper.getFiles())
                 .removeExists()
                 .startUp { zipFile ->
                     val usedTime = System.currentTimeMillis() - startTime

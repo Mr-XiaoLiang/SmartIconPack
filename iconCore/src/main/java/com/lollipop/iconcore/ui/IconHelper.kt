@@ -304,7 +304,14 @@ class IconHelper private constructor(
     class IconInfo(val name: CharSequence, val pkg: ComponentName, val resId: Int)
 
     class AppInfo(val name: CharSequence, val pkg: ComponentName,
-                  val srcIcon: Drawable, val iconPack: IntArray)
+                  val srcIcon: Drawable, val iconPack: IntArray) {
+        val drawableName: String by lazy {
+            pkg.className
+                .fullName(pkg.packageName)
+                .replace(".", "_")
+                .toLowerCase()
+        }
+    }
 
     class DefaultXmlMap(context: Context, xml: XmlPullParser): DrawableMap {
 
