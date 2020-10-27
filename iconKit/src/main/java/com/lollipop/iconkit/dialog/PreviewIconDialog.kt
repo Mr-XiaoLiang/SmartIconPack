@@ -88,6 +88,11 @@ class PreviewIconDialog: BackPressedListener,
 
     fun show(view: View, icon: Int) {
         val preview = previewView?:return
+
+        targetView?.let {
+            it.visibility = View.VISIBLE
+        }
+
         targetView = view
 
         progress = 0F
@@ -105,7 +110,6 @@ class PreviewIconDialog: BackPressedListener,
         }
         preview.loadIcon(icon)
         initInfo(view, preview)
-        view.visibility = View.INVISIBLE
         doAnimation(true)
     }
 
@@ -207,6 +211,9 @@ class PreviewIconDialog: BackPressedListener,
     override fun onAnimationStart(animation: Animator?) {
         if (animation == animator && dialogView?.visibility != View.VISIBLE) {
             dialogView?.visibility = View.VISIBLE
+        }
+        targetView?.let {
+            it.visibility = View.INVISIBLE
         }
     }
 
