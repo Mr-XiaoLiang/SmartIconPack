@@ -1,17 +1,17 @@
 <resources>
     <string name="app_name">LIconPackKit</string>
-    <string name="home">主页</string>
-    <string name="icon">图标</string>
-    <string name="request">适配</string>
-    <string name="about">关于</string>
-    <string name="support_quantity">覆盖率</string>
-    <string name="support_quantity_help">当前设备已安装应用的图标覆盖率</string>
-    <string name="summary_version">点击查看版本更新内容</string>
-    <string name="open_link_error">找不到可以打开的应用</string>
+    <string name="home">Home</string>
+    <string name="icon">Icons</string>
+    <string name="request">Request</string>
+    <string name="about">About</string>
+    <string name="support_quantity">Coverage</string>
+    <string name="support_quantity_help">The icon coverage of the installed applications on the current device</string>
+    <string name="summary_version">Click to view the updated content of the version</string>
+    <string name="open_link_error">Cannot find an application that can be opened</string>
     <string name="power_by">power by</string>
-    <string name="chosen">已选择 %1$d</string>
-    <string name="send">发送</string>
-    <string name="request_title">适配申请</string>
-    <string name="title_choose_email">请选择邮件类应用</string>
-    <string name="email_request_subject">图标包适配申请</string>
+    <string name="chosen">Has selected %1$d</string>
+    <string name="send">send</string>
+    <string name="request_title">Request icon</string>
+    <string name="title_choose_email">Please select mail application</string>
+    <string name="email_request_subject">Icon package adaptation application</string>
 </resources>

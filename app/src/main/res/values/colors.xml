@@ -25,6 +25,7 @@
     <color name="tabHomeSelectedColor">#EF9A9A</color>
     <color name="tabIconSelectedColor">#80CBC4</color>
     <color name="tabAboutSelectedColor">#B39DDB</color>
+    <color name="tabRequestSelectedColor">#80A6DF</color>
 
     <color name="tabUnselectedColor">#DDFFFFFF</color>
 
@@ -34,4 +35,9 @@
 
     <color name="curtainText">#353936</color>
     <color name="curtainTextSecondary">#585C59</color>
+    <color name="supportQuantityIcon">#00B591</color>
+    <color name="versionIcon">#E49800</color>
+    <color name="preview_background">#FAFAFA</color>
+    <color name="maker_name">#353936</color>
+    <color name="maker_signature">#353936</color>
 </resources>

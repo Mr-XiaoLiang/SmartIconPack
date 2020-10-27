@@ -109,12 +109,14 @@
         <TextView
             android:textColor="@color/curtainTextSecondary"
             android:id="@+id/supportQuantityHelp"
-            android:layout_width="wrap_content"
+            android:layout_width="0px"
             android:layout_height="wrap_content"
             android:textSize="@dimen/summary_size"
             android:text="@string/support_quantity_help"
             app:layout_constraintTop_toBottomOf="@id/supportQuantityText"
-            app:layout_constraintLeft_toLeftOf="@id/supportQuantityText"/>
+            app:layout_constraintLeft_toLeftOf="@id/supportQuantityText"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginRight="@dimen/right_space"/>
 
         <ProgressBar
             android:id="@+id/supportQuantityProgress"

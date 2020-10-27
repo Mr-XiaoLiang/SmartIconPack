@@ -1,12 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">L图标包模板</string>
+    <string name="app_name">LIconPackKit</string>
     <string name="home">主页</string>
     <string name="icon">图标</string>
+    <string name="request">适配</string>
     <string name="about">关于</string>
     <string name="support_quantity">覆盖率</string>
     <string name="support_quantity_help">当前设备已安装应用的图标覆盖率</string>
-
-    <string name="request">适配</string>
     <string name="summary_version">点击查看版本更新内容</string>
     <string name="open_link_error">找不到可以打开的应用</string>
     <string name="power_by">power by</string>
@@ -15,12 +15,4 @@
     <string name="request_title">适配申请</string>
     <string name="title_choose_email">请选择邮件类应用</string>
     <string name="email_request_subject">图标包适配申请</string>
-
-    <string name="maker_name">Lollipop</string>
-    <string name="maker_sign">一个喜欢Android的初学者</string>
-    <string-array name="maker_motto">
-        <item>必须很努力</item>
-        <item>才能看起来毫不费力</item>
-    </string-array>
-    <string name="maker_email">lollipop8555@gmail.com</string>
 </resources>
