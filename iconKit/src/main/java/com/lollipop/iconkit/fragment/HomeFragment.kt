@@ -46,15 +46,20 @@ class HomeFragment: BaseTabFragment() {
         LIconKit.createHomePageMap(it)
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        iconHelper.loadAppInfo(context)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initView()
+        doAsync {
+            iconHelper.loadAppInfo(view.context)
+            onUI {
+                initIconView()
+            }
+        }
+
     }
 
     @SuppressLint("SetTextI18n")
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+    private fun initIconView() {
         val supportedCount = iconHelper.supportedCount
         val allAppCount = iconHelper.allAppCount
 
@@ -80,6 +85,9 @@ class HomeFragment: BaseTabFragment() {
 
         supportQuantityValue.text = "$supportedCount/$allAppCount"
         supportQuantityProgress.progress = (100F * supportedCount / allAppCount).toInt()
+    }
+
+    private fun initView() {
 
         val checkSelfPermission = PermissionChecker.checkSelfPermission(
             context!!, Manifest.permission.READ_EXTERNAL_STORAGE

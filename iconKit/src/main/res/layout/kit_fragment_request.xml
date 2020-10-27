@@ -3,19 +3,41 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.RequestFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragment.RequestFragment"
+    android:background="@color/contentBackground">
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/appList"/>
 
-    <TextView
+    <FrameLayout
+        android:id="@+id/floatingPanel"
         android:visibility="invisible"
-        android:id="@+id/floatingTextView"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:textSize="@dimen/title_size"
-        android:gravity="center"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/contentBackground">
+        <TextView
+            android:id="@+id/floatingTextView"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:textSize="20sp"
+            android:layout_marginTop="@dimen/top_space"
+            android:layout_marginBottom="@dimen/bottom_space"
+            android:gravity="center"/>
+    </FrameLayout>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        app:icon="@drawable/ic_baseline_send_24"
+        app:iconTint="@color/fabIcon"
+        android:textColor="@color/fabIcon"
+        android:backgroundTint="@color/fabBackground"
+        android:text="@string/chosen"
+        android:layout_marginBottom="@dimen/bottom_space"
+        android:layout_marginRight="@dimen/right_space"/>
 
 </FrameLayout>

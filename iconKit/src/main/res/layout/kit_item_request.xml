@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingBottom="@dimen/bottom_space">
+
+    <TextView
+        android:id="@+id/tagTextView"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/top_space"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="L"/>
+
+    <com.lollipop.iconcore.ui.IconImageView
+        android:layout_width="0px"
+        android:layout_height="0px"
+        android:id="@+id/iconView"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintLeft_toRightOf="@id/tagTextView"
+        app:layout_constraintTop_toTopOf="@id/tagTextView"
+        app:layout_constraintBottom_toBottomOf="@id/tagTextView" />
+
+    <TextView
+        android:id="@+id/labelView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/iconView"
+        app:layout_constraintTop_toTopOf="@id/iconView"
+        app:layout_constraintBottom_toTopOf="@id/pkgView"
+        android:textColor="@color/curtainText"
+        android:textSize="@dimen/link_title"
+        android:text="@string/app_name"
+        android:layout_marginLeft="@dimen/left_space"
+        android:singleLine="true"
+        android:maxLines="1"
+        android:ellipsize="end"/>
+
+    <TextView
+        android:layout_marginTop="@dimen/mini_space"
+        android:id="@+id/pkgView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@id/labelView"
+        app:layout_constraintTop_toBottomOf="@id/labelView"
+        app:layout_constraintBottom_toBottomOf="@id/iconView"
+        android:textColor="@color/curtainTextSecondary"
+        android:textSize="@dimen/summary_size"
+        android:text="@string/app_name"
+        android:singleLine="true"
+        android:maxLines="1"
+        android:ellipsize="end"/>
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/checkBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iconView"
+        app:layout_constraintBottom_toBottomOf="@id/iconView"
+        android:layout_marginRight="@dimen/right_space"
+        android:clickable="false"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
