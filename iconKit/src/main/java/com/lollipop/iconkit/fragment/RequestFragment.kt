@@ -57,6 +57,10 @@ class RequestFragment : BaseTabFragment() {
             appAdapter.selectAll()
         }
 
+        sendRequestBtn.setOnClickListener {
+            createRequest()
+        }
+
         onSelectedChange(0)
 
         doAsync {
@@ -73,7 +77,16 @@ class RequestFragment : BaseTabFragment() {
     }
 
     private fun onSelectedChange(count: Int) {
-        titleView.text = String.format(getString(R.string.chosen), count)
+        subtitleView.text = String.format(getString(R.string.chosen), count)
+        if (count == 0) {
+            sendRequestBtn.hide()
+        } else {
+            sendRequestBtn.show()
+        }
+    }
+
+    private fun createRequest() {
+        val selectedApp = appAdapter.selectedApp
     }
 
     override fun onInsetsChange(root: View, left: Int, top: Int, right: Int, bottom: Int) {
@@ -203,7 +216,7 @@ class RequestFragment : BaseTabFragment() {
             private const val FOOTER_EMPTY = 1
         }
 
-        private val selectedApp = ArrayList<RequestAppInfo>()
+        val selectedApp = ArrayList<RequestAppInfo>()
 
         override fun onCreateViewHolder(
             parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

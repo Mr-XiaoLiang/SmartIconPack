@@ -33,6 +33,15 @@ class IconHelper private constructor(
         const val FLAG_ALL_INFO = 0xFFFFFF
         const val FLAG_FULL_APP_INFO = FLAG_SUPPORTED_INFO or FLAG_UNSUPPORTED_INFO
 
+        const val CATEGORY = "category"
+        const val ITEM = "item"
+        const val CATEGORY_DEFAULT = "default"
+
+        const val ATTR_NAME = "name"
+        const val ATTR_TITLE = "title"
+        const val ATTR_COMPONENT = "component"
+        const val ATTR_DRAWABLE = "drawable"
+
         private val EMPTY_ICON_ID = IntArray(0)
         private val EMPTY_COMPONENT = ComponentName("", "")
         private val EMPTY_ICON = IconInfo("", EMPTY_COMPONENT, 0)
@@ -308,14 +317,6 @@ class IconHelper private constructor(
         }
 
         companion object {
-            private const val CATEGORY = "category"
-            private const val ITEM = "item"
-            const val CATEGORY_DEFAULT = "default"
-
-            private const val ATTR_NAME = "name"
-            private const val ATTR_TITLE = "title"
-            private const val ATTR_COMPONENT = "component"
-            private const val ATTR_DRAWABLE = "drawable"
 
             fun readFromAssets(context: Context, name: String): DefaultXmlMap {
                 val newPullParser = Xml.newPullParser()

@@ -11,4 +11,5 @@
     <string name="power_by">power by</string>
     <string name="chosen">已选择 %1$d</string>
     <string name="send">发送</string>
+    <string name="request_title">适配申请</string>
 </resources>

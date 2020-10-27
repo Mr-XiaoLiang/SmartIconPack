@@ -37,6 +37,7 @@ open class MainActivity: SimpleActivityRenderer() {
     private fun initView(target: IconPackActivity) {
         val pageGroup: ViewPager2 = find(R.id.pageGroup)?:return
         val tabView: LTabView = find(R.id.tabView)?:return
+
         val customizeFragment = customizeFragment()
         if (customizeFragment.isEmpty()) {
             fragmentList.add(HomeFragment())
@@ -76,12 +77,13 @@ open class MainActivity: SimpleActivityRenderer() {
         build.onSelected {
             pageGroup.currentItem = it
         }
-        tabGroupInsetsHelper = WindowInsetsHelper(tabView)
-        tabGroupInsetsHelper?.baseMarginFromNow()
+
+        val tabGroup: View = find(R.id.tabGroup)?:return
+        tabGroupInsetsHelper = WindowInsetsHelper(tabGroup)
     }
 
     override fun onInsetsChange(root: View, left: Int, top: Int, right: Int, bottom: Int) {
-        tabGroupInsetsHelper?.updateByMargin(root, left, top, right, bottom)
+        tabGroupInsetsHelper?.updateByPadding(root, left, top, right, bottom)
         log("onInsetsChange: ", root, left, top, right, bottom)
     }
 

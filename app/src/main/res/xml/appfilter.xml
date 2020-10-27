@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- 如果想要适配POCO这样的Launcher，必须把drawable节点写在component的后面 -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 如果想要适配POCO这样的Launcher，必须把drawable节点写在component的后面 -->
 
 <resources>
 

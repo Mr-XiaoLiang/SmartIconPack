@@ -26,6 +26,8 @@
     <dimen name="link_title">18sp</dimen>
     <dimen name="link_summary">14sp</dimen>
     <dimen name="motto_size">16sp</dimen>
+    <dimen name="toolbar_left">20dp</dimen>
+    <dimen name="toolbar_right">20dp</dimen>
 
     <integer name="app_list_column">5</integer>
 </resources>

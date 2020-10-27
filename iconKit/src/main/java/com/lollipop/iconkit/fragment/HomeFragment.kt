@@ -53,7 +53,6 @@ class HomeFragment: BaseTabFragment() {
                 initIconView()
             }
         }
-
     }
 
     @SuppressLint("SetTextI18n")

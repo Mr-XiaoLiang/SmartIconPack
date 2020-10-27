@@ -14,6 +14,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.core.content.ContextCompat
+import java.io.File
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
@@ -75,7 +76,7 @@ object CommonUtil {
         var i = 0
         while (true) {
             b.append(value[i].toString())
-            if (i == iMax)  {
+            if (i == iMax) {
                 return b.toString()
             }
             b.append(" ")
@@ -91,9 +92,10 @@ object CommonUtil {
      * 因此包装了任务类，以任务类为对象来保留任务和移除任务
      */
     class Task<T>(
-            private val target: T,
-            private val err: ((Throwable) -> Unit) = {},
-            private val run: T.() -> Unit) {
+        private val target: T,
+        private val err: ((Throwable) -> Unit) = {},
+        private val run: T.() -> Unit
+    ) {
 
         val runnable = Runnable {
             try {
@@ -126,15 +128,17 @@ object CommonUtil {
  * 用于创建一个任务对象
  */
 inline fun <reified T> T.task(
-        noinline err: ((Throwable) -> Unit) = {},
-        noinline run: T.() -> Unit) = CommonUtil.Task(this, err, run)
+    noinline err: ((Throwable) -> Unit) = {},
+    noinline run: T.() -> Unit
+) = CommonUtil.Task(this, err, run)
 
 /**
  * 异步任务
  */
 inline fun <reified T> T.doAsync(
-        noinline err: ((Throwable) -> Unit) = {},
-        noinline run: T.() -> Unit): CommonUtil.Task<T> {
+    noinline err: ((Throwable) -> Unit) = {},
+    noinline run: T.() -> Unit
+): CommonUtil.Task<T> {
     val task = task(err, run)
     CommonUtil.doAsync(task)
     return task
@@ -144,8 +148,9 @@ inline fun <reified T> T.doAsync(
  * 主线程
  */
 inline fun <reified T> T.onUI(
-        noinline err: ((Throwable) -> Unit) = {},
-        noinline run: T.() -> Unit): CommonUtil.Task<T> {
+    noinline err: ((Throwable) -> Unit) = {},
+    noinline run: T.() -> Unit
+): CommonUtil.Task<T> {
     val task = task(err, run)
     CommonUtil.onUI(task)
     return task
@@ -155,15 +160,16 @@ inline fun <reified T> T.onUI(
  * 延迟任务
  */
 inline fun <reified T> T.delay(
-        delay: Long,
-        noinline err: ((Throwable) -> Unit) = {},
-        noinline run: T.() -> Unit): CommonUtil.Task<T> {
+    delay: Long,
+    noinline err: ((Throwable) -> Unit) = {},
+    noinline run: T.() -> Unit
+): CommonUtil.Task<T> {
     val task = task(err, run)
     CommonUtil.delay(delay, task)
     return task
 }
 
-inline fun <reified T: Any> T.log(vararg value: Any) {
+inline fun <reified T : Any> T.log(vararg value: Any) {
     Log.d("LIconKit", "${this.javaClass.simpleName} -> ${CommonUtil.print(value)}")
 }
 
@@ -207,14 +213,16 @@ fun Int.alpha(f: Float): Int {
 
 fun Float.toDip(context: Context): Float {
     return TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, this,
-            context.resources.displayMetrics)
+        TypedValue.COMPLEX_UNIT_DIP, this,
+        context.resources.displayMetrics
+    )
 }
 
 fun Float.toSp(context: Context): Float {
     return TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_SP, this,
-            context.resources.displayMetrics)
+        TypedValue.COMPLEX_UNIT_SP, this,
+        context.resources.displayMetrics
+    )
 }
 
 fun Float.toDip(view: View): Float {
@@ -268,7 +276,7 @@ fun String.parseColor(): Int {
     if (value.isEmpty()) {
         return 0
     }
-    return when(value.length) {
+    return when (value.length) {
         1 -> {
             val v = (value + value).toInt(16)
             Color.rgb(v, v, v)
@@ -281,19 +289,23 @@ fun String.parseColor(): Int {
             val r = value.substring(0, 1)
             val g = value.substring(1, 2)
             val b = value.substring(2, 3)
-            Color.rgb((r + r).toInt(16),
-                    (g + g).toInt(16),
-                    (b + b).toInt(16))
+            Color.rgb(
+                (r + r).toInt(16),
+                (g + g).toInt(16),
+                (b + b).toInt(16)
+            )
         }
         4, 5 -> {
             val a = value.substring(0, 1)
             val r = value.substring(1, 2)
             val g = value.substring(2, 3)
             val b = value.substring(3, 4)
-            Color.argb((a + a).toInt(16),
-                    (r + r).toInt(16),
-                    (g + g).toInt(16),
-                    (b + b).toInt(16))
+            Color.argb(
+                (a + a).toInt(16),
+                (r + r).toInt(16),
+                (g + g).toInt(16),
+                (b + b).toInt(16)
+            )
         }
         6, 7 -> {
             val r = value.substring(0, 2).toInt(16)
@@ -314,10 +326,11 @@ fun String.parseColor(): Int {
     }
 }
 
-inline fun <reified T: EditText> T.onActionDone(noinline run: T.() -> Unit) {
+inline fun <reified T : EditText> T.onActionDone(noinline run: T.() -> Unit) {
     this.setOnEditorActionListener { _, actionId, event ->
         if (actionId == EditorInfo.IME_ACTION_DONE
-                || event.keyCode == KeyEvent.KEYCODE_ENTER) {
+            || event.keyCode == KeyEvent.KEYCODE_ENTER
+        ) {
             run.invoke(this)
             true
         } else {
@@ -332,7 +345,8 @@ fun String.tryInt(def: Int): Int {
             return def
         }
         return this.toInt()
-    } catch (e: Throwable) { }
+    } catch (e: Throwable) {
+    }
     return def
 }
 
