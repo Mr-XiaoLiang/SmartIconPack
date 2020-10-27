@@ -50,12 +50,12 @@ open class BaseFragment: Fragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        windowInsetsProviderHelper.call(this)
         lifecycleHelper.onViewCreated(view, savedInstanceState)
     }
 
     override fun onStart() {
         super.onStart()
+        windowInsetsProviderHelper.call(this)
         lifecycleHelper.onStart()
     }
 

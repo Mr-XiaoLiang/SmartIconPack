@@ -32,9 +32,9 @@ class IconFragment: BaseTabFragment() {
     override val layoutId: Int
         get() = R.layout.kit_fragment_icon
 
-    private val iconHelper = IconHelper(IconHelper.DrawableMapProvider {
+    private val iconHelper = IconHelper.iconPackOnly {
         LIconKit.createAppsPageMap(it)
-    })
+    }
 
     private val previewIconDialog = PreviewIconDialog()
 

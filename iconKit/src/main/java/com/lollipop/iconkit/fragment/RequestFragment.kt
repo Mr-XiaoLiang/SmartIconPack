@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.checkbox.MaterialCheckBox
+import com.lollipop.iconcore.listener.WindowInsetsHelper
 import com.lollipop.iconcore.ui.IconHelper
 import com.lollipop.iconcore.ui.IconImageView
 import com.lollipop.iconcore.util.delay
@@ -18,6 +19,7 @@ import kotlinx.android.synthetic.main.kit_fragment_request.*
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.max
+import kotlin.math.min
 
 class RequestFragment : BaseTabFragment() {
     override val tabIcon: Int
@@ -31,19 +33,31 @@ class RequestFragment : BaseTabFragment() {
 
     private val appInfoList = ArrayList<RequestAppInfo>()
 
-    private val appAdapter = AppAdapter(appInfoList)
+    private val appAdapter = AppAdapter(appInfoList, ::onSelectedChange)
 
-    private val iconHelper = IconHelper(IconHelper.DrawableMapProvider {
+    private val iconHelper = IconHelper.unsupportedOnly {
         LIconKit.createRequestPageMap(it)
-    })
+    }
+
+    private var toolBarInsetsHelper: WindowInsetsHelper? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        toolBarInsetsHelper = WindowInsetsHelper(toolBar)
+
         appList.layoutManager = LinearLayoutManager(
             view.context, RecyclerView.VERTICAL, false)
         appList.adapter = appAdapter
+        appList.addOnScrollListener(FloatingTagHelper(
+            floatingPanel, floatingTextView, appAdapter::isShowTag, appAdapter::getTag))
         appAdapter.notifyDataSetChanged()
+
+        selectAllBtn.setOnClickListener {
+            appAdapter.selectAll()
+        }
+
+        onSelectedChange(0)
 
         doAsync {
             iconHelper.loadAppInfo(view.context)
@@ -56,6 +70,20 @@ class RequestFragment : BaseTabFragment() {
                 appAdapter.notifyDataSetChanged()
             }
         }
+    }
+
+    private fun onSelectedChange(count: Int) {
+        titleView.text = String.format(getString(R.string.chosen), count)
+    }
+
+    override fun onInsetsChange(root: View, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onInsetsChange(root, left, top, right, bottom)
+        toolBarInsetsHelper?.setInsetsByPadding(left, top, right, 0)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        toolBarInsetsHelper = null
     }
 
     private class RequestAppComparator: Comparator<RequestAppInfo> {
@@ -126,6 +154,9 @@ class RequestFragment : BaseTabFragment() {
 
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
+            if (recyclerView.adapter?.itemCount == 0) {
+                return
+            }
             val layoutManager = recyclerView.layoutManager
             if (layoutManager is LinearLayoutManager) {
                 onScrolled(layoutManager)
@@ -136,28 +167,39 @@ class RequestFragment : BaseTabFragment() {
             val firstPosition = layoutManager.findFirstVisibleItemPosition()
             val firstCompletelyPosition =
                 layoutManager.findFirstCompletelyVisibleItemPosition()
-
-            if (firstPosition == firstCompletelyPosition) {
-                if (isShowTag(firstPosition)) {
-                    floatingPanel.visibility = View.INVISIBLE
-                } else {
-                    floatingText.text = getTag(firstPosition)
-                    floatingPanel.visibility = View.VISIBLE
-                }
+            if (firstCompletelyPosition == 0) {
+                floatingPanel.visibility = View.INVISIBLE
+                return
             }
+            floatingText.text = getTag(firstPosition)
+            if (floatingPanel.visibility != View.VISIBLE) {
+                floatingPanel.visibility = View.VISIBLE
+            }
+            if (!isShowTag(firstCompletelyPosition)) {
+                floatingPanel.translationY = 0F
+                return
+            }
+            val firstView =
+                layoutManager.findViewByPosition(firstCompletelyPosition)
 
+            floatingPanel.translationY = if (firstView != null) {
+                min(1F * firstView.top - floatingPanel.height, 0F)
+            } else {
+                0F
+            }
         }
 
     }
 
     private class AppAdapter(
-        private val appList: ArrayList<RequestAppInfo>): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+        private val appList: ArrayList<RequestAppInfo>,
+        private val onSelectedChange: (Int) -> Unit): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         companion object {
             private const val TYPE_APP = 0
             private const val TYPE_EMPTY = 1
 
-            private const val HEADER_EMPTY = 1
+            private const val HEADER_EMPTY = 0
             private const val FOOTER_EMPTY = 1
         }
 
@@ -172,19 +214,41 @@ class RequestFragment : BaseTabFragment() {
         }
 
         private fun onAppClick(position: Int): Boolean {
+            if (appList.isEmpty()) {
+                return false
+            }
             val real = position - HEADER_EMPTY
             val app = appList[real]
             if (selectedApp.remove(app)) {
+                onSelectedChange(selectedApp.size)
                 return false
             }
             selectedApp.add(app)
+            onSelectedChange(selectedApp.size)
             return true
         }
 
-        private fun isShowTag(position: Int): Boolean {
+        fun selectAll() {
+            if (selectedApp.size < appList.size) {
+                selectedApp.clear()
+                selectedApp.addAll(appList)
+            } else {
+                selectedApp.clear()
+            }
+            onSelectedChange(selectedApp.size)
+            notifyDataSetChanged()
+        }
+
+        fun isShowTag(position: Int): Boolean {
+            if (appList.isEmpty()) {
+                return false
+            }
             val real = position - HEADER_EMPTY
             if (real == 0) {
                 return true
+            }
+            if (real < 0) {
+                return false
             }
             if (appList[real].tag != appList[real - 1].tag) {
                 return true
@@ -192,7 +256,18 @@ class RequestFragment : BaseTabFragment() {
             return false
         }
 
+        fun getTag(position: Int): String {
+            if (appList.isEmpty() || getItemViewType(position) == TYPE_EMPTY) {
+                return ""
+            }
+            return appList[position - HEADER_EMPTY].tag
+
+        }
+
         private fun isChecked(position: Int): Boolean {
+            if (appList.isEmpty()) {
+                return false
+            }
             val app = appList[position - HEADER_EMPTY]
             return selectedApp.contains(app)
         }
@@ -212,6 +287,9 @@ class RequestFragment : BaseTabFragment() {
         }
 
         override fun getItemCount(): Int {
+            if (appList.isEmpty()) {
+                return 0
+            }
             return appList.size + HEADER_EMPTY + FOOTER_EMPTY
         }
 
@@ -264,9 +342,12 @@ class RequestFragment : BaseTabFragment() {
 
         fun bind(info: RequestAppInfo) {
             tagView.text = if (isShowTag(adapterPosition)) { info.tag } else { "" }
-            iconView.setImageDrawable(info.app.srcIcon)
+            if (iconView.drawable != info.app.srcIcon) {
+                iconView.setImageDrawable(info.app.srcIcon)
+            }
             labelView.text = info.app.name
             pkgView.text = info.app.pkg.packageName
+            checkBox.isChecked = isChecked(adapterPosition)
         }
 
     }

@@ -20,13 +20,36 @@ import kotlin.collections.HashMap
  * @date 10/22/20 02:32
  * 图标计算辅助类
  */
-class IconHelper(private val customizeMap: DrawableMapProvider? = null) {
+class IconHelper private constructor(
+    private val flags: Int,
+    private val customizeMap: DrawableMapProvider? = null) {
 
     companion object {
+
+        const val FLAG_SUPPORTED_INFO = 1
+        const val FLAG_UNSUPPORTED_INFO = 1 shl 1
+        const val FLAG_ICON_PACK_INFO = 1 shl 2
+
+        const val FLAG_ALL_INFO = 0xFFFFFF
+        const val FLAG_FULL_APP_INFO = FLAG_SUPPORTED_INFO or FLAG_UNSUPPORTED_INFO
+
         private val EMPTY_ICON_ID = IntArray(0)
         private val EMPTY_COMPONENT = ComponentName("", "")
         private val EMPTY_ICON = IconInfo("", EMPTY_COMPONENT, 0)
         private val EMPTY_APP_INFO = AppInfo("", EMPTY_COMPONENT, ColorDrawable(Color.BLACK), EMPTY_ICON_ID)
+
+        fun supportedOnly(creator: (context: Context) -> DrawableMap?): IconHelper {
+            return IconHelper(FLAG_SUPPORTED_INFO, DrawableMapProvider(creator))
+        }
+
+        fun unsupportedOnly(creator: (context: Context) -> DrawableMap?): IconHelper {
+            return IconHelper(FLAG_UNSUPPORTED_INFO, DrawableMapProvider(creator))
+        }
+
+        fun iconPackOnly(creator: (context: Context) -> DrawableMap?): IconHelper {
+            return IconHelper(FLAG_ICON_PACK_INFO, DrawableMapProvider(creator))
+        }
+
         fun findDrawableId(context: Context, name: String): Int {
             return context.findDrawableId(name)
         }
@@ -59,8 +82,8 @@ class IconHelper(private val customizeMap: DrawableMapProvider? = null) {
             return activityFullName(pkg, this)
         }
 
-        fun newHelper(creator: (context: Context) -> DrawableMap?): IconHelper {
-            return IconHelper(DrawableMapProvider(creator))
+        fun newHelper(flags: Int, creator: (context: Context) -> DrawableMap?): IconHelper {
+            return IconHelper(flags, DrawableMapProvider(creator))
         }
 
     }
@@ -70,28 +93,41 @@ class IconHelper(private val customizeMap: DrawableMapProvider? = null) {
     private var iconList = ArrayList<IconInfo>()
     private var drawableMap: DrawableMap? = null
 
+    private var supportedListSize = 0
+    private var notSupportListSize = 0
+    private var iconListSize = 0
+
     val allAppCount: Int
         get() {
-            return supportedList.size + notSupportList.size
+            return supportedCount + notSupportCount
         }
 
     val notSupportCount: Int
         get() {
+            if (flags and FLAG_UNSUPPORTED_INFO == 0) {
+                return notSupportListSize
+            }
             return notSupportList.size
         }
 
     val supportedCount: Int
         get() {
+            if (flags and FLAG_SUPPORTED_INFO == 0) {
+                return supportedListSize
+            }
             return supportedList.size
         }
 
     val iconCount: Int
         get() {
+            if (flags and FLAG_ICON_PACK_INFO == 0) {
+                return iconListSize
+            }
             return iconList.size
         }
 
     fun getIconInfo(index: Int): IconInfo {
-        if (index < 0 || index >= iconCount) {
+        if (index < 0 || index >= iconCount || flags and FLAG_ICON_PACK_INFO == 0) {
             return EMPTY_ICON
         }
         return iconList[index]
@@ -102,16 +138,28 @@ class IconHelper(private val customizeMap: DrawableMapProvider? = null) {
             return EMPTY_APP_INFO
         }
         if (index < supportedCount) {
+            if (flags and FLAG_SUPPORTED_INFO == 0) {
+                return EMPTY_APP_INFO
+            }
             return getSupportedInfo(index)
+        }
+        if (flags and FLAG_UNSUPPORTED_INFO == 0) {
+            return EMPTY_APP_INFO
         }
         return getNotSupportInfo(index - supportedCount)
     }
 
     fun getNotSupportInfo(index: Int): AppInfo {
+        if (flags and FLAG_UNSUPPORTED_INFO == 0) {
+            return EMPTY_APP_INFO
+        }
         return notSupportList[index]
     }
 
     fun getSupportedInfo(index: Int): AppInfo {
+        if (flags and FLAG_SUPPORTED_INFO == 0) {
+            return EMPTY_APP_INFO
+        }
         return supportedList[index]
     }
 
@@ -119,9 +167,20 @@ class IconHelper(private val customizeMap: DrawableMapProvider? = null) {
         if (drawableMap == null) {
             drawableMap = customizeMap?.getDrawableMap(context)
         }
+        loadAppInfoOnly(context)
+        loadIconPackInfoOnly(context)
+    }
+
+    private fun loadAppInfoOnly(context: Context) {
         supportedList.clear()
         notSupportList.clear()
-        iconList.clear()
+        supportedListSize = 0
+        notSupportListSize = 0
+        val isLoadSupportedInfo = flags and FLAG_SUPPORTED_INFO != 0
+        val isLoadUnsupportedInfo = flags and FLAG_UNSUPPORTED_INFO != 0
+        if (!isLoadSupportedInfo && !isLoadUnsupportedInfo) {
+            return
+        }
         val pm = context.packageManager
         val mainIntent = Intent(Intent.ACTION_MAIN)
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER)
@@ -132,33 +191,69 @@ class IconHelper(private val customizeMap: DrawableMapProvider? = null) {
             val pkgName = appInfo.activityInfo.packageName
             val clsName = appInfo.activityInfo.name.fullName(pkgName)
             val iconPack = getIconByPkg(context, pkgName, clsName)
-            val app = AppInfo(
-                    appInfo.loadLabel(pm), ComponentName(pkgName, clsName),
-                    appInfo.loadIcon(pm), iconPack)
             if (iconPack.isEmpty()) {
-                notSupportList.add(app)
+                if (isLoadUnsupportedInfo) {
+                    notSupportList.add(AppInfo(
+                        appInfo.loadLabel(pm), ComponentName(pkgName, clsName),
+                        appInfo.loadIcon(pm), iconPack))
+                } else {
+                    notSupportListSize ++
+                }
             } else {
-                supportedList.add(app)
+                if (isLoadSupportedInfo) {
+                    supportedList.add(AppInfo(
+                        appInfo.loadLabel(pm), ComponentName(pkgName, clsName),
+                        appInfo.loadIcon(pm), iconPack))
+                } else {
+                    supportedListSize ++
+                }
             }
         }
-        val deduplicationList = ArrayList<Int>()
+    }
+
+    private fun loadIconPackInfoOnly(context: Context) {
+        iconList.clear()
+        iconListSize = 0
         val map = drawableMap
-        if (map == null) {
-            for (app in supportedList) {
-                val iconPack = app.iconPack
-                if (iconPack.isEmpty()) {
-                    continue
-                }
-                for (icon in iconPack) {
-                    if (icon != 0 && deduplicationList.indexOf(icon) < 0) {
-                        deduplicationList.add(icon)
-                        iconList.add(IconInfo(app.name, app.pkg, icon))
+        if (flags and FLAG_ICON_PACK_INFO != 0) {
+            if (map == null) {
+                val deduplicationList = ArrayList<Int>()
+                for (app in supportedList) {
+                    val iconPack = app.iconPack
+                    if (iconPack.isEmpty()) {
+                        continue
                     }
+                    for (icon in iconPack) {
+                        if (icon != 0 && deduplicationList.indexOf(icon) < 0) {
+                            deduplicationList.add(icon)
+                            iconList.add(IconInfo(app.name, app.pkg, icon))
+                        }
+                    }
+                }
+            } else {
+                for (index in 0 until map.iconCount) {
+                    iconList.add(map[index])
                 }
             }
         } else {
-            for (index in 0 until map.iconCount) {
-                iconList.add(map[index])
+            if (map != null) {
+                iconListSize = map.iconCount
+            } else if (supportedList.isNotEmpty()) {
+                val deduplicationList = ArrayList<Int>()
+                for (app in supportedList) {
+                    val iconPack = app.iconPack
+                    if (iconPack.isEmpty()) {
+                        continue
+                    }
+                    for (icon in iconPack) {
+                        if (icon != 0 && deduplicationList.indexOf(icon) < 0) {
+                            deduplicationList.add(icon)
+                            iconList.add(IconInfo(app.name, app.pkg, icon))
+                        }
+                    }
+                }
+            } else {
+                iconListSize = supportedListSize
             }
         }
     }

@@ -3,7 +3,6 @@ package com.lollipop.iconkit.fragment
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.WallpaperManager
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -12,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.content.PermissionChecker
 import com.google.android.material.snackbar.Snackbar
 import com.lollipop.iconcore.listener.WindowInsetsHelper
@@ -42,7 +40,7 @@ class HomeFragment: BaseTabFragment() {
         private const val REQUEST_READ_SDCARD = 996
     }
 
-    private var iconHelper = IconHelper.newHelper {
+    private var iconHelper = IconHelper.supportedOnly {
         LIconKit.createHomePageMap(it)
     }
 
