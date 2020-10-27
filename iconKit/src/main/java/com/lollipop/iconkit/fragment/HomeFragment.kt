@@ -98,7 +98,7 @@ class HomeFragment: BaseTabFragment() {
             setHeadWallpaper()
         }
 
-        versionTitle.text = versionName()
+        versionTitle.text = context?.versionName()?: "Unknown"
         versionBtn.setOnClickListener {
             activity?.let { activity ->
                 val updateInfoProvider = LIconKit.createUpdateInfoProvider(activity)
@@ -109,12 +109,6 @@ class HomeFragment: BaseTabFragment() {
         }
 
         bindLinkInfo(linkGroup, ExternalLinkManager(LIconKit.createLinkInfoProvider(context!!)))
-    }
-
-    private fun versionName(): String {
-        return context?.let {
-            it.packageManager.getPackageInfo(it.packageName, 0).versionName
-        } ?: "Unknown"
     }
 
     private class IconChangeCallback(

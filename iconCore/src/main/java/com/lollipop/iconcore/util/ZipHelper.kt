@@ -4,6 +4,7 @@ import android.text.TextUtils
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.time.temporal.Temporal
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
@@ -15,11 +16,33 @@ import java.util.zip.ZipOutputStream
 class ZipHelper private constructor (private var zipFile: File) {
 
     companion object {
-        fun to(path: String): ZipHelper {
-            val fileName = if (path.endsWith(".zip", true)) {
+
+        const val SUFFIX = ".zip"
+
+        const val TEMP_ZIP = "temp$SUFFIX"
+
+        fun zipFile(dir: File, name: String): File {
+            return File(dir, name + SUFFIX)
+        }
+
+        fun zipTo(dir: File, name: String): ZipHelper {
+            return zipTo(zipFile(dir, name))
+        }
+
+        fun zipTo(file: File): ZipHelper {
+            val zipFile = if (file.path.endsWith(SUFFIX, true)) {
+                file
+            } else {
+                File(file, TEMP_ZIP)
+            }
+            return ZipHelper(zipFile)
+        }
+
+        fun zipTo(path: String): ZipHelper {
+            val fileName = if (path.endsWith(SUFFIX, true)) {
                 path
             } else {
-                path + File.separator + "temp.zip"
+                path + File.separator + TEMP_ZIP
             }
             return ZipHelper(File(fileName))
         }

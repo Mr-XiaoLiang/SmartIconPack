@@ -25,7 +25,7 @@ open class InnerDialogProvider: BackPressedListener, OnWindowInsetsListener {
         this.callback = callback
     }
 
-    protected fun dismiss() {
+    fun dismiss() {
         callback?.callDismiss()
     }
 

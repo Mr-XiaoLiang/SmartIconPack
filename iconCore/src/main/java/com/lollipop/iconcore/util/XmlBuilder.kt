@@ -2,7 +2,9 @@ package com.lollipop.iconcore.util
 
 import android.text.TextUtils
 import com.lollipop.iconcore.ui.IconHelper
+import java.io.*
 import java.lang.StringBuilder
+import java.nio.charset.Charset
 
 /**
  * @author lollipop
@@ -23,9 +25,14 @@ class XmlBuilder private constructor(private val tag: String) {
         }
 
         fun create(infoList: List<IconHelper.AppInfo>): XmlBuilder {
-            val builder = XmlBuilder.create(XmlBuilder.RESOURCES)
-            for (info in infoList) {
-                builder.addChild(XmlBuilder.ITEM)
+            return create(infoList.size) { infoList[it] }
+        }
+
+        fun create(count: Int, infoProvider: (Int) -> IconHelper.AppInfo): XmlBuilder {
+            val builder = create(RESOURCES)
+            for (index in 0 until count) {
+                val info = infoProvider(index)
+                builder.addChild(ITEM)
                     .addAttr(IconHelper.ATTR_NAME, info.name.toString())
                     .addAttr(IconHelper.ATTR_COMPONENT, info.pkg.toString())
                     .addAttr(IconHelper.ATTR_DRAWABLE,
@@ -39,6 +46,8 @@ class XmlBuilder private constructor(private val tag: String) {
     private val children = ArrayList<XmlBuilder>()
     private val attributeList = ArrayList<Attribute>()
     private var text = ""
+
+    private val commentList = ArrayList<String>()
 
     fun addChild(tag: String): XmlBuilder {
         val xml = XmlBuilder(tag)
@@ -61,6 +70,11 @@ class XmlBuilder private constructor(private val tag: String) {
         return this
     }
 
+    fun addComment(value: String): XmlBuilder {
+        commentList.add(value)
+        return this
+    }
+
     fun up(): XmlBuilder {
         return parent?:this
     }
@@ -78,6 +92,13 @@ class XmlBuilder private constructor(private val tag: String) {
         val builder = StringBuilder()
         if (!hasParent) {
             builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+            builder.append(RETURN)
+        }
+        for (comment in commentList) {
+            // <!--  -->
+            builder.append("<!-- ")
+            builder.append(comment)
+            builder.append(" -->")
             builder.append(RETURN)
         }
         builder.append("<")
@@ -103,10 +124,40 @@ class XmlBuilder private constructor(private val tag: String) {
                 builder.append(RETURN)
             }
         }
-        builder.append("</ ")
+        builder.append("</")
         builder.append(tag)
         builder.append(">")
         return builder.toString()
+    }
+
+    fun writeTo(file: File) {
+        try {
+            if (file.exists()) {
+                file.delete()
+            } else {
+                file.parentFile?.mkdirs()
+            }
+            var inputStream: InputStream? = null
+            var outputStream: OutputStream? = null
+            val buffer = ByteArray(2048)
+            try {
+                inputStream = ByteArrayInputStream(toString().toByteArray(Charsets.UTF_8))
+                outputStream = FileOutputStream(file)
+                var length = inputStream.read(buffer)
+                while (length >= 0) {
+                    outputStream.write(buffer, 0, length)
+                    length = inputStream.read(buffer)
+                }
+                outputStream.flush()
+            } catch (ee: Throwable) {
+                ee.printStackTrace()
+            } finally {
+                inputStream?.close()
+                outputStream?.close()
+            }
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
     }
 
     private data class Attribute(val name: String, val value: String)

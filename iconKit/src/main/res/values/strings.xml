@@ -12,4 +12,6 @@
     <string name="chosen">已选择 %1$d</string>
     <string name="send">发送</string>
     <string name="request_title">适配申请</string>
+    <string name="title_choose_email">请选择邮件类应用</string>
+    <string name="email_request_subject">图标包适配申请</string>
 </resources>

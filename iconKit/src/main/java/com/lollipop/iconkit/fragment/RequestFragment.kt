@@ -1,27 +1,36 @@
 package com.lollipop.iconkit.fragment
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.lollipop.iconcore.listener.WindowInsetsHelper
 import com.lollipop.iconcore.ui.IconHelper
 import com.lollipop.iconcore.ui.IconImageView
-import com.lollipop.iconcore.util.delay
-import com.lollipop.iconcore.util.doAsync
+import com.lollipop.iconcore.util.*
 import com.lollipop.iconkit.LIconKit
 import com.lollipop.iconkit.R
+import com.lollipop.iconkit.dialog.LoadingDialog
 import kotlinx.android.synthetic.main.kit_fragment_request.*
+import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.max
 import kotlin.math.min
 
 class RequestFragment : BaseTabFragment() {
+
+    companion object {
+        private const val MIN_LOADING = LoadingDialog.ANIMATION_DURATION
+    }
+
     override val tabIcon: Int
         get() = R.drawable.ic_baseline_architecture_24
     override val tabTitle: Int
@@ -40,6 +49,10 @@ class RequestFragment : BaseTabFragment() {
     }
 
     private var toolBarInsetsHelper: WindowInsetsHelper? = null
+
+    private val loadingDialog: LoadingDialog by lazy {
+        LoadingDialog(LoadIconProvider(appAdapter.selectedApp, appInfoList))
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -87,6 +100,61 @@ class RequestFragment : BaseTabFragment() {
 
     private fun createRequest() {
         val selectedApp = appAdapter.selectedApp
+        if (selectedApp.isEmpty()) {
+            return
+        }
+        val cont = activity?:return
+        loadingDialog.show(cont)
+        doAsync {
+            val startTime = System.currentTimeMillis()
+
+            val builder = XmlBuilder.create(selectedApp.size) { selectedApp[it].app }
+            val display = cont.resources.displayMetrics
+            builder.addComment("OS: ${android.os.Build.VERSION.RELEASE}")
+                .addComment("Api: ${android.os.Build.VERSION.SDK_INT}")
+                .addComment("Model: ${android.os.Build.MODEL}")
+                .addComment("Brand: ${android.os.Build.BRAND}")
+                .addComment("Product: ${android.os.Build.PRODUCT}")
+                .addComment("Rom: ${android.os.Build.DISPLAY}")
+                .addComment("DPI: ${display.densityDpi}")
+                .addComment("Screen: ${display.widthPixels} * ${display.heightPixels}")
+                .addComment("Language: ${Locale.getDefault().language}")
+                .addComment("App: ${cont.versionName()}")
+
+            val cacheDir = cont.cacheDir
+            val xmlFile = File(cacheDir, "request.xml")
+            builder.writeTo(xmlFile)
+            ZipHelper.zipTo(cacheDir, "Request_${selectedApp.size}")
+                .addFile(xmlFile)
+                .removeExists()
+                .startUp { zipFile ->
+                    val usedTime = System.currentTimeMillis() - startTime
+                    log("create request file, used: $usedTime")
+                    val delay = max(MIN_LOADING - usedTime, 0)
+                    delay(delay) {
+                        loadingDialog.dismiss()
+                        emailTo(zipFile)
+                    }
+                }
+        }
+    }
+
+    private fun emailTo(path: File){
+        // 必须明确使用mailto前缀来修饰邮件地址,如果使用
+        // intent.putExtra(Intent.EXTRA_EMAIL, email)，结果将匹配不到任何应用
+        val requireActivity = requireActivity()
+        val emailId = LIconKit.createMakerInfoProvider(requireActivity)?.email?:0
+        val email = resources.getString(emailId)
+        val uri = Uri.parse("mailto:$email")
+        val intent = Intent(Intent.ACTION_SEND, uri)
+        intent.type = "application/octet-stream"
+        intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+        intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_request_subject)) // 主题
+        intent.putExtra(Intent.EXTRA_TEXT, requireActivity.packageName) // 正文
+        intent.putExtra(Intent.EXTRA_STREAM,
+            FileProvider.getUriForFile(requireActivity,
+                "${requireActivity.packageName}.provider", path))
+        startActivity(Intent.createChooser(intent, getString(R.string.title_choose_email)))
     }
 
     override fun onInsetsChange(root: View, left: Int, top: Int, right: Int, bottom: Int) {
@@ -97,6 +165,27 @@ class RequestFragment : BaseTabFragment() {
     override fun onDestroy() {
         super.onDestroy()
         toolBarInsetsHelper = null
+    }
+
+    private class LoadIconProvider(
+        private val selectedInfoList: List<RequestAppInfo>,
+        private val appInfoList: List<RequestAppInfo>): LoadingDialog.NextIconProvider {
+
+        private var index = 0
+
+        override fun next(view: IconImageView) {
+            val list = if (selectedInfoList.isEmpty()) {
+                appInfoList
+            } else {
+                selectedInfoList
+            }
+            if (index >= list.size) {
+                index = 0
+            }
+            view.setImageDrawable(list[index].app.srcIcon)
+            index++
+        }
+
     }
 
     private class RequestAppComparator: Comparator<RequestAppInfo> {

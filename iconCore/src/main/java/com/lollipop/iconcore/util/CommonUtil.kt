@@ -376,3 +376,7 @@ fun Context.findDrawableId(name: String): Int {
 fun Context.findId(name: String, type: String): Int {
     return resources.getIdentifier(name, type, packageName)
 }
+
+fun Context.versionName(): String {
+    return packageManager.getPackageInfo(packageName, 0).versionName
+}

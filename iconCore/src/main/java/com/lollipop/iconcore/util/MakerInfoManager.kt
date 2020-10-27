@@ -31,6 +31,11 @@ class MakerInfoManager(private val provider: MakerInfoProvider?) {
             return provider?.background?:0
         }
 
+    val email: Int
+        get() {
+            return provider?.email?:0
+        }
+
 
 
     interface MakerInfoProvider {
@@ -44,6 +49,8 @@ class MakerInfoManager(private val provider: MakerInfoProvider?) {
         val mottoArray: Int
 
         val background: Int
+
+        val email: Int
     }
 
 }

@@ -59,7 +59,7 @@ class PreviewIconDialog: BackPressedListener,
         remove()
         val rootGroup = CurtainDialog.findGroup(context.window.decorView)
         val view = LayoutInflater.from(context).inflate(
-            R.layout.kit_preview_dialog, rootGroup, false)
+            R.layout.kit_dialog_preview, rootGroup, false)
         dialogView = view
         view.setOnClickListener {
             dismiss()
