@@ -27,7 +27,7 @@ class SmartApplication: LApplication() {
             }
 
             override fun createRequestPageMap(context: Context): IconHelper.DrawableMap {
-                return LIconKit.createDefXmlMapFromResource(context, R.xml.drawable)
+                return LIconKit.createDefXmlMapFromResource(context, R.xml.appfilter)
             }
 
             override fun createUpdateInfoProvider(context: Context):

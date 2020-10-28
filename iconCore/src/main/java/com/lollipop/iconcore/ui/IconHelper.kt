@@ -267,7 +267,7 @@ class IconHelper private constructor(
             drawableMap = customizeMap?.getDrawableMap(context)
         }
         loadAppInfoOnly(context)
-        loadIconPackInfoOnly(context)
+        loadIconPackInfoOnly()
     }
 
     private fun loadAppInfoOnly(context: Context) {
@@ -277,9 +277,6 @@ class IconHelper private constructor(
         notSupportListSize = 0
         val isLoadSupportedInfo = flags and FLAG_SUPPORTED_INFO != 0
         val isLoadUnsupportedInfo = flags and FLAG_UNSUPPORTED_INFO != 0
-        if (!isLoadSupportedInfo && !isLoadUnsupportedInfo) {
-            return
-        }
         val pm = context.packageManager
         val mainIntent = Intent(Intent.ACTION_MAIN)
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER)
@@ -310,7 +307,7 @@ class IconHelper private constructor(
         }
     }
 
-    private fun loadIconPackInfoOnly(context: Context) {
+    private fun loadIconPackInfoOnly() {
         iconList.clear()
         iconListSize = 0
         val map = drawableMap
