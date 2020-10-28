@@ -5,14 +5,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.iconcore.listener.OnWindowInsetsListener
 import com.lollipop.iconcore.listener.WindowInsetsHelper
 import com.lollipop.iconcore.util.UpdateInfoManager
 import com.lollipop.iconkit.R
 import com.lollipop.iconkit.dialog.base.InnerDialogProvider
-import liang.lollipop.rvbannerlib.BannerUtil
-import liang.lollipop.rvbannerlib.banner.Orientation
+import com.lollipop.iconkit.view.LBannerLayoutManager
 
 /**
  * @author lollipop
@@ -31,17 +31,16 @@ class UpdateInfoDialog(private val updateInfoManager: UpdateInfoManager):
         val pageGroup: RecyclerView = find(R.id.updateInfoPage) ?: return
         windowInsetsHelper = WindowInsetsHelper(pageGroup)
         windowInsetsHelper?.baseMarginFromNow()
-        BannerUtil.with(pageGroup)//关联一个RecyclerView
-            .attachAdapter(PageAdapter(updateInfoManager))//传入RecyclerView的Adapter
-            .setOrientation(Orientation.HORIZONTAL )//设置方向
-            .isPagerMode(true)//设置是否单页模式，一次只能翻一页
-            .isAutoNext(false)//设置是否开启自动翻页
-            .init()//执行初始化
+        pageGroup.adapter = PageAdapter(updateInfoManager)
+        pageGroup.layoutManager = LinearLayoutManager(
+            pageGroup.context, RecyclerView.HORIZONTAL, false)
+        pageGroup.layoutManager = LBannerLayoutManager()
+        pageGroup.adapter?.notifyDataSetChanged()
+        PagerSnapHelper().attachToRecyclerView(pageGroup)
     }
 
     override fun onInsetsChange(root: View, left: Int, top: Int, right: Int, bottom: Int) {
         windowInsetsHelper?.updateByMargin(root, left, top, right, bottom)
-//        windowInsetsHelper?.setInsetsByMargin(left, 0, right, bottom)
     }
 
     private class PageAdapter(private val infoManager: UpdateInfoManager):
