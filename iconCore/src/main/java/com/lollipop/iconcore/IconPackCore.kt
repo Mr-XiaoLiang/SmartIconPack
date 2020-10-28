@@ -14,6 +14,12 @@ object IconPackCore {
 
     private var isInit = false
 
+    /**
+     * Core核心类的初始化方法，
+     * 如果没有调用他，那么可能无法成功展示页面，
+     * 建议继承{@link com.lollipop.iconcore.ui.IconApplication}
+     * 并在onCreate中初始化
+     */
     fun init(context: Context, provider: MainPageProvider = (context as MainPageProvider)) {
         if (isInit) {
             return

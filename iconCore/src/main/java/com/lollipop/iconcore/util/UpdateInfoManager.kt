@@ -17,29 +17,51 @@ class UpdateInfoManager(private val provider: UpdateInfoProvider?) {
         private val EMPTY_INFO = VersionInfo("", 0, arrayOf())
     }
 
+    /**
+     * 更新记录的数量（版本数量）
+     */
     val infoCount: Int
         get() {
             return provider?.infoCount?:0
         }
 
+    /**
+     * 根据序号获取版本信息
+     */
     fun getVersionInfo(index: Int): VersionInfo {
         return provider?.getVersionInfo(index)?: EMPTY_INFO
     }
 
+    /**
+     * 通过版本号获取对应的版本更新信息
+     * 如果找不到，那么将会返回一个空的对象
+     */
     fun findVersionInfo(code: Int): VersionInfo {
         return provider?.findVersionInfo(code)?: EMPTY_INFO
     }
 
     interface UpdateInfoProvider {
 
+        /**
+         * 更新记录的数量
+         */
         val infoCount: Int
 
+        /**
+         * 根据序号获取版本信息
+         */
         fun getVersionInfo(index: Int): VersionInfo
 
+        /**
+         * 通过版本号获取对应的版本更新信息
+         */
         fun findVersionInfo(code: Int): VersionInfo
 
     }
 
+    /**
+     * 基础的版本信息提供类
+     */
     open class BaseDefInfoProvider: UpdateInfoProvider {
 
         companion object {
@@ -73,15 +95,45 @@ class UpdateInfoManager(private val provider: UpdateInfoProvider?) {
 
     }
 
+    /**
+     * 默认的基于xml的版本更新信息解析类
+     *
+    <updates >
+
+        <!--  版本  -->
+        <version name="1.0" code="5">
+            <!--  更新内容，数量不限   -->
+            <item>增加基础的图标</item>
+            <item>完成基础的图标包模板</item>
+            <item>性能优化</item>
+            <item>开发者QQ：1982568737</item>
+        </version>
+
+        <version name="0.9" code="4">
+            <item>移除不必要的Java代码</item>
+            <item>增加主题色配置</item>
+            <item>核心代码精简</item>
+            <item>开发者QQ：1982568737</item>
+        </version>
+
+    </updates>
+     *
+     */
     class DefXmlInfoProvider(xml: XmlPullParser): BaseDefInfoProvider() {
 
         companion object {
+            /**
+             * 从Assets解析更新内容
+             */
             fun readFromAssets(context: Context, name: String): DefXmlInfoProvider {
                 val newPullParser = Xml.newPullParser()
                 newPullParser.setInput(context.assets.open(name), "UTF-8")
                 return DefXmlInfoProvider(newPullParser)
             }
 
+            /**
+             * 从res解析更新内容
+             */
             fun readFromResource(context: Context, resId: Int): DefXmlInfoProvider {
                 return DefXmlInfoProvider(context.resources.getXml(resId))
             }
@@ -139,6 +191,29 @@ class UpdateInfoManager(private val provider: UpdateInfoProvider?) {
 
     }
 
+    /**
+     * 默认的基于json的版本更新信息解析类
+     *
+        [
+            {
+                "name": "1.0",
+                "code": 5,
+                "item": [
+                    "AAAA",
+                    "BBBB"
+                ]
+            },
+            {
+                "name": "0.9",
+                "code": 4,
+                "item": [
+                    "CCCC",
+                    "DDDD"
+                ]
+            }
+        ]
+     *
+     */
     class DefJsonInfoProvider(json: String): BaseDefInfoProvider() {
 
         init {
@@ -167,6 +242,12 @@ class UpdateInfoManager(private val provider: UpdateInfoProvider?) {
 
     }
 
+    /**
+     * 版本信息
+     * @param name 版本名 versionName
+     * @param code 版本号 versionCode
+     * @param info 更新内容
+     */
     class VersionInfo(val name: String, val code: Int, val info: Array<String>)
 
 }

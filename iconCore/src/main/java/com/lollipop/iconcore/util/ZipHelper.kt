@@ -13,6 +13,7 @@ import kotlin.collections.ArrayList
 /**
  * @author lollipop
  * @date 10/27/20 23:01
+ * 文件压缩辅助类
  */
 class ZipHelper private constructor (private var zipFile: File) {
 
@@ -22,14 +23,23 @@ class ZipHelper private constructor (private var zipFile: File) {
 
         const val TEMP_ZIP = "temp$SUFFIX"
 
+        /**
+         * 创建一个符合规范的压缩文件名
+         */
         fun zipFile(dir: File, name: String): File {
             return File(dir, name + SUFFIX)
         }
 
+        /**
+         * 指定压缩文件名，开始一个文件压缩流程
+         */
         fun zipTo(dir: File, name: String): ZipHelper {
             return zipTo(zipFile(dir, name))
         }
 
+        /**
+         * 指定一个文件的形式开始一个文件压缩流程
+         */
         fun zipTo(file: File): ZipHelper {
             val zipFile = if (file.path.endsWith(SUFFIX, true)) {
                 file
@@ -39,6 +49,9 @@ class ZipHelper private constructor (private var zipFile: File) {
             return ZipHelper(zipFile)
         }
 
+        /**
+         * 指定一个路径，开始一个文件压缩流程
+         */
         fun zipTo(path: String): ZipHelper {
             val fileName = if (path.endsWith(SUFFIX, true)) {
                 path
@@ -51,11 +64,17 @@ class ZipHelper private constructor (private var zipFile: File) {
 
     private val fileList = LinkedList<FileEntry>()
 
+    /**
+     * 添加一个文件到压缩包中
+     */
     fun addFile(file: File): ZipHelper {
         fileList.addLast(FileEntry.create(file))
         return this
     }
 
+    /**
+     * 添加一组文件到压缩包中
+     */
     fun addFiles(files: List<File>): ZipHelper {
         for (file in files) {
             addFile(file)
@@ -63,10 +82,16 @@ class ZipHelper private constructor (private var zipFile: File) {
         return this
     }
 
+    /**
+     * 以文件路径的形式添加文件到压缩包中
+     */
     fun addFile(fileName: String): ZipHelper {
         return addFile(File(fileName))
     }
 
+    /**
+     * 如果当前压缩包已经存在了，那么删除它
+     */
     fun removeExists(): ZipHelper {
         if (zipFile.exists()) {
             zipFile.delete()
@@ -74,6 +99,13 @@ class ZipHelper private constructor (private var zipFile: File) {
         return this
     }
 
+    /**
+     * 开始压缩流程
+     * 此操作是异步的，可以放心在主线程中操作
+     * @param callback 返回压缩后的压缩包文件，
+     * 它可能会和最开始设置的有所不同，当压缩文件已存在时，
+     * 它会创建一个新的文件并且添加别名
+     */
     fun startUp(callback: (File) -> Unit) {
         doAsync {
             if (zipFile.exists()) {

@@ -8,10 +8,14 @@ import android.view.ViewOutlineProvider
  * @author lollipop
  * @date 10/26/20 18:12
  * 椭圆的View剪裁工具
+ * 绑定到一个View上，使他被剪裁为椭圆形
  */
 class OvalOutlineProvider: ViewOutlineProvider() {
 
     companion object {
+        /**
+         * 绑定到一个View上，使他被剪裁为椭圆形
+         */
         fun bind(view: View?) {
             view?:return
             val outlineProvider = view.outlineProvider
