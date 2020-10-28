@@ -17,14 +17,25 @@ import kotlin.math.sqrt
 
 object AnimatorHelper {
 
+    /**
+     * 通过勾股定理
+     * 计算一个矩形的对角线
+     */
     fun getDiam(width:Int,height:Int):Float{
         return sqrt(1.0*width*width+height*height).toFloat()
     }
 
+    /**
+     * 默认的动画时长
+     */
     var animatorDuration = 300L
 
 }
 
+/**
+ * 一个简化后的动画监听类
+ * 它主要用于某些时候，只需要监听某个状态的场景
+ */
 class AnimatorListenerImpl: AnimatorListenerAdapter() {
 
     var cancelListener: ((Animator?) -> Unit)? = null
@@ -88,17 +99,27 @@ fun AnimatorListenerImpl.onEnd(run: (Animator?) -> Unit) {
     this.endListener = run
 }
 
+/**
+ * 对一个动画对象绑定状态监听器
+ */
 fun Animator.lifecycleBinding(listener: (AnimatorListenerImpl.() -> Unit)?): Animator {
     listener?:return this
     this.addListener(AnimatorListenerImpl().apply { listener.invoke(this) })
     return this
 }
 
+/**
+ * 对一个动画对象绑定状态监听器
+ */
 fun ViewPropertyAnimator.lifecycleBinding(listener: (AnimatorListenerImpl.() -> Unit)): ViewPropertyAnimator {
     this.setListener(AnimatorListenerImpl().apply { listener.invoke(this) })
     return this
 }
 
+/**
+ * 对一个View使用展开的揭示动画，它会要求提供一个锚点
+ * 动画会以锚点为中心来展开自身
+ */
 fun View.revealOpenWith(anchorView: View, listener: (AnimatorListenerImpl.() -> Unit)? = null): Animator {
     val myLoc = IntArray(2)
     this.getLocationInWindow(myLoc)
@@ -115,6 +136,10 @@ fun View.revealOpenWith(anchorView: View, listener: (AnimatorListenerImpl.() -> 
     return reveal
 }
 
+/**
+ * 对一个View使用关闭的揭示动画，它会要求提供一个锚点
+ * 动画会以锚点为中心来关闭自身
+ */
 fun View.revealCloseWith(anchorView: View, listener: (AnimatorListenerImpl.() -> Unit)? = null): Animator {
     val myLoc = IntArray(2)
     this.getLocationInWindow(myLoc)

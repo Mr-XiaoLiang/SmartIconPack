@@ -7,6 +7,9 @@ package com.lollipop.iconcore.provider
  */
 interface MainPageProvider {
 
+    /**
+     * 创建一个主页展示实现类
+     */
     fun createRenderer(): MainPageRenderer
 
 }

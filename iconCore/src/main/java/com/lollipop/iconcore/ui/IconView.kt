@@ -3,6 +3,7 @@ package com.lollipop.iconcore.ui
 /**
  * @author lollipop
  * @date 10/24/20 20:28
+ * icon的View接口
  */
 interface IconView {
 

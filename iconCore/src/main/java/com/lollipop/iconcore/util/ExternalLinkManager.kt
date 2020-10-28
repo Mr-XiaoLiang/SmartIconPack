@@ -19,9 +19,25 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
 
     companion object {
 
+        /**
+         * 打开应用商店
+         */
         const val LINK_TYPE_STORE = -1
+
+        /**
+         * 打开指定的应用
+         */
         const val LINK_TYPE_APP = 0
+
+        /**
+         * 打开一个网页
+         */
         const val LINK_TYPE_WEB = 1
+
+        /**
+         * 未知操作
+         * 这表示它不会被处理
+         */
         const val LINK_TYPE_UNKNOWN = -2
 
         const val ARG_WEB_URL = "webUrl"
@@ -30,25 +46,40 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
 
         val EMPTY_INFO = LinkInfo("", "", 0, Intent())
 
+        /**
+         * 从意图中获取链接类型
+         */
         fun getLinkType(intent: Intent): Int {
             return intent.getIntExtra(KEY_LINK_TYPE, LINK_TYPE_UNKNOWN)
         }
 
+        /**
+         * 尝试从意图中获取网页的链接
+         */
         fun getWebUrl(intent: Intent): String {
             return intent.getStringExtra(ARG_WEB_URL)?:""
         }
 
     }
 
+    /**
+     * 外部链接的数量
+     */
     val linkCount: Int
         get() {
             return linkProvider?.linkCount?:0
         }
 
+    /**
+     * 通过序号获取一个链接信息
+     */
     fun getLink(index: Int): LinkInfo {
         return linkProvider?.getLink(index)?: EMPTY_INFO
     }
 
+    /**
+     * 链接信息提供者的接口
+     */
     interface ExternalLinkProvider {
 
         val linkCount: Int
@@ -57,6 +88,10 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
 
     }
 
+    /**
+     * 一个开放的基础的链接信息提供者
+     * 它提供了一些标准的链接信息关键字
+     */
     open class BaseDefInfoProvider: ExternalLinkProvider {
 
         protected val linkList = ArrayList<LinkInfo>()
@@ -79,7 +114,6 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
 
             const val ARG_NAME = "name"
             const val ARG_TYPE = "type"
-            const val ARG_VALUE = "value"
 
             fun decodeUrl(intent: Intent, url: String) {
                 when {
@@ -120,6 +154,40 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
 
     }
 
+    /**
+     * 默认的解析基于xml的外部链接提供者
+     * <links>
+        <link
+        title=""
+        summary=""
+        icon=""
+        url="store"/>
+
+        <link
+        title=""
+        summary=""
+        icon=""
+        url="https://lollipoppp.com/"/>
+
+        <link
+        title=""
+        summary=""
+        icon=""
+        url="action(android.settings.APPLICATION_DETAILS_SETTINGS)">
+        <arg type="data">package:com.lollipop.smarticonpack</arg>
+        </link>
+
+        <link
+        title=""
+        summary=""
+        icon=""
+        url="ComponentInfo{com.google.android.apps.messaging/com.google.android.apps.messaging.ui.ConversationListActivity}">
+        <arg name="argName1">arg value</arg>
+        <arg name="argName2">arg value</arg>
+        </link>
+
+        </links>
+     */
     class DefXmlInfoProvider(xml: XmlPullParser, context: Context): BaseDefInfoProvider() {
 
         companion object {

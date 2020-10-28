@@ -11,6 +11,8 @@ import kotlinx.android.extensions.LayoutContainer
 /**
  * @author lollipop
  * @date 10/23/20 19:01
+ * 简易的Activity呈现类实现，它提供了基础的方法实现
+ * 可以更加简单的实现Activity的布局
  */
 open class SimpleActivityRenderer: MainPageRenderer,
         LayoutContainer, OnWindowInsetsListener, BackPressedListener {
@@ -20,17 +22,27 @@ open class SimpleActivityRenderer: MainPageRenderer,
     override val containerView: View?
         get() = activityView
 
+    /**
+     * 为activty设置内容体的View
+     */
     protected fun setContentView(activity: IconPackActivity, view: View) {
         activityView = view
         activity.setContentView(activityView)
         activity.initRootGroup(view)
     }
 
+    /**
+     * 以ID的形式为activity设置内容体的view
+     */
     protected fun setContentView(activity: IconPackActivity, resId: Int) {
         setContentView(activity,
             LayoutInflater.from(activity).inflate(resId, null))
     }
 
+    /**
+     * 为了弥补不在activity中，不能便捷寻找View的缺憾
+     * 这里提供了方法，简化来这个过程
+     */
     protected fun <T: View> find(id: Int): T? {
         return activityView?.findViewById(id)
     }

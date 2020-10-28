@@ -19,6 +19,14 @@ open class IconApplication: Application(), Application.ActivityLifecycleCallback
         registerActivityLifecycleCallbacks(this)
     }
 
+    /**
+     * 绑定主页实现类的提供者
+     * @param provider 主页实现类的提供者
+     * 由于需要注册activity用于声明图标包身份
+     * 因此使用一个空的activity占位，
+     * 并且将页面显示以接口的形式释放出来
+     *
+     */
     fun bindMainPageProvider(provider: MainPageProvider) {
         this.mainPageProvider = provider
     }

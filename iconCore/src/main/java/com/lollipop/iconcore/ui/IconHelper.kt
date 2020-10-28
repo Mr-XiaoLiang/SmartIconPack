@@ -19,6 +19,15 @@ import kotlin.collections.HashMap
  * @author lollipop
  * @date 10/22/20 02:32
  * 图标计算辅助类
+ *
+ * 它提供了主要的Icon处理操作
+ * @param flags 图标处理的一些标示，它可以优化一些性能以及内存使用
+ * 请见 {@link #FLAG_SUPPORTED_INFO},
+ * {@link #FLAG_UNSUPPORTED_INFO},
+ * {@link #FLAG_ICON_PACK_INFO}
+ * @param customizeMap 自定义图标包提供器
+ * 它可能是必要的，如果没有设置，
+ * 那么可能会导致找不到对应的图标而认为没有适配
  */
 class IconHelper private constructor(
     private val flags: Int,
@@ -26,11 +35,33 @@ class IconHelper private constructor(
 
     companion object {
 
+        /**
+         * 只保留已适配应用的具体信息
+         * 但是会保留未适配以及图标包的数量信息
+         */
         const val FLAG_SUPPORTED_INFO = 1
+
+        /**
+         * 只保留未适配应用的具体信息
+         * 但是会保留其他信息的数量
+         */
         const val FLAG_UNSUPPORTED_INFO = 1 shl 1
+
+        /**
+         * 只保留图标包的信息
+         * 这表示它不会记录系统应用的相关信息
+         * 同时它会非常依赖{@link #customizeMap}
+         */
         const val FLAG_ICON_PACK_INFO = 1 shl 2
 
+        /**
+         * 记录所有信息
+         */
         const val FLAG_ALL_INFO = 0xFFFFFF
+
+        /**
+         * 记录所有应用信息
+         */
         const val FLAG_FULL_APP_INFO = FLAG_SUPPORTED_INFO or FLAG_UNSUPPORTED_INFO
 
         const val CATEGORY = "category"
@@ -47,22 +78,37 @@ class IconHelper private constructor(
         private val EMPTY_ICON = IconInfo("", EMPTY_COMPONENT, 0)
         private val EMPTY_APP_INFO = AppInfo("", EMPTY_COMPONENT, ColorDrawable(Color.BLACK), EMPTY_ICON_ID)
 
+        /**
+         * 以只记录已适配应用的形式创建
+         */
         fun supportedOnly(creator: (context: Context) -> DrawableMap?): IconHelper {
             return IconHelper(FLAG_SUPPORTED_INFO, DrawableMapProvider(creator))
         }
 
+        /**
+         * 以只记录未适配应用的形式创建
+         */
         fun unsupportedOnly(creator: (context: Context) -> DrawableMap?): IconHelper {
             return IconHelper(FLAG_UNSUPPORTED_INFO, DrawableMapProvider(creator))
         }
 
+        /**
+         * 以只记录图标包的形式创建
+         */
         fun iconPackOnly(creator: (context: Context) -> DrawableMap?): IconHelper {
             return IconHelper(FLAG_ICON_PACK_INFO, DrawableMapProvider(creator))
         }
 
+        /**
+         * 根据名字检索Drawable的id
+         */
         fun findDrawableId(context: Context, name: String): Int {
             return context.findDrawableId(name)
         }
 
+        /**
+         * 解析Component信息
+         */
         fun parseComponent(info: String): ComponentName {
             if (!info.startsWith("ComponentInfo")) {
                 return EMPTY_COMPONENT
@@ -87,10 +133,16 @@ class IconHelper private constructor(
             return if (cls[0] == '.') { pkg + cls } else { cls }
         }
 
+        /**
+         * 解析补全一个activity路径
+         */
         fun String.fullName(pkg: String): String {
             return activityFullName(pkg, this)
         }
 
+        /**
+         * 自定义Flag的形式创建
+         */
         fun newHelper(flags: Int, creator: (context: Context) -> DrawableMap?): IconHelper {
             return IconHelper(flags, DrawableMapProvider(creator))
         }
@@ -106,11 +158,17 @@ class IconHelper private constructor(
     private var notSupportListSize = 0
     private var iconListSize = 0
 
+    /**
+     * 所有应用的数量
+     */
     val allAppCount: Int
         get() {
             return supportedCount + notSupportCount
         }
 
+    /**
+     * 未适配的应用数量
+     */
     val notSupportCount: Int
         get() {
             if (flags and FLAG_UNSUPPORTED_INFO == 0) {
@@ -119,6 +177,9 @@ class IconHelper private constructor(
             return notSupportList.size
         }
 
+    /**
+     * 已适配的应用数量
+     */
     val supportedCount: Int
         get() {
             if (flags and FLAG_SUPPORTED_INFO == 0) {
@@ -127,6 +188,9 @@ class IconHelper private constructor(
             return supportedList.size
         }
 
+    /**
+     * 图标包的图标数量
+     */
     val iconCount: Int
         get() {
             if (flags and FLAG_ICON_PACK_INFO == 0) {
@@ -135,6 +199,11 @@ class IconHelper private constructor(
             return iconList.size
         }
 
+    /**
+     * 按照序号获取图标信息
+     * 如果flag中未保留图标包信息，或找不到有效的图标
+     * 那么会返回一个空的图标信息
+     */
     fun getIconInfo(index: Int): IconInfo {
         if (index < 0 || index >= iconCount || flags and FLAG_ICON_PACK_INFO == 0) {
             return EMPTY_ICON
@@ -142,6 +211,11 @@ class IconHelper private constructor(
         return iconList[index]
     }
 
+    /**
+     * 按照序号获取应用信息
+     * 如果flag中未保留应用信息，或找不到有效的应用
+     * 那么会返回一个空的应用信息
+     */
     fun getAppInfo(index: Int): AppInfo {
         if (index < 0 || index >= allAppCount) {
             return EMPTY_APP_INFO
@@ -158,6 +232,11 @@ class IconHelper private constructor(
         return getNotSupportInfo(index - supportedCount)
     }
 
+    /**
+     * 按照序号获取未适配的应用信息
+     * 如果flag中未保留未适配的应用信息，或找不到有效的应用
+     * 那么会返回一个空的应用信息
+     */
     fun getNotSupportInfo(index: Int): AppInfo {
         if (flags and FLAG_UNSUPPORTED_INFO == 0) {
             return EMPTY_APP_INFO
@@ -165,6 +244,11 @@ class IconHelper private constructor(
         return notSupportList[index]
     }
 
+    /**
+     * 按照序号获取已适配的应用信息
+     * 如果flag中未保留已适配的应用信息，或找不到有效的应用
+     * 那么会返回一个空的应用信息
+     */
     fun getSupportedInfo(index: Int): AppInfo {
         if (flags and FLAG_SUPPORTED_INFO == 0) {
             return EMPTY_APP_INFO
@@ -172,6 +256,12 @@ class IconHelper private constructor(
         return supportedList[index]
     }
 
+    /**
+     * 加载应用信息
+     * 需要触发它来激活并获取图标信息
+     * 如果没有调用，那么将会导致获取不到有效的信息
+     * 如果图标信息发生了变更，那么需要重新触发初始化信息
+     */
     fun loadAppInfo(context: Context) {
         if (drawableMap == null) {
             drawableMap = customizeMap?.getDrawableMap(context)
@@ -301,10 +391,26 @@ class IconHelper private constructor(
         operator fun get(index: Int): IconInfo
     }
 
+    /**
+     * 图标包信息
+     * @param name 图标名称
+     * @param pkg 图标包对应的应用包名
+     * @param resId 图标对应的drawable id
+     */
     class IconInfo(val name: CharSequence, val pkg: ComponentName, val resId: Int)
 
+    /**
+     * 应用信息
+     * @param name 应用名称
+     * @param pkg 应用包名
+     * @param srcIcon 应用原始的图标信息
+     * @param iconPack 应用对应的图标包（允许一个应用对应多个图标）
+     */
     class AppInfo(val name: CharSequence, val pkg: ComponentName,
                   val srcIcon: Drawable, val iconPack: IntArray) {
+        /**
+         * 通过包信息生成一个图标名称
+         */
         val drawableName: String by lazy {
             pkg.className
                 .fullName(pkg.packageName)
@@ -313,6 +419,9 @@ class IconHelper private constructor(
         }
     }
 
+    /**
+     * 默认的图标包配置清单解析器
+     */
     class DefaultXmlMap(context: Context, xml: XmlPullParser): DrawableMap {
 
         private val iconMap = HashMap<String, ArrayList<IconInfo>>()
@@ -325,12 +434,18 @@ class IconHelper private constructor(
 
         companion object {
 
+            /**
+             * 从Assets中读取配置清单文件
+             */
             fun readFromAssets(context: Context, name: String): DefaultXmlMap {
                 val newPullParser = Xml.newPullParser()
                 newPullParser.setInput(context.assets.open(name), "UTF-8")
                 return DefaultXmlMap(context, newPullParser)
             }
 
+            /**
+             * 从res中读取配置清单文件
+             */
             fun readFromResource(context: Context, resId: Int): DefaultXmlMap {
                 return DefaultXmlMap(context, context.resources.getXml(resId))
             }
@@ -419,6 +534,9 @@ class IconHelper private constructor(
 
     }
 
+    /**
+     * 图标包提供者包装类
+     */
     class DrawableMapProvider(private val creator: (context: Context) -> DrawableMap?) {
 
         private var drawableMap: DrawableMap? = null

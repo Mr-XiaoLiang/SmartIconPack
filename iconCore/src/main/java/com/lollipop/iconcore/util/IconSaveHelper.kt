@@ -11,6 +11,8 @@ import androidx.core.content.ContextCompat
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * @author lollipop
@@ -25,19 +27,32 @@ class IconSaveHelper (
         const val SUFFIX = ".png"
     }
 
-    private val iconList = ArrayList<Icon>()
+    private val iconList = LinkedList<Icon>()
     private val fileList = ArrayList<File>()
 
+    /**
+     * 添加一个图标到队列中
+     * 每个icon只能保存一次
+     */
     fun add(context: Context, id: Int, name: String): IconSaveHelper {
         val drawable = ContextCompat.getDrawable(context, id)?:return this
         return add(drawable, name)
     }
 
+    /**
+     * 添加一个drawable对象到队列中
+     * 每个icon只能保存一次
+     */
     fun add(drawable: Drawable, name: String): IconSaveHelper {
-        iconList.add(Icon(drawable, name))
+        iconList.addLast(Icon(drawable, name))
         return this
     }
 
+    /**
+     * 检索队列中的icon，并且保存到指定的文件夹中
+     * 每个icon只能保存一次
+     * 注意，这是一个耗时操作，不建议在主线程中执行
+     */
     fun saveTo(dir: File) {
         if (iconList.isEmpty()) {
             return
@@ -48,7 +63,8 @@ class IconSaveHelper (
             }
             val bitmap = Bitmap.createBitmap(iconWidth, iconHeight, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(bitmap)
-            for (icon in iconList) {
+            while (iconList.isNotEmpty()) {
+                val icon = iconList.removeFirst()
                 var outputStream: OutputStream? = null
                 try {
                     val iconFile = File(dir, icon.name + SUFFIX)
@@ -73,6 +89,10 @@ class IconSaveHelper (
         }
     }
 
+    /**
+     * 获取所有已保存的图片
+     * 如果多次使用保存，那么每次新增的图片都会累加在其中
+     */
     fun getFiles(): ArrayList<File> {
         return fileList
     }

@@ -16,6 +16,10 @@ class IconImageView(context: Context, attr: AttributeSet?, defStyle: Int):
     constructor(context: Context, attr: AttributeSet?): this(context, attr, 0)
     constructor(context: Context): this(context, null)
 
+    /**
+     * 使用id加载一个图标
+     * 如果图标无效，那么它会清空已有图标
+     */
     override fun loadIcon(iconId: Int) {
         if (iconId == 0) {
             setImageDrawable(null)
@@ -24,30 +28,35 @@ class IconImageView(context: Context, attr: AttributeSet?, defStyle: Int):
         setImageResource(iconId)
     }
 
+    /**
+     * 以名字的形式加载一个图标
+     */
     override fun loadIcon(iconName: String) {
-        setImageResource(context.findDrawableId(iconName))
+        loadIcon(context.findDrawableId(iconName))
     }
 
     override var iconIndex = -1
 
+    /**
+     * 从图标包信息中加载图标
+     */
     fun load(icon: IconHelper.IconInfo, def: Int = 0) {
         if (icon.resId == 0) {
-            if (def != 0) {
-                setImageResource(def)
-            } else {
-                setImageDrawable(null)
-            }
+            loadIcon(def)
             return
         }
-        setImageResource(icon.resId)
+        loadIcon(icon.resId)
     }
 
+    /**
+     * 从应用信息中加载图标
+     */
     fun load(icon: IconHelper.AppInfo, iconIndex: Int = 0) {
         if (icon.iconPack.isEmpty()) {
             setImageDrawable(icon.srcIcon)
             return
         }
-        setImageResource(icon.iconPack[iconIndex])
+        loadIcon(icon.iconPack[iconIndex])
     }
 
 }

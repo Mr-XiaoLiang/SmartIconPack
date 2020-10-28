@@ -11,6 +11,12 @@ import com.lollipop.iconcore.listener.*
 /**
  * @author lollipop
  * @date 10/24/20 20:24
+ *
+ * 基础的Fragment，它提供了：
+ * 基础的返回事件监听与分发
+ * 基础的窗口缩进事件接受与分发
+ * 自动创建View（需要设置layoutId）
+ *
  */
 open class BaseFragment: Fragment(),
         BackPressedListener,
@@ -18,6 +24,10 @@ open class BaseFragment: Fragment(),
         OnWindowInsetsProvider,
         OnWindowInsetsListener {
 
+    /**
+     * 设置Layout的ID，以此来简化开发过程
+     * 在{@link #onCreateView}时，将会使用它来实例化View
+     */
     open val layoutId = 0
 
     private var lifecycleHelper: FragmentLifecycleHelper = FragmentLifecycleHelper()

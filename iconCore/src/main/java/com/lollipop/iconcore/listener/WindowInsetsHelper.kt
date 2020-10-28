@@ -9,13 +9,28 @@ import android.view.ViewGroup
  * @author lollipop
  * @date 2020/5/13 23:05
  * 窗口的Insets变化时的辅助处理器
+ *
+ * 它可以帮助你快速处理窗口的缩进事件
+ * 它主要提供了padding和margin两种处理方式
+ * 同时，它会自动发起布局事件（你可以选择关闭它），触发布局排版以此来计算需要缩进的尺寸
+ *
+ * 它会对比事件来源的rootView是否与当前绑定的View存在包含关系，
+ * 如果存在，那么将会进一步计算当前View与系统缩进部分的重叠区域，
+ * 并且自动规避这部分区域，如果当前View尚未完成排版，它会把事件保留
+ * 并在View准备就绪后再次尝试排版
+ *
  */
 class WindowInsetsHelper (
     private val self: View,
     private val ignoreRootGroup: Boolean = false,
-    private val autoLayout: Boolean = true) {
+    autoLayout: Boolean = true) {
 
     companion object {
+        /**
+         * 一个开放的设置外补白的方法
+         * 它主要方便为某些不适合自动化设置外补白的场景使用
+         * 它包含了必要来判定
+         */
         fun setMargin(self: View?, left: Int, top: Int, right: Int, bottom: Int) {
             self?:return
             val layoutParams = self.layoutParams
@@ -35,6 +50,7 @@ class WindowInsetsHelper (
     private val tempOutSize = Rect()
 
     private val srcMargin = Rect()
+    private val srcPadding = Rect()
 
     private val pendingInsetsList = ArrayList<PendingInsets>()
 
@@ -96,6 +112,13 @@ class WindowInsetsHelper (
 
     }
 
+    /**
+     * 以内补白的形式更新布局
+     * @param view 这是onInsets()事件中的root，
+     * 表示这是事件的来源，用于区分View树，并且决定是否响应事件
+     *
+     * 参数位置与定义同{@link OnWindowInsetsListener#onInsetsChange}
+     */
     fun updateByPadding(view: View, left: Int, top: Int, right: Int, bottom: Int) {
         if (checkParent(view)) {
             if (self.width < 1 && self.height < 1) {
@@ -112,6 +135,13 @@ class WindowInsetsHelper (
         }
     }
 
+    /**
+     * 以外补白的形式更新布局
+     * @param view 这是onInsets()事件中的root，
+     * 表示这是事件的来源，用于区分View树，并且决定是否响应事件
+     *
+     * 参数位置与定义同{@link OnWindowInsetsListener#onInsetsChange}
+     */
     fun updateByMargin(view: View, left: Int, top: Int, right: Int, bottom: Int) {
         if (checkParent(view)) {
             if (self.width < 1 && self.height < 1) {
@@ -128,10 +158,28 @@ class WindowInsetsHelper (
         }
     }
 
+    /**
+     * 直接对当前绑定的View设置内补白
+     * 但是它会叠加基础的内补白信息
+     * 主要用于已存在内补白的情况下，
+     * 希望保留间距的情况下叠加内补白
+     * 请见{@link #basePaddingFromNow() }
+     */
     fun setInsetsByPadding(left: Int, top: Int, right: Int, bottom: Int) {
-        self.setPadding(left, top, right, bottom)
+        self.setPadding(
+            srcPadding.left + left,
+            srcPadding.top + top,
+            srcPadding.right + right,
+            srcPadding.bottom + bottom)
     }
 
+    /**
+     * 直接对当前绑定的View设置外补白
+     * 但是它会叠加基础的外补白信息
+     * 主要用于已存在外补白的情况下，
+     * 希望保留间距的情况下叠加外补白
+     * 请见{@link #baseMarginFromNow() }
+     */
     fun setInsetsByMargin(left: Int, top: Int, right: Int, bottom: Int) {
         val layoutParams = self.layoutParams
         if (layoutParams is ViewGroup.MarginLayoutParams) {
@@ -144,13 +192,17 @@ class WindowInsetsHelper (
         }
     }
 
+    /**
+     * 设置自定义的窗口缩进处理回调
+     * 如果设置了它，那么将不会再自动设置内补白或者外补白
+     * 它会传出缩进的计算结果，你可以按照需要自行处理
+     */
     fun custom(callback: (WindowInsetsHelper.(Rect) -> Unit)?): WindowInsetsHelper {
         this.insetsCallback = callback
         return this
     }
 
     private fun getViewInsets(left: Int, top: Int, right: Int, bottom: Int): Rect {
-//        self.getLocationInWindow(tempLocalArray)
         getLocationInRoot(tempLocalArray)
         tempBounds.set(0, 0, self.width, self.height)
         tempBounds.offset(tempLocalArray[0], tempLocalArray[1])
@@ -164,8 +216,6 @@ class WindowInsetsHelper (
             tempOutSize.right = (right - (windowBounds.right - tempBounds.right)).limit()
             tempOutSize.bottom = (bottom - (windowBounds.bottom - tempBounds.bottom)).limit()
         }
-        Log.d("getViewInsets", "${self.javaClass.simpleName}: [$left, $top - $right, $bottom], $tempOutSize")
-        Log.d("getViewInsets", "${self.javaClass.simpleName}: windowBounds: $windowBounds, tempBounds: $tempBounds")
         return tempOutSize
     }
 
@@ -198,16 +248,43 @@ class WindowInsetsHelper (
         return parent == rootParent
     }
 
+    /**
+     * 手动设置基础的margin值
+     * 后续的外补白设置都会在此值上叠加，
+     * 默认情况下，他们都会是0
+     */
     fun baseMargin(left: Int, top: Int, right: Int, bottom: Int) {
         srcMargin.set(left, top, right, bottom)
     }
 
+    /**
+     * 手动设置基础的padding值
+     * 后续的内补白设置都会在此值上叠加，
+     * 默认情况下，他们都会是0
+     */
+    fun basePadding(left: Int, top: Int, right: Int, bottom: Int) {
+        srcPadding.set(left, top, right, bottom)
+    }
+
+    /**
+     * 记录当前的外补白值作为基础值
+     * 后续的外补白设置都会在此基础上叠加
+     */
     fun baseMarginFromNow() {
         val layoutParams = self.layoutParams
         if (layoutParams is ViewGroup.MarginLayoutParams) {
             baseMargin(layoutParams.leftMargin, layoutParams.topMargin,
                     layoutParams.rightMargin, layoutParams.bottomMargin)
         }
+    }
+
+    /**
+     * 记录当前的内补白值作为基础值
+     * 后续的内补白设置都会在此基础上叠加
+     */
+    fun basePaddingFromNow() {
+        basePadding(self.paddingLeft, self.paddingTop,
+            self.paddingRight, self.paddingBottom)
     }
 
     private fun findRootParent(view: View): View {
