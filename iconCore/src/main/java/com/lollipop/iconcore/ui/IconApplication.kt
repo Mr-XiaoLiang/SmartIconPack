@@ -36,7 +36,6 @@ open class IconApplication: Application(), Application.ActivityLifecycleCallback
             mainPageProvider?.let {
                 val renderer = it.createRenderer()
                 activity.bindRenderer(renderer)
-                renderer.onCreate(activity, bundle)
             }
         }
     }

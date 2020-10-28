@@ -26,6 +26,7 @@ class IconPackActivity: BaseActivity() {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         super.onCreate(savedInstanceState)
+        mainPageRenderer?.onCreate(this, savedInstanceState)
     }
 
     override fun onStart() {
