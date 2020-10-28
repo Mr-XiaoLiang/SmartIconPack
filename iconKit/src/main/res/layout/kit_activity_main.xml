@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:background="@color/windowBackground">
 
-    <androidx.viewpager2.widget.ViewPager2
+    <androidx.viewpager.widget.ViewPager
         android:layout_width="match_parent"
         android:layout_height="0px"
         android:id="@+id/pageGroup"

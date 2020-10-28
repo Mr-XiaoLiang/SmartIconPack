@@ -4,13 +4,14 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.viewpager.widget.ViewPager
 import com.lollipop.iconcore.listener.WindowInsetsHelper
 import com.lollipop.iconcore.ui.IconPackActivity
 import com.lollipop.iconcore.ui.SimpleActivityRenderer
-import com.lollipop.iconkit.fragment.*
 import com.lollipop.iconcore.util.log
+import com.lollipop.iconkit.fragment.*
 import liang.lollipop.ltabview.LTabHelper
 import liang.lollipop.ltabview.LTabView
 
@@ -35,7 +36,7 @@ open class MainActivity: SimpleActivityRenderer() {
     }
 
     private fun initView(target: IconPackActivity) {
-        val pageGroup: ViewPager2 = find(R.id.pageGroup)?:return
+        val pageGroup: ViewPager = find(R.id.pageGroup)?:return
         val tabView: LTabView = find(R.id.tabView)?:return
 
         val customizeFragment = customizeFragment()
@@ -47,8 +48,9 @@ open class MainActivity: SimpleActivityRenderer() {
         } else {
             fragmentList.addAll(customizeFragment)
         }
-        pageGroup.adapter = FragmentAdapter(target, fragmentList)
-        pageGroup.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+        pageGroup.adapter = FragmentAdapter(target.supportFragmentManager, fragmentList)
+        // 全部保留
+        pageGroup.offscreenPageLimit = fragmentList.size
         val build = LTabHelper.withExpandItem(tabView)
         build.layoutStyle = LTabView.Style.Fit
         val tabUnselectedColor = ContextCompat.getColor(target, R.color.tabUnselectedColor)
@@ -68,15 +70,7 @@ open class MainActivity: SimpleActivityRenderer() {
                 }
             }
         }
-        pageGroup.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                build.selected(position)
-            }
-        })
-        build.onSelected {
-            pageGroup.currentItem = it
-        }
+        build.setupWithViewPager(pageGroup)
 
         val tabGroup: View = find(R.id.tabGroup)?:return
         tabGroupInsetsHelper = WindowInsetsHelper(tabGroup)
@@ -87,16 +81,17 @@ open class MainActivity: SimpleActivityRenderer() {
         log("onInsetsChange: ", root, left, top, right, bottom)
     }
 
-    private class FragmentAdapter(activity: IconPackActivity,
-        private val fragments: ArrayList<BaseTabFragment>): FragmentStateAdapter(activity) {
-
-        override fun getItemCount(): Int {
+    private class FragmentAdapter(fragmentManager: FragmentManager,
+        private val fragments: ArrayList<BaseTabFragment>):
+        FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+        override fun getCount(): Int {
             return fragments.size
         }
 
-        override fun createFragment(position: Int): Fragment {
+        override fun getItem(position: Int): Fragment {
             return fragments[position]
         }
+
 
     }
 

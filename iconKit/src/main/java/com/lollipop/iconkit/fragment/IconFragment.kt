@@ -57,7 +57,7 @@ class IconFragment: BaseTabFragment() {
         doAsync {
             iconHelper.loadAppInfo(context!!)
             delay(appList.animate().duration) {
-                appList.adapter?.notifyItemRangeInserted(0, iconHelper.iconCount)
+                appList.adapter?.notifyDataSetChanged()
             }
         }
         appListInsetsHelper = WindowInsetsHelper(appList, autoLayout = false)
