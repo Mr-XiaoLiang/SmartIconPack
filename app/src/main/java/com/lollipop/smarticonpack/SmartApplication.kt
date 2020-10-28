@@ -48,6 +48,7 @@ class SmartApplication: LApplication() {
                     override val mottoArray = R.array.maker_motto
                     override val background = R.drawable.header
                     override val email = R.string.maker_email
+                    override val appIcon = R.mipmap.ic_launcher_round
                 }
             }
         })

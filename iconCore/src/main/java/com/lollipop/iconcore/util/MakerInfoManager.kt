@@ -55,7 +55,13 @@ class MakerInfoManager(private val provider: MakerInfoProvider?) {
             return provider?.email?:0
         }
 
-
+    /**
+     * 当前应用使用的图标
+     */
+    val appIcon: Int
+        get() {
+            return provider?.appIcon?:0
+        }
 
     interface MakerInfoProvider {
 
@@ -100,6 +106,13 @@ class MakerInfoManager(private val provider: MakerInfoProvider?) {
          * 这里使用id的原因是为了国际化
          */
         val email: Int
+
+        /**
+         * 当前应用的图标
+         * 可以是mipmap的图标资源id
+         * 建议填写原始的未剪裁的资源ID
+         */
+        val appIcon: Int
     }
 
 }
