@@ -10,7 +10,10 @@ import android.view.ViewGroup
  * @date 2020/5/13 23:05
  * 窗口的Insets变化时的辅助处理器
  */
-class WindowInsetsHelper (private val self: View, private val ignoreRootGroup: Boolean = false) {
+class WindowInsetsHelper (
+    private val self: View,
+    private val ignoreRootGroup: Boolean = false,
+    private val autoLayout: Boolean = true) {
 
     companion object {
         fun setMargin(self: View?, left: Int, top: Int, right: Int, bottom: Int) {
@@ -38,9 +41,11 @@ class WindowInsetsHelper (private val self: View, private val ignoreRootGroup: B
     private var insetsCallback: (WindowInsetsHelper.(Rect) -> Unit)? = null
 
     init {
-        // 准备就绪后发起一次布局排班
-        self.post {
-            self.requestLayout()
+        // 准备就绪后发起一次布局排版
+        if (autoLayout) {
+            self.post {
+                self.requestLayout()
+            }
         }
         if (self.isAttachedToWindow) {
             rootParent = findRootParent(self)

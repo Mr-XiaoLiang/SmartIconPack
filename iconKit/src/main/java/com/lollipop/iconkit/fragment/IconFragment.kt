@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.lollipop.iconcore.listener.WindowInsetsHelper
 import com.lollipop.iconcore.ui.IconHelper
 import com.lollipop.iconcore.util.delay
 import com.lollipop.iconkit.LIconKit
@@ -38,6 +39,8 @@ class IconFragment: BaseTabFragment() {
 
     private val previewIconDialog = PreviewIconDialog()
 
+    private var appListInsetsHelper: WindowInsetsHelper? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         addBackPressedListener(previewIconDialog)
@@ -57,13 +60,20 @@ class IconFragment: BaseTabFragment() {
                 appList.adapter?.notifyItemRangeInserted(0, iconHelper.iconCount)
             }
         }
-        appList.post {
+        appListInsetsHelper = WindowInsetsHelper(appList, autoLayout = false)
+        view.post {
             previewIconDialog.attach(activity!!)
         }
     }
 
+    override fun onInsetsChange(root: View, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onInsetsChange(root, left, top, right, bottom)
+        appListInsetsHelper?.setInsetsByPadding(left, top, right, 0)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        appListInsetsHelper = null
         previewIconDialog.onDestroy()
     }
 
