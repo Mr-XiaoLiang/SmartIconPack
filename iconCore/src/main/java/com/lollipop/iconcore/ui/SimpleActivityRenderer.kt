@@ -1,8 +1,11 @@
 package com.lollipop.iconcore.ui
 
+import android.app.TaskStackBuilder
+import android.content.Intent
+import android.content.res.Resources
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
+import android.view.*
+import androidx.fragment.app.Fragment
 import com.lollipop.iconcore.listener.BackPressedListener
 import com.lollipop.iconcore.listener.OnWindowInsetsListener
 import com.lollipop.iconcore.provider.MainPageRenderer
@@ -81,6 +84,109 @@ open class SimpleActivityRenderer: MainPageRenderer,
 
     override fun onRestoreInstanceState(target: IconPackActivity, savedInstanceState: Bundle) {
 
+    }
+
+    override fun onSupportNavigateUp(target: IconPackActivity): Boolean? {
+        return null
+    }
+
+    override fun onActionModeFinished(target: IconPackActivity, mode: ActionMode?) {
+        return
+    }
+
+    override fun onActionModeStarted(target: IconPackActivity, mode: ActionMode?) {
+        return
+    }
+
+    override fun onActivityReenter(target: IconPackActivity, resultCode: Int, data: Intent?) {
+        return
+    }
+
+    override fun onApplyThemeResource(
+        target: IconPackActivity, theme: Resources.Theme?,
+        resid: Int, first: Boolean) {
+        return
+    }
+
+    override fun onAttachedToWindow(target: IconPackActivity) {
+        return
+    }
+
+    override fun onContextMenuClosed(target: IconPackActivity, menu: Menu) {
+        return
+    }
+
+    override fun onCreateContextMenu(
+        target: IconPackActivity, menu: ContextMenu?,
+        v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
+        return
+    }
+
+    override fun onCreateDescription(target: IconPackActivity): CharSequence? {
+        return null
+    }
+
+    override fun onCreateOptionsMenu(target: IconPackActivity, menu: Menu?): Boolean? {
+        return null
+    }
+
+    override fun onOptionsMenuClosed(target: IconPackActivity, menu: Menu?) {
+        return
+    }
+
+    override fun onPrepareOptionsMenu(target: IconPackActivity, menu: Menu?): Boolean? {
+        return null
+    }
+
+    override fun onOptionsItemSelected(target: IconPackActivity, item: MenuItem): Boolean? {
+        return null
+    }
+
+    override fun onPrepareNavigateUpTaskStack(
+        target: IconPackActivity, builder: TaskStackBuilder?) {
+        return
+    }
+
+    override fun onActivityResult(
+        target: IconPackActivity, requestCode: Int, resultCode: Int, data: Intent?) {
+        return
+    }
+
+    override fun onAttachFragment(target: IconPackActivity, fragment: Fragment) {
+        return
+    }
+
+    override fun onLowMemory(target: IconPackActivity) {
+        return
+    }
+
+    override fun onNightModeChanged(target: IconPackActivity, mode: Int) {
+        return
+    }
+
+    override fun onNewIntent(target: IconPackActivity, intent: Intent?) {
+        return
+    }
+
+    override fun onMenuOpened(target: IconPackActivity, featureId: Int, menu: Menu): Boolean? {
+        return null
+    }
+
+    override fun onDetachedFromWindow(target: IconPackActivity) {
+        return
+    }
+
+    override fun onEnterAnimationComplete(target: IconPackActivity) {
+        return
+    }
+
+    override fun onKeyLongPress(
+        target: IconPackActivity, keyCode: Int, event: KeyEvent?): Boolean? {
+        return null
+    }
+
+    override fun onNavigateUp(target: IconPackActivity): Boolean? {
+        return null
     }
 
     override fun onInsetsChange(root: View, left: Int, top: Int, right: Int, bottom: Int) {
