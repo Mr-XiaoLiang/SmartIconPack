@@ -6,8 +6,8 @@
     <color name="colorPrimaryDark">#026C6B</color>
     <color name="colorPrimaryLight">#819ca9</color>
     <color name="colorAccent">#C55454</color>
-    <color name="colorAccentDark">#BC8597</color>
-    <color name="colorAccentLight">#F4B2C7</color>
+    <color name="colorAccentDark">#C55454</color>
+    <color name="colorAccentLight">#C55454</color>
     <color name="colorPrimaryText">#ffffff</color>
     <color name="windowBackground">#546e7a</color>
     <color name="contentBackground">#ffffff</color>
