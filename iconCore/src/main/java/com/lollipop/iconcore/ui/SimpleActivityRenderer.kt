@@ -17,8 +17,7 @@ import kotlinx.android.extensions.LayoutContainer
  * 简易的Activity呈现类实现，它提供了基础的方法实现
  * 可以更加简单的实现Activity的布局
  */
-open class SimpleActivityRenderer: MainPageRenderer,
-        LayoutContainer, OnWindowInsetsListener, BackPressedListener {
+open class SimpleActivityRenderer: MainPageRenderer, LayoutContainer {
 
     private var activityView: View? = null
 
