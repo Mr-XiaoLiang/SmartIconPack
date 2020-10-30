@@ -474,8 +474,11 @@ class IconHelper private constructor(
          * 通过包信息生成一个图标名称
          */
         val drawableName: String by lazy {
-            pkg.className
-                .fullName(pkg.packageName)
+            if (pkg.className.contains(pkg.packageName)) {
+                pkg.className
+            } else {
+                pkg.packageName + "_" + pkg.className
+            }.fullName(pkg.packageName)
                 .replace(".", "_")
                 .toLowerCase()
         }
