@@ -9,6 +9,7 @@
         android:id="@+id/iconView"
         android:layout_width="0px"
         android:layout_height="0px"
+        android:scaleType="fitCenter"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintWidth_percent="0.3"
         app:layout_constraintTop_toTopOf="parent"

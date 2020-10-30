@@ -1,6 +1,7 @@
 package com.lollipop.iconcore.ui
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
 import com.lollipop.iconcore.util.AppInfoCore
@@ -68,14 +69,22 @@ class IconImageView(context: Context, attr: AttributeSet?, defStyle: Int):
      */
     fun loadAppIcon(icon: IconHelper.AppInfo) {
         if (icon.iconIsLoaded) {
-            setImageDrawable(icon.loadIcon(context))
+            setIconDrawable(icon.loadIcon(context))
             return
         }
         doAsync {
             val drawable = icon.loadIcon(context)
             onUI {
-                setImageDrawable(drawable)
+                setIconDrawable(drawable)
             }
+        }
+    }
+
+    private fun setIconDrawable(loadIcon: Drawable) {
+        if (this.drawable != loadIcon) {
+            setImageDrawable(loadIcon)
+        } else  if (this.width > 0 && this.height > 0) {
+            requestLayout()
         }
     }
 
