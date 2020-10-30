@@ -111,6 +111,11 @@ class HomeFragment: BaseTabFragment() {
         bindLinkInfo(linkGroup, ExternalLinkManager(LIconKit.createLinkInfoProvider(context!!)))
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        iconHelper.onDestroy()
+    }
+
     private class IconChangeCallback(
         private val iconGroup: IconGroup,
         private val iconFit: (icon: IconView, index: Int) -> Unit
@@ -173,10 +178,7 @@ class HomeFragment: BaseTabFragment() {
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_READ_SDCARD) {
             val index = permissions.indexOf(Manifest.permission.READ_EXTERNAL_STORAGE)

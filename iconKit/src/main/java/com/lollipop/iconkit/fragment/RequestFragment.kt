@@ -1,5 +1,6 @@
 package com.lollipop.iconkit.fragment
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -80,7 +81,8 @@ class RequestFragment : BaseTabFragment() {
             iconHelper.loadAppInfo(view.context)
             appInfoList.clear()
             for (index in 0 until iconHelper.notSupportCount) {
-                appInfoList.add(RequestAppInfo.create(iconHelper.getNotSupportInfo(index)))
+                appInfoList.add(RequestAppInfo.create(
+                    view.context, iconHelper.getNotSupportInfo(index)))
             }
             Collections.sort(appInfoList, RequestAppComparator())
             delay(appList.animate().duration) {
@@ -108,7 +110,7 @@ class RequestFragment : BaseTabFragment() {
         doAsync {
             val startTime = System.currentTimeMillis()
 
-            val builder = XmlBuilder.create(selectedApp.size) { selectedApp[it].app }
+            val builder = XmlBuilder.create(cont, selectedApp.size) { selectedApp[it].app }
             val display = cont.resources.displayMetrics
             builder.addComment("OS: ${android.os.Build.VERSION.RELEASE}")
                 .addComment("Api: ${android.os.Build.VERSION.SDK_INT}")
@@ -127,7 +129,7 @@ class RequestFragment : BaseTabFragment() {
 
             val iconSaveHelper = IconSaveHelper(220)
             for (icon in selectedApp) {
-                iconSaveHelper.add(icon.app.srcIcon, icon.app.drawableName)
+                iconSaveHelper.add(icon.app.loadIcon(cont), icon.app.drawableName)
             }
             iconSaveHelper.saveTo(cacheDir)
 
@@ -173,6 +175,7 @@ class RequestFragment : BaseTabFragment() {
     override fun onDestroy() {
         super.onDestroy()
         toolBarInsetsHelper = null
+        iconHelper.onDestroy()
     }
 
     private class LoadIconProvider(
@@ -190,7 +193,7 @@ class RequestFragment : BaseTabFragment() {
             if (index >= list.size) {
                 index = 0
             }
-            view.setImageDrawable(list[index].app.srcIcon)
+            view.loadAppIcon(list[index].app)
             index++
         }
 
@@ -242,15 +245,15 @@ class RequestFragment : BaseTabFragment() {
     private class RequestAppInfo(val tag: String, val app: IconHelper.AppInfo) {
         companion object {
 
-            fun create(app: IconHelper.AppInfo): RequestAppInfo {
-                return RequestAppInfo(findTag(app), app)
+            fun create(context: Context, app: IconHelper.AppInfo): RequestAppInfo {
+                return RequestAppInfo(findTag(app.getLabel(context).toString()), app)
             }
 
-            private fun findTag(app: IconHelper.AppInfo): String {
-                if (app.name.isEmpty()) {
+            private fun findTag(appName: String): String {
+                if (appName.isEmpty()) {
                     return ""
                 }
-                return app.name.substring(0, 1).toUpperCase(Locale.CHINA)
+                return appName.toUpperCase(Locale.CHINA)
             }
 
         }
@@ -452,10 +455,8 @@ class RequestFragment : BaseTabFragment() {
 
         fun bind(info: RequestAppInfo) {
             tagView.text = if (isShowTag(adapterPosition)) { info.tag } else { "" }
-            if (iconView.drawable != info.app.srcIcon) {
-                iconView.setImageDrawable(info.app.srcIcon)
-            }
-            labelView.text = info.app.name
+            iconView.loadAppIcon(info.app)
+            labelView.text = info.app.getLabel(labelView.context)
             pkgView.text = info.app.pkg.packageName
             checkBox.isChecked = isChecked(adapterPosition)
         }

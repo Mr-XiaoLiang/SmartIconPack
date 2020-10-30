@@ -466,3 +466,9 @@ fun Context.findId(name: String, type: String): Int {
 fun Context.versionName(): String {
     return packageManager.getPackageInfo(packageName, 0).versionName
 }
+
+inline fun <reified T: Any> T.timeProfiler(): TimeProfiler {
+    val profiler = TimeProfiler(this.javaClass.simpleName)
+    profiler.punch()
+    return profiler
+}

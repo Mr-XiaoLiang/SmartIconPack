@@ -3,7 +3,10 @@ package com.lollipop.iconcore.ui
 import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
+import com.lollipop.iconcore.util.AppInfoCore
+import com.lollipop.iconcore.util.doAsync
 import com.lollipop.iconcore.util.findDrawableId
+import com.lollipop.iconcore.util.onUI
 
 /**
  * @author lollipop
@@ -53,10 +56,27 @@ class IconImageView(context: Context, attr: AttributeSet?, defStyle: Int):
      */
     fun load(icon: IconHelper.AppInfo, iconIndex: Int = 0) {
         if (icon.iconPack.isEmpty()) {
-            setImageDrawable(icon.srcIcon)
+            loadAppIcon(icon)
             return
         }
         loadIcon(icon.iconPack[iconIndex])
+    }
+
+    /**
+     * 直接加载App的Icon
+     * 包含一个异步的drawable加载过程
+     */
+    fun loadAppIcon(icon: IconHelper.AppInfo) {
+        if (icon.iconIsLoaded) {
+            setImageDrawable(icon.loadIcon(context))
+            return
+        }
+        doAsync {
+            val drawable = icon.loadIcon(context)
+            onUI {
+                setImageDrawable(drawable)
+            }
+        }
     }
 
 }

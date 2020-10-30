@@ -1,5 +1,6 @@
 package com.lollipop.iconcore.util
 
+import android.content.Context
 import android.text.TextUtils
 import com.lollipop.iconcore.ui.IconHelper
 import java.io.*
@@ -37,19 +38,19 @@ class XmlBuilder private constructor(private val tag: String) {
         /**
          * 创建一个appInfo的xml配置信息
          */
-        fun create(infoList: List<IconHelper.AppInfo>): XmlBuilder {
-            return create(infoList.size) { infoList[it] }
+        fun create(context: Context, infoList: List<IconHelper.AppInfo>): XmlBuilder {
+            return create(context, infoList.size) { infoList[it] }
         }
 
         /**
          * 从自定义来源创建一个标准的app信息的配置文件
          */
-        fun create(count: Int, infoProvider: (Int) -> IconHelper.AppInfo): XmlBuilder {
+        fun create(context: Context, count: Int, infoProvider: (Int) -> IconHelper.AppInfo): XmlBuilder {
             val builder = create(RESOURCES)
             for (index in 0 until count) {
                 val info = infoProvider(index)
                 builder.addChild(ITEM)
-                    .addAttr(IconHelper.ATTR_NAME, info.name.toString())
+                    .addAttr(IconHelper.ATTR_NAME, info.getLabel(context).toString())
                     .addAttr(IconHelper.ATTR_COMPONENT, info.pkg.toString())
                     .addAttr(IconHelper.ATTR_DRAWABLE, info.drawableName)
             }

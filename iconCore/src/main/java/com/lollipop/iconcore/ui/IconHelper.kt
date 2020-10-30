@@ -2,18 +2,15 @@ package com.lollipop.iconcore.ui
 
 import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
-import android.content.pm.ResolveInfo
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.Xml
+import com.lollipop.iconcore.util.AppInfoCore
+import com.lollipop.iconcore.util.TimeProfiler
 import com.lollipop.iconcore.util.findDrawableId
+import com.lollipop.iconcore.util.timeProfiler
 import org.xmlpull.v1.XmlPullParser
 import java.io.Closeable
-import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
+import java.lang.ref.WeakReference
 
 /**
  * @author lollipop
@@ -31,7 +28,7 @@ import kotlin.collections.HashMap
  */
 class IconHelper private constructor(
     private val flags: Int,
-    private val customizeMap: DrawableMapProvider? = null) {
+    private val customizeMap: DrawableMapProvider? = null): AppInfoCore.AppChangeListener {
 
     companion object {
 
@@ -55,14 +52,22 @@ class IconHelper private constructor(
         const val FLAG_ICON_PACK_INFO = 1 shl 2
 
         /**
-         * 记录所有信息
+         * 跳过AppInfo
+         * 如果设置来此Flag，表示将不会检查应用列表
+         * 这可能会加快数据的读取，但是也将得不到任何应用列表相关的数据
+         * 甚至是应用数量
          */
-        const val FLAG_ALL_INFO = 0xFFFFFF
+        const val FLAG_SKIP_APP_INFO = 1 shl 3
 
         /**
          * 记录所有应用信息
          */
         const val FLAG_FULL_APP_INFO = FLAG_SUPPORTED_INFO or FLAG_UNSUPPORTED_INFO
+
+        /**
+         * 记录所有信息
+         */
+        const val FLAG_ALL_INFO = FLAG_FULL_APP_INFO or FLAG_ICON_PACK_INFO
 
         const val CATEGORY = "category"
         const val ITEM = "item"
@@ -76,7 +81,7 @@ class IconHelper private constructor(
         private val EMPTY_ICON_ID = IntArray(0)
         private val EMPTY_COMPONENT = ComponentName("", "")
         private val EMPTY_ICON = IconInfo("", EMPTY_COMPONENT, 0)
-        private val EMPTY_APP_INFO = AppInfo("", EMPTY_COMPONENT, ColorDrawable(Color.BLACK), EMPTY_ICON_ID)
+        private val EMPTY_APP_INFO = AppInfo(EMPTY_COMPONENT, EMPTY_ICON_ID)
 
         /**
          * 以只记录已适配应用的形式创建
@@ -95,8 +100,14 @@ class IconHelper private constructor(
         /**
          * 以只记录图标包的形式创建
          */
-        fun iconPackOnly(creator: (context: Context) -> DrawableMap?): IconHelper {
-            return IconHelper(FLAG_ICON_PACK_INFO, DrawableMapProvider(creator))
+        fun iconPackOnly(skipAppInfo: Boolean = false,
+                         creator: (context: Context) -> DrawableMap?): IconHelper {
+            val flag = if (skipAppInfo) {
+                FLAG_ICON_PACK_INFO or FLAG_SKIP_APP_INFO
+            } else {
+                FLAG_ICON_PACK_INFO
+            }
+            return IconHelper(flag, DrawableMapProvider(creator))
         }
 
         /**
@@ -147,6 +158,14 @@ class IconHelper private constructor(
             return IconHelper(flags, DrawableMapProvider(creator))
         }
 
+        fun loadIcon(context: Context, name: ComponentName): Drawable {
+            return AppInfoCore.loadIcon(context, name)
+        }
+
+        fun getLabel(context: Context, name: ComponentName): CharSequence {
+            return AppInfoCore.getLabel(context, name)
+        }
+
     }
 
     private val notSupportList = ArrayList<AppInfo>()
@@ -171,7 +190,7 @@ class IconHelper private constructor(
      */
     val notSupportCount: Int
         get() {
-            if (flags and FLAG_UNSUPPORTED_INFO == 0) {
+            if (!hasUnsupportedInfo) {
                 return notSupportListSize
             }
             return notSupportList.size
@@ -182,7 +201,7 @@ class IconHelper private constructor(
      */
     val supportedCount: Int
         get() {
-            if (flags and FLAG_SUPPORTED_INFO == 0) {
+            if (!hasSupportedInfo) {
                 return supportedListSize
             }
             return supportedList.size
@@ -193,11 +212,23 @@ class IconHelper private constructor(
      */
     val iconCount: Int
         get() {
-            if (flags and FLAG_ICON_PACK_INFO == 0) {
+            if (!hasIconPackInfo) {
                 return iconListSize
             }
             return iconList.size
         }
+
+    val skipAppInfo = flags and FLAG_SKIP_APP_INFO != 0
+
+    val hasSupportedInfo = !skipAppInfo && (flags and FLAG_SUPPORTED_INFO != 0)
+
+    val hasUnsupportedInfo = !skipAppInfo && (flags and FLAG_UNSUPPORTED_INFO != 0)
+
+    val hasIconPackInfo = flags and FLAG_ICON_PACK_INFO != 0
+
+    private var onAppListChangeCallback: ((IconHelper) -> Unit)? = null
+
+    private var autoFixCallback: AutoFixCallback? = null
 
     /**
      * 按照序号获取图标信息
@@ -205,7 +236,7 @@ class IconHelper private constructor(
      * 那么会返回一个空的图标信息
      */
     fun getIconInfo(index: Int): IconInfo {
-        if (index < 0 || index >= iconCount || flags and FLAG_ICON_PACK_INFO == 0) {
+        if (index < 0 || index >= iconCount || !hasIconPackInfo) {
             return EMPTY_ICON
         }
         return iconList[index]
@@ -221,12 +252,12 @@ class IconHelper private constructor(
             return EMPTY_APP_INFO
         }
         if (index < supportedCount) {
-            if (flags and FLAG_SUPPORTED_INFO == 0) {
+            if (!hasSupportedInfo) {
                 return EMPTY_APP_INFO
             }
             return getSupportedInfo(index)
         }
-        if (flags and FLAG_UNSUPPORTED_INFO == 0) {
+        if (!hasUnsupportedInfo) {
             return EMPTY_APP_INFO
         }
         return getNotSupportInfo(index - supportedCount)
@@ -238,7 +269,7 @@ class IconHelper private constructor(
      * 那么会返回一个空的应用信息
      */
     fun getNotSupportInfo(index: Int): AppInfo {
-        if (flags and FLAG_UNSUPPORTED_INFO == 0) {
+        if (!hasUnsupportedInfo) {
             return EMPTY_APP_INFO
         }
         return notSupportList[index]
@@ -250,7 +281,7 @@ class IconHelper private constructor(
      * 那么会返回一个空的应用信息
      */
     fun getSupportedInfo(index: Int): AppInfo {
-        if (flags and FLAG_SUPPORTED_INFO == 0) {
+        if (!hasSupportedInfo) {
             return EMPTY_APP_INFO
         }
         return supportedList[index]
@@ -262,12 +293,39 @@ class IconHelper private constructor(
      * 如果没有调用，那么将会导致获取不到有效的信息
      * 如果图标信息发生了变更，那么需要重新触发初始化信息
      */
-    fun loadAppInfo(context: Context) {
+    fun loadAppInfo(context: Context, autoFix: Boolean = true) {
         if (drawableMap == null) {
             drawableMap = customizeMap?.getDrawableMap(context)
         }
+        val timeProfiler = timeProfiler()
         loadAppInfoOnly(context)
-        loadIconPackInfoOnly()
+        timeProfiler.punch()
+        loadIconPackInfoOnly(context)
+        timeProfiler.punchAndPrintInterval()
+        if (autoFix) {
+            AppInfoCore.addAppChangeListener(this)
+            autoFixCallback = AutoFixCallback(context)
+        }
+    }
+
+    fun onAppListChange(callback: (IconHelper) -> Unit) {
+        onAppListChangeCallback = callback
+    }
+
+    fun onDestroy() {
+        offline()
+        onAppListChangeCallback = null
+
+    }
+
+    private fun offline() {
+        autoFixCallback = null
+        AppInfoCore.removeAppChangeListener(this)
+    }
+
+    override fun onAppListChange() {
+        autoFixCallback?.autoFix(this)
+        onAppListChangeCallback?.invoke(this)
     }
 
     private fun loadAppInfoOnly(context: Context) {
@@ -275,43 +333,37 @@ class IconHelper private constructor(
         notSupportList.clear()
         supportedListSize = 0
         notSupportListSize = 0
-        val isLoadSupportedInfo = flags and FLAG_SUPPORTED_INFO != 0
-        val isLoadUnsupportedInfo = flags and FLAG_UNSUPPORTED_INFO != 0
-        val pm = context.packageManager
-        val mainIntent = Intent(Intent.ACTION_MAIN)
-        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER)
-        val appList = pm.queryIntentActivities(mainIntent, 0)
-        // 调用系统排序 ， 根据name排序
-        Collections.sort(appList, ResolveInfo.DisplayNameComparator(pm))
-        for (appInfo in appList){
-            val pkgName = appInfo.activityInfo.packageName
-            val clsName = appInfo.activityInfo.name.fullName(pkgName)
-            val iconPack = getIconByPkg(context, pkgName, clsName)
-            if (iconPack.isEmpty()) {
-                if (isLoadUnsupportedInfo) {
-                    notSupportList.add(AppInfo(
-                        appInfo.loadLabel(pm), ComponentName(pkgName, clsName),
-                        appInfo.loadIcon(pm), iconPack))
+        if (skipAppInfo) {
+            return
+        }
+
+        AppInfoCore.init(context) {
+            AppInfoCore.forEach { i, appInfo ->
+                val pkgName = appInfo.activityInfo.packageName
+                val clsName = appInfo.activityInfo.name.fullName(pkgName)
+                val iconPack = getIconByPkg(context, pkgName, clsName)
+                if (iconPack.isEmpty()) {
+                    if (hasUnsupportedInfo) {
+                        notSupportList.add(AppInfo(ComponentName(pkgName, clsName), iconPack))
+                    } else {
+                        notSupportListSize ++
+                    }
                 } else {
-                    notSupportListSize ++
-                }
-            } else {
-                if (isLoadSupportedInfo) {
-                    supportedList.add(AppInfo(
-                        appInfo.loadLabel(pm), ComponentName(pkgName, clsName),
-                        appInfo.loadIcon(pm), iconPack))
-                } else {
-                    supportedListSize ++
+                    if (hasSupportedInfo) {
+                        supportedList.add(AppInfo(ComponentName(pkgName, clsName), iconPack))
+                    } else {
+                        supportedListSize ++
+                    }
                 }
             }
         }
     }
 
-    private fun loadIconPackInfoOnly() {
+    private fun loadIconPackInfoOnly(context: Context) {
         iconList.clear()
         iconListSize = 0
         val map = drawableMap
-        if (flags and FLAG_ICON_PACK_INFO != 0) {
+        if (hasIconPackInfo) {
             if (map == null) {
                 val deduplicationList = ArrayList<Int>()
                 for (app in supportedList) {
@@ -322,7 +374,7 @@ class IconHelper private constructor(
                     for (icon in iconPack) {
                         if (icon != 0 && deduplicationList.indexOf(icon) < 0) {
                             deduplicationList.add(icon)
-                            iconList.add(IconInfo(app.name, app.pkg, icon))
+                            iconList.add(IconInfo(context, app, icon))
                         }
                     }
                 }
@@ -344,7 +396,7 @@ class IconHelper private constructor(
                     for (icon in iconPack) {
                         if (icon != 0 && deduplicationList.indexOf(icon) < 0) {
                             deduplicationList.add(icon)
-                            iconList.add(IconInfo(app.name, app.pkg, icon))
+                            iconList.add(IconInfo(app.getLabel(context), app.pkg, icon))
                         }
                     }
                 }
@@ -394,7 +446,21 @@ class IconHelper private constructor(
      * @param pkg 图标包对应的应用包名
      * @param resId 图标对应的drawable id
      */
-    class IconInfo(val name: CharSequence, val pkg: ComponentName, val resId: Int)
+    class IconInfo protected constructor(
+        val nameProvider: () -> CharSequence, component: ComponentName, id: Int) {
+
+        constructor(label: CharSequence, component: ComponentName, id: Int):
+                this({label}, component, id)
+
+        constructor(context: Context, appInfo: AppInfo, icon: Int):
+                this({ getLabel(context, appInfo.pkg)}, appInfo.pkg, icon)
+
+        val name: CharSequence by lazy {
+            nameProvider()
+        }
+        val pkg: ComponentName = component
+        val resId: Int = id
+    }
 
     /**
      * 应用信息
@@ -403,8 +469,7 @@ class IconHelper private constructor(
      * @param srcIcon 应用原始的图标信息
      * @param iconPack 应用对应的图标包（允许一个应用对应多个图标）
      */
-    class AppInfo(val name: CharSequence, val pkg: ComponentName,
-                  val srcIcon: Drawable, val iconPack: IntArray) {
+    class AppInfo(val pkg: ComponentName, val iconPack: IntArray) {
         /**
          * 通过包信息生成一个图标名称
          */
@@ -414,6 +479,41 @@ class IconHelper private constructor(
                 .replace(".", "_")
                 .toLowerCase()
         }
+
+        private var myLabel: CharSequence? = null
+
+        private var myIcon: Drawable? = null
+
+        val iconIsLoaded: Boolean
+            get() {
+                return myIcon != null
+            }
+
+        val labelIsLoaded: Boolean
+            get() {
+                return myLabel != null
+            }
+
+        fun getLabel(context: Context): CharSequence {
+            val label = myLabel
+            if (label != null) {
+                return label
+            }
+            val l = getLabel(context, pkg)
+            myLabel = l
+            return l
+        }
+
+        fun loadIcon(context: Context): Drawable {
+            val icon = myIcon
+            if (icon != null) {
+                return icon
+            }
+            val loadIcon = loadIcon(context, pkg)
+            myIcon = loadIcon
+            return loadIcon
+        }
+
     }
 
     /**
@@ -546,6 +646,20 @@ class IconHelper private constructor(
             }
             return drawableMap
         }
+    }
+
+    private class AutoFixCallback(context: Context) {
+        private val contextWrapper = WeakReference(context)
+
+        fun autoFix(helper: IconHelper) {
+            val context = contextWrapper.get()
+            if (context != null) {
+                helper.loadAppInfoOnly(context)
+            } else {
+                helper.offline()
+            }
+        }
+
     }
 
 }

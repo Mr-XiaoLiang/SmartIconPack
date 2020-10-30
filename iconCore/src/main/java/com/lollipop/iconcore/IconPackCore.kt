@@ -4,6 +4,7 @@ import android.content.Context
 import com.lollipop.iconcore.provider.MainPageProvider
 import com.lollipop.iconcore.throwable.IconPackException
 import com.lollipop.iconcore.ui.IconApplication
+import com.lollipop.iconcore.util.AppInfoCore
 
 /**
  * @author lollipop
@@ -29,6 +30,11 @@ object IconPackCore {
             throw IconPackException("Application is not IconApplication, nor is it a child of IconApplication")
         }
         applicationContext.bindMainPageProvider(provider)
+        AppInfoCore.init(context, object : AppInfoCore.AppLoadPendingTask{
+            override fun onAppLoaded() {
+                // onLoaded
+            }
+        })
         isInit = true
     }
 
