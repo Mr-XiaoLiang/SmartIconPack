@@ -28,6 +28,7 @@ open class MainActivity: SimpleActivityRenderer() {
     override fun onCreate(target: IconPackActivity, savedInstanceState: Bundle?) {
         super.onCreate(target, savedInstanceState)
         setContentView(target, R.layout.kit_activity_main)
+        target.initWindowFlag()
         initView(target)
     }
 

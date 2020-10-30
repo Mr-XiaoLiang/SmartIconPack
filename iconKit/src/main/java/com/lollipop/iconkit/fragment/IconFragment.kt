@@ -30,6 +30,8 @@ class IconFragment: BaseTabFragment() {
         get() = R.color.tabIconSelectedColor
     override val layoutId: Int
         get() = R.layout.kit_fragment_icon
+    override val isLightStatusBar: Boolean
+        get() = true
 
     private val iconHelper = IconHelper.iconPackOnly(true) {
         LIconKit.createAppsPageMap(it)

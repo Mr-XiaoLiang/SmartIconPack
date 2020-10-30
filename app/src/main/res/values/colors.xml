@@ -2,12 +2,12 @@
 <resources>
     <color name="black">#000000</color>
 
-    <color name="colorPrimary">#FF018786</color>
-    <color name="colorPrimaryDark">#026C6B</color>
-    <color name="colorPrimaryLight">#819ca9</color>
-    <color name="colorAccent">#C55454</color>
-    <color name="colorAccentDark">#C55454</color>
-    <color name="colorAccentLight">#C55454</color>
+    <color name="colorPrimary">#638798</color>
+    <color name="colorPrimaryDark">#587988</color>
+    <color name="colorPrimaryLight">#749CAF</color>
+    <color name="colorAccent">#df9fb4</color>
+    <color name="colorAccentDark">#BC8597</color>
+    <color name="colorAccentLight">#F4B2C7</color>
     <color name="colorPrimaryText">#ffffff</color>
     <color name="windowBackground">#546e7a</color>
     <color name="contentBackground">#ffffff</color>
@@ -40,4 +40,5 @@
     <color name="preview_background">#FAFAFA</color>
     <color name="maker_name">#353936</color>
     <color name="maker_signature">#353936</color>
+    <color name="title_bar_background">#638798</color>
 </resources>
