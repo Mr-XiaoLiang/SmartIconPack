@@ -40,6 +40,24 @@ open class BaseFragment: Fragment(),
         BackPressedProviderHelper()
     }
 
+    open val isLightStatusBar = false
+
+    open val isLightNavigationBar = false
+
+    private fun setViewFlag(open: Boolean, flag: Int) {
+        val decorView = activity?.window?.decorView?:return
+        val systemUiFlag = decorView.systemUiVisibility
+        val has = systemUiFlag and flag != 0
+        if (open == has) {
+            return
+        }
+        if (open) {
+            decorView.systemUiVisibility = (systemUiFlag or flag)
+        } else {
+            decorView.systemUiVisibility = (systemUiFlag xor flag)
+        }
+    }
+
     protected fun supportLifecycle(fragment: Fragment) {
         lifecycleHelper.bindFragment(fragment)
     }
@@ -71,6 +89,8 @@ open class BaseFragment: Fragment(),
 
     override fun onResume() {
         super.onResume()
+        setViewFlag(isLightStatusBar, View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
+        setViewFlag(isLightNavigationBar, View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR)
         lifecycleHelper.onResume()
     }
 

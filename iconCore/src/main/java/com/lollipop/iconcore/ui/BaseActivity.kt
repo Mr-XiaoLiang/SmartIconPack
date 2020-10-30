@@ -24,16 +24,15 @@ open class BaseActivity: AppCompatActivity(), BackPressedProvider, OnWindowInset
      * 对当前activity设置默认的全屏Flag
      */
     fun initWindowFlag() {
-        val attributes = window.attributes
-        attributes.systemUiVisibility = (
-                attributes.systemUiVisibility
-                        or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+        window.clearFlags(
+            WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+                    or WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION
+        )
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
     }
@@ -47,20 +46,28 @@ open class BaseActivity: AppCompatActivity(), BackPressedProvider, OnWindowInset
         group.setOnApplyWindowInsetsListener { _, insets ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 val systemInsets = insets.getInsets(WindowInsets.Type.systemBars())
-                onWindowInsetsChange(group,
+                onWindowInsetsChange(
+                    group,
                     systemInsets.left, systemInsets.top,
-                    systemInsets.right, systemInsets.bottom)
-                windowInsetsProviderHelper.onInsetsChange(group,
+                    systemInsets.right, systemInsets.bottom
+                )
+                windowInsetsProviderHelper.onInsetsChange(
+                    group,
                     systemInsets.left, systemInsets.top,
-                    systemInsets.right, systemInsets.bottom)
+                    systemInsets.right, systemInsets.bottom
+                )
                 WindowInsets.CONSUMED
             } else {
-                onWindowInsetsChange(group,
+                onWindowInsetsChange(
+                    group,
                     insets.systemWindowInsetLeft, insets.systemWindowInsetTop,
-                    insets.systemWindowInsetRight, insets.systemWindowInsetBottom)
-                windowInsetsProviderHelper.onInsetsChange(group,
+                    insets.systemWindowInsetRight, insets.systemWindowInsetBottom
+                )
+                windowInsetsProviderHelper.onInsetsChange(
+                    group,
                     insets.systemWindowInsetLeft, insets.systemWindowInsetTop,
-                    insets.systemWindowInsetRight, insets.systemWindowInsetBottom)
+                    insets.systemWindowInsetRight, insets.systemWindowInsetBottom
+                )
                 insets.consumeSystemWindowInsets()
             }
         }
@@ -78,7 +85,8 @@ open class BaseActivity: AppCompatActivity(), BackPressedProvider, OnWindowInset
         super.onBackPressed()
     }
 
-    protected open fun onWindowInsetsChange(root: View, left: Int, top: Int, right: Int, bottom: Int) {
+    protected open fun onWindowInsetsChange(
+        root: View, left: Int, top: Int, right: Int, bottom: Int) {
     }
 
     override fun addBackPressedListener(listener: BackPressedListener) {
