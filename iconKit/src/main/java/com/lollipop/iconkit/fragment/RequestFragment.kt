@@ -253,7 +253,7 @@ class RequestFragment : BaseTabFragment() {
                 if (appName.isEmpty()) {
                     return ""
                 }
-                return appName.toUpperCase(Locale.CHINA)
+                return appName.substring(0, 1).toUpperCase(Locale.CHINA)
             }
 
         }
