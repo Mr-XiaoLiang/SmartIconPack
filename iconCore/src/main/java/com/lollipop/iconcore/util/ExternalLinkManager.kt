@@ -40,13 +40,30 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
          */
         const val LINK_TYPE_UNKNOWN = -2
 
+        /**
+         * 网页外链的地址
+         */
         const val ARG_WEB_URL = "webUrl"
 
+        /**
+         * 链接标识
+         */
         const val ARG_TAG = "linkTag"
 
+        /**
+         * 链接类型
+         */
         const val KEY_LINK_TYPE = "linkType"
 
+        /**
+         * 空的外链
+         */
         val EMPTY_INFO = LinkInfo("", "", 0, Intent(), "", "")
+
+        /**
+         * 已经解析的外链集合
+         */
+        private val externalLinkMap = HashMap<String, Array<LinkInfo>>()
 
         /**
          * 从意图中获取链接类型
@@ -67,6 +84,21 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
          */
         fun getLinkUrl(intent: Intent): String {
             return intent.getStringExtra(ARG_TAG)?:""
+        }
+
+        /**
+         * 尝试寻找一个外部链接的集合
+         */
+        fun optExternalLink(token: String): Array<LinkInfo>? {
+            val array = externalLinkMap[token]?:return null
+            return Array(array.size) { array[it] }
+        }
+
+        /**
+         * 放置一个外部链接的信息
+         */
+        private fun putExternalLink(token: String, links: List<LinkInfo>) {
+            externalLinkMap[token] = Array(links.size) { links[it] }
         }
 
     }
@@ -203,22 +235,33 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
 
         </links>
      */
-    class DefXmlInfoProvider(xml: XmlPullParser, context: Context): BaseDefInfoProvider() {
+    class DefXmlInfoProvider(xml: XmlPullParser, context: Context, token: String): BaseDefInfoProvider() {
 
         companion object {
             fun readFromAssets(context: Context, name: String): DefXmlInfoProvider {
                 val newPullParser = Xml.newPullParser()
                 newPullParser.setInput(context.assets.open(name), "UTF-8")
-                return DefXmlInfoProvider(newPullParser, context)
+                return DefXmlInfoProvider(
+                    newPullParser, context, "Assets$name")
             }
 
             fun readFromResource(context: Context, resId: Int): DefXmlInfoProvider {
-                return DefXmlInfoProvider(context.resources.getXml(resId), context)
+                return DefXmlInfoProvider(
+                    context.resources.getXml(resId), context, "Resource$resId")
             }
         }
 
         init {
-            decodeFromXml(xml, context)
+            val optLinkArray = optExternalLink(token)
+            if (optLinkArray != null && optLinkArray.isNotEmpty()) {
+                linkList.clear()
+                for (link in optLinkArray) {
+                    linkList.add(link)
+                }
+            } else {
+                decodeFromXml(xml, context)
+                putExternalLink(token, linkList)
+            }
         }
 
         private fun decodeFromXml(xml: XmlPullParser, context: Context) {
