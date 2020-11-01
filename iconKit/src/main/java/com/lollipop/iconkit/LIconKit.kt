@@ -68,7 +68,11 @@ object LIconKit {
     }
 
     fun readLinkInfoByXml(context: Context, resId: Int): ExternalLinkManager.ExternalLinkProvider {
-        return ExternalLinkManager.DefXmlInfoProvider.readFromResource(context, resId)
+        return ExternalLinkManager.readFromResource(context, resId)
+    }
+
+    fun readLinkInfoByXmlFromAssets(context: Context, name: String): ExternalLinkManager.ExternalLinkProvider {
+        return ExternalLinkManager.readFromAssets(context, name)
     }
 
 }

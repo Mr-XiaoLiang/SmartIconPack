@@ -101,6 +101,32 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
             externalLinkMap[token] = Array(links.size) { links[it] }
         }
 
+        fun readFromAssets(context: Context, name: String): ExternalLinkProvider {
+            val token = getTokenByAssets(name)
+            val optExternalLink = optExternalLink(token)
+            if (optExternalLink != null && optExternalLink.isNotEmpty()) {
+                return SimpleInfoProvider(optExternalLink)
+            }
+            return DefXmlInfoProvider.readFromAssets(context, name)
+        }
+
+        fun readFromResource(context: Context, resId: Int): ExternalLinkProvider {
+            val token = getTokenByResource(resId)
+            val optExternalLink = optExternalLink(token)
+            if (optExternalLink != null && optExternalLink.isNotEmpty()) {
+                return SimpleInfoProvider(optExternalLink)
+            }
+            return DefXmlInfoProvider.readFromResource(context, resId)
+        }
+
+        private fun getTokenByResource(id: Int): String {
+            return "Resource$id"
+        }
+
+        private fun getTokenByAssets(name: String): String {
+            return "Assets$name"
+        }
+
     }
 
     /**
@@ -242,26 +268,18 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
                 val newPullParser = Xml.newPullParser()
                 newPullParser.setInput(context.assets.open(name), "UTF-8")
                 return DefXmlInfoProvider(
-                    newPullParser, context, "Assets$name")
+                    newPullParser, context, getTokenByAssets(name))
             }
 
             fun readFromResource(context: Context, resId: Int): DefXmlInfoProvider {
                 return DefXmlInfoProvider(
-                    context.resources.getXml(resId), context, "Resource$resId")
+                    context.resources.getXml(resId), context, getTokenByResource(resId))
             }
         }
 
         init {
-            val optLinkArray = optExternalLink(token)
-            if (optLinkArray != null && optLinkArray.isNotEmpty()) {
-                linkList.clear()
-                for (link in optLinkArray) {
-                    linkList.add(link)
-                }
-            } else {
-                decodeFromXml(xml, context)
-                putExternalLink(token, linkList)
-            }
+            decodeFromXml(xml, context)
+            putExternalLink(token, linkList)
         }
 
         private fun decodeFromXml(xml: XmlPullParser, context: Context) {
@@ -326,6 +344,15 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
             }
         }
 
+    }
+
+    private class SimpleInfoProvider(links: Array<LinkInfo>): BaseDefInfoProvider() {
+        init {
+            linkList.clear()
+            for (link in links) {
+                linkList.add(link)
+            }
+        }
     }
 
     data class LinkInfo(
