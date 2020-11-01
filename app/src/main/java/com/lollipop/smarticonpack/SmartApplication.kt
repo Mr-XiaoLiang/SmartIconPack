@@ -32,7 +32,7 @@ class SmartApplication: LApplication() {
 
             override fun createUpdateInfoProvider(context: Context):
                     UpdateInfoManager.UpdateInfoProvider? {
-                return LIconKit.readUpdateInfoByXml(context, R.xml.updates)
+                return LIconKit.readUpdateXmlFromResource(context, R.xml.updates)
             }
 
             override fun createLinkInfoProvider(context: Context):

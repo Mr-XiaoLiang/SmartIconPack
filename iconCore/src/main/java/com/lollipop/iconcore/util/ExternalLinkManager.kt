@@ -89,7 +89,7 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
         /**
          * 尝试寻找一个外部链接的集合
          */
-        fun optExternalLink(token: String): Array<LinkInfo>? {
+        private fun optExternalLink(token: String): Array<LinkInfo>? {
             val array = externalLinkMap[token]?:return null
             return Array(array.size) { array[it] }
         }

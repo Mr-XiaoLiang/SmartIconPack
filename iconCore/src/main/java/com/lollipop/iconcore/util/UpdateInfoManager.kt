@@ -15,6 +15,54 @@ class UpdateInfoManager(private val provider: UpdateInfoProvider?) {
 
     companion object {
         private val EMPTY_INFO = VersionInfo("", 0, arrayOf())
+
+        private val updateInfoCache = HashMap<String, Array<VersionInfo>>()
+
+        private fun getTokenByResource(id: Int): String {
+            return "Resource$id"
+        }
+
+        private fun getTokenByAssets(name: String): String {
+            return "Assets$name"
+        }
+
+        /**
+         * 尝试寻找一个外部链接的集合
+         */
+        private fun optVersionInfo(token: String): Array<VersionInfo>? {
+            val array = updateInfoCache[token]?:return null
+            return Array(array.size) { array[it] }
+        }
+
+        /**
+         * 放置一个外部链接的信息
+         */
+        private fun putVersionInfo(token: String, infoList: List<VersionInfo>) {
+            updateInfoCache[token] = Array(infoList.size) { infoList[it] }
+        }
+
+        /**
+         * 从Assets解析更新内容
+         */
+        fun readXmlFromAssets(context: Context, name: String): UpdateInfoProvider {
+            val versionInfo = optVersionInfo(getTokenByAssets(name))
+            if (versionInfo != null && versionInfo.isNotEmpty()) {
+                return SimpleProvider(versionInfo)
+            }
+            return DefXmlInfoProvider.readFromAssets(context, name)
+        }
+
+        /**
+         * 从res解析更新内容
+         */
+        fun readXmlFromResource(context: Context, resId: Int): UpdateInfoProvider {
+            val versionInfo = optVersionInfo(getTokenByResource(resId))
+            if (versionInfo != null && versionInfo.isNotEmpty()) {
+                return SimpleProvider(versionInfo)
+            }
+            return DefXmlInfoProvider.readFromResource(context, resId)
+        }
+
     }
 
     /**
@@ -119,7 +167,7 @@ class UpdateInfoManager(private val provider: UpdateInfoProvider?) {
     </updates>
      *
      */
-    class DefXmlInfoProvider(xml: XmlPullParser): BaseDefInfoProvider() {
+    class DefXmlInfoProvider(xml: XmlPullParser, token: String): BaseDefInfoProvider() {
 
         companion object {
             /**
@@ -128,19 +176,22 @@ class UpdateInfoManager(private val provider: UpdateInfoProvider?) {
             fun readFromAssets(context: Context, name: String): DefXmlInfoProvider {
                 val newPullParser = Xml.newPullParser()
                 newPullParser.setInput(context.assets.open(name), "UTF-8")
-                return DefXmlInfoProvider(newPullParser)
+                return DefXmlInfoProvider(
+                    newPullParser, getTokenByAssets(name))
             }
 
             /**
              * 从res解析更新内容
              */
             fun readFromResource(context: Context, resId: Int): DefXmlInfoProvider {
-                return DefXmlInfoProvider(context.resources.getXml(resId))
+                return DefXmlInfoProvider(
+                    context.resources.getXml(resId), getTokenByResource(resId))
             }
         }
 
         init {
             decodeFromXml(xml)
+            putVersionInfo(token, versionInfoList)
         }
 
         private fun decodeFromXml(xml: XmlPullParser) {
@@ -227,11 +278,9 @@ class UpdateInfoManager(private val provider: UpdateInfoProvider?) {
                 for (index in 0 until jsonArray.length()) {
                     val obj = jsonArray.optJSONObject(index)?:continue
                     val name = obj.optString(ATTR_NAME) ?: ""
-                    val code = obj.optInt(ATTR_CODE) ?: 0
+                    val code = obj.optInt(ATTR_CODE, 0)
                     val info = obj.optJSONArray(ITEM) ?: continue
-                    val infoArray = Array(info.length()){ it ->
-                        info.optString(it)?:""
-                    }
+                    val infoArray = Array(info.length()){ info.optString(it)?:"" }
                     versionInfoList.add(VersionInfo(name, code, infoArray))
                 }
             } catch (e: Throwable) {
@@ -240,6 +289,18 @@ class UpdateInfoManager(private val provider: UpdateInfoProvider?) {
         }
 
 
+    }
+
+    /**
+     * 一个简单的内容提供者包装类
+     */
+    private class SimpleProvider(array: Array<VersionInfo>): BaseDefInfoProvider() {
+        init {
+            versionInfoList.clear()
+            for (info in array) {
+                versionInfoList.add(info)
+            }
+        }
     }
 
     /**
