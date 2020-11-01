@@ -11,6 +11,9 @@ import com.lollipop.iconcore.util.timeProfiler
 import org.xmlpull.v1.XmlPullParser
 import java.io.Closeable
 import java.lang.ref.WeakReference
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 /**
  * @author lollipop
@@ -158,10 +161,18 @@ class IconHelper private constructor(
             return IconHelper(flags, DrawableMapProvider(creator))
         }
 
+        /**
+         * 通过包信息直接获取一个Drawable
+         * 如果找不到匹配的包信息，那么将会返回一个无效的Drawable
+         */
         fun loadIcon(context: Context, name: ComponentName): Drawable {
             return AppInfoCore.loadIcon(context, name)
         }
 
+        /**
+         * 通过包信息直接获取一个label
+         * 如果找不到匹配的包信息，那么将会返回一个无效的CharSequence
+         */
         fun getLabel(context: Context, name: ComponentName): CharSequence {
             return AppInfoCore.getLabel(context, name)
         }
@@ -338,7 +349,7 @@ class IconHelper private constructor(
         }
 
         AppInfoCore.init(context) {
-            AppInfoCore.forEach { i, appInfo ->
+            AppInfoCore.forEach { _, appInfo ->
                 val pkgName = appInfo.activityInfo.packageName
                 val clsName = appInfo.activityInfo.name.fullName(pkgName)
                 val iconPack = getIconByPkg(context, pkgName, clsName)
@@ -442,31 +453,47 @@ class IconHelper private constructor(
 
     /**
      * 图标包信息
-     * @param name 图标名称
-     * @param pkg 图标包对应的应用包名
-     * @param resId 图标对应的drawable id
      */
-    class IconInfo protected constructor(
+    class IconInfo private constructor(
         val nameProvider: () -> CharSequence, component: ComponentName, id: Int) {
 
+        /**
+         * @param label 图标名称
+         * @param component 图标包对应的应用包名
+         * @param id 图标对应的drawable id
+         */
         constructor(label: CharSequence, component: ComponentName, id: Int):
                 this({label}, component, id)
 
+        /**
+         * @param context 上下文
+         * @param appInfo 应用信息
+         * @param icon 图标对应的drawable id
+         */
         constructor(context: Context, appInfo: AppInfo, icon: Int):
                 this({ getLabel(context, appInfo.pkg)}, appInfo.pkg, icon)
 
+        /**
+         * 图标包的名称
+         */
         val name: CharSequence by lazy {
             nameProvider()
         }
+
+        /**
+         * 包信息
+         */
         val pkg: ComponentName = component
+
+        /**
+         * 资源id
+         */
         val resId: Int = id
     }
 
     /**
      * 应用信息
-     * @param name 应用名称
      * @param pkg 应用包名
-     * @param srcIcon 应用原始的图标信息
      * @param iconPack 应用对应的图标包（允许一个应用对应多个图标）
      */
     class AppInfo(val pkg: ComponentName, val iconPack: IntArray) {
@@ -480,23 +507,50 @@ class IconHelper private constructor(
                 pkg.packageName + "_" + pkg.className
             }.fullName(pkg.packageName)
                 .replace(".", "_")
-                .toLowerCase()
+                .toLowerCase(Locale.getDefault())
         }
 
         private var myLabel: CharSequence? = null
 
         private var myIcon: Drawable? = null
 
+        /**
+         * 图标是否已经被加载过了
+         */
         val iconIsLoaded: Boolean
             get() {
                 return myIcon != null
             }
 
+        /**
+         * 应用名称是否已经被加载过了
+         */
         val labelIsLoaded: Boolean
             get() {
                 return myLabel != null
             }
 
+        /**
+         * 直接获取info中的icon信息
+         * 但是它可能是空的
+         * 你需要使用{@link #iconIsLoaded}来检查
+         */
+        fun optIcon(): Drawable? {
+            return myIcon
+        }
+
+        /**
+         * 直接获取info中的label信息
+         * 但是它可能是空的
+         * 你需要使用{@link #labelIsLoaded}来检查
+         */
+        fun optLabel(): CharSequence? {
+            return myLabel
+        }
+
+        /**
+         * 加载应用名称
+         */
         fun getLabel(context: Context): CharSequence {
             val label = myLabel
             if (label != null) {
@@ -507,6 +561,9 @@ class IconHelper private constructor(
             return l
         }
 
+        /**
+         * 加载应用图标
+         */
         fun loadIcon(context: Context): Drawable {
             val icon = myIcon
             if (icon != null) {

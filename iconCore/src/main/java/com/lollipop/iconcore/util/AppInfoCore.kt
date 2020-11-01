@@ -2,10 +2,9 @@ package com.lollipop.iconcore.util
 
 import android.content.*
 import android.content.pm.ResolveInfo
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.text.TextUtils
+import com.lollipop.iconcore.ui.EmptyDrawable
 import com.lollipop.iconcore.ui.IconHelper.Companion.fullName
 import java.util.*
 import kotlin.collections.ArrayList
@@ -52,7 +51,7 @@ object AppInfoCore: BroadcastReceiver() {
 
     private val EMPTY_LABEL = ""
 
-    private val EMPTY_ICON = ColorDrawable(Color.BLACK)
+    private val EMPTY_ICON = EmptyDrawable()
 
     private var isRegisterReceiver = false
 
