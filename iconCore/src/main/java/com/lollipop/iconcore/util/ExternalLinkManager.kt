@@ -42,9 +42,11 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
 
         const val ARG_WEB_URL = "webUrl"
 
+        const val ARG_TAG = "linkTag"
+
         const val KEY_LINK_TYPE = "linkType"
 
-        val EMPTY_INFO = LinkInfo("", "", 0, Intent())
+        val EMPTY_INFO = LinkInfo("", "", 0, Intent(), "", "")
 
         /**
          * 从意图中获取链接类型
@@ -58,6 +60,13 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
          */
         fun getWebUrl(intent: Intent): String {
             return intent.getStringExtra(ARG_WEB_URL)?:""
+        }
+
+        /**
+         * 获取原始的配置中的url信息
+         */
+        fun getLinkUrl(intent: Intent): String {
+            return intent.getStringExtra(ARG_TAG)?:""
         }
 
     }
@@ -104,6 +113,8 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
             const val ATTR_SUMMARY = "summary"
             const val ATTR_ICON = "icon"
             const val ATTR_URL = "url"
+            const val ATTR_OTHER1 = "attr1"
+            const val ATTR_OTHER2 = "attr2"
 
             const val TYPE_ACTION = "action"
             const val TYPE_HTTP = "http"
@@ -116,6 +127,7 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
             const val ARG_TYPE = "type"
 
             fun decodeUrl(intent: Intent, url: String) {
+                intent.putExtra(ARG_TAG, url)
                 when {
                     url.startsWith(TYPE_ACTION, true) -> {
                         val start = url.indexOf("(") + 1
@@ -135,6 +147,9 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
                     }
                     url == TYPE_STORE -> {
                         intent.putExtra(KEY_LINK_TYPE, LINK_TYPE_STORE)
+                    }
+                    else -> {
+                        intent.putExtra(KEY_LINK_TYPE, LINK_TYPE_UNKNOWN)
                     }
                 }
             }
@@ -217,6 +232,8 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
                 var itemInfo = false
                 var argType = ""
                 var argName = ""
+                var other1 = ""
+                var other2 = ""
                 while (eventType != XmlPullParser.END_DOCUMENT) {
                     val tagName = xml.name
                     when (eventType) {
@@ -224,6 +241,8 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
                             if (TAG_LINK == tagName) {
                                 title = xml.getAttributeValue(null, ATTR_TITLE)?:""
                                 summary = xml.getAttributeValue(null, ATTR_SUMMARY)?:""
+                                other1 = xml.getAttributeValue(null, ATTR_OTHER1)?:""
+                                other2 = xml.getAttributeValue(null, ATTR_OTHER2)?:""
                                 icon = context.findDrawableId(
                                     xml.getAttributeValue(null, ATTR_ICON))
                                 url = Intent()
@@ -246,7 +265,7 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
                         }
                         XmlPullParser.END_TAG -> {
                             if (TAG_LINK == tagName) {
-                                linkList.add(LinkInfo(title, summary, icon, url))
+                                linkList.add(LinkInfo(title, summary, icon, url, other1, other2))
                             } else if (TAG_ARG == tagName) {
                                 itemInfo = false
                             }
@@ -266,6 +285,8 @@ class ExternalLinkManager(private val linkProvider: ExternalLinkProvider?) {
 
     }
 
-    data class LinkInfo(val title: String, val summary: String, val icon: Int, val url: Intent)
+    data class LinkInfo(val title: String, val summary: String,
+                        val icon: Int, val url: Intent,
+                        val attr1: String, val attr2: String)
 
 }
