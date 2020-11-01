@@ -5,7 +5,9 @@
         title="为图标包评分吧"
         summary="如果你喜欢这个图标包，请给个好评吧！"
         icon="ic_launcher_round"
-        url="store"/>
+        url="store"
+        attr1="other1"
+        attr2="other2"/>
 
     <link
         title="开发者的个人网站"
