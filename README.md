@@ -45,8 +45,12 @@
 ## 接入
 
 ### 核心(IconCore)
-目前`核心`正处于`Alpha`阶段，尚不稳定，需要接入者clone项目后接入module。
-后续相对稳定时，将会提供`jCenter`仓库地址，以实现快速接入。
+
+使用Gradle接入：
+```groovy
+implementation 'com.lollipop.smartIconPack:IconCore:1.0'
+```
+
 当然，如果对现有`核心`不满意的同学，也可以直接clone来修改它。
 
 由于图标包需要在`Manifest.xml`中的`MainActivity`下声明相应的权限规则，因此，模块为了简化这个配置过程，在模块中内置了入口的`Activity`，并且提供交互界面的接口，让接入者定制主页的UI，这可能会和常规的应用开发有所区别，但是我们也提供了非常多的辅助方法，能让接入过程不会太过于复杂。
