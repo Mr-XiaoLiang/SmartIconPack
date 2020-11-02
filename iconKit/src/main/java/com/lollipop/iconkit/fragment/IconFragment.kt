@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.iconcore.listener.WindowInsetsHelper
@@ -12,6 +13,7 @@ import com.lollipop.iconcore.ui.IconHelper
 import com.lollipop.iconcore.ui.IconImageView
 import com.lollipop.iconcore.util.delay
 import com.lollipop.iconcore.util.doAsync
+import com.lollipop.iconcore.util.zeroTo
 import com.lollipop.iconkit.LIconKit
 import com.lollipop.iconkit.R
 import com.lollipop.iconkit.dialog.PreviewIconDialog
@@ -68,7 +70,11 @@ class IconFragment: BaseTabFragment() {
 
     override fun onInsetsChange(root: View, left: Int, top: Int, right: Int, bottom: Int) {
         super.onInsetsChange(root, left, top, right, bottom)
-        appListInsetsHelper?.setInsetsByPadding(left, top, right, 0)
+        appListInsetsHelper?.setInsetsByPadding(
+            left.zeroTo { root.resources.getDimensionPixelSize(R.dimen.left_space) },
+            top,
+            right.zeroTo { root.resources.getDimensionPixelSize(R.dimen.right_space) },
+            0)
     }
 
     override fun onDestroy() {
