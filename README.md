@@ -124,3 +124,220 @@ implementation 'com.lollipop.smartIconPack:IconCore:1.0'
 
 * **AboutFragment**
     这是开发者个人信息展示的页面，用于展示一些个性化的开发者信息。
+
+## 上传
+上传模块到`JCenter`，总共包含几个修改：
+1. 工程的`build.gradle`引入插件
+2. 工程中引入2个`gradle`打包脚本文件
+3. 模块下引入配置信息文件及应用插件
+4. `local.properties`中添加个人密钥
+
+### 引入插件
+`project`下的`build.gradle`中加入
+```groovy
+buildscript {
+    dependencies {
+        // Jcenter上传工具，需要加入以下两行
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+    }
+}
+allprojects {
+    //如果是kotlin项目,请添加此项,纯Java项目请忽略
+    tasks.withType(Javadoc).all { enabled = false }
+}
+```
+
+### 增加打包脚本
+
+`project`根目录加入以下两个文件
+
+原地址：[bintrayv1.gradle](https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle) , [installv1.gradle](https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle)
+
+bintrayv1.gradle
+```groovy
+apply plugin: 'com.jfrog.bintray'
+
+// 这是Jcenter上传前的打包脚本
+
+version = libraryVersion
+
+if (project.hasProperty("android")) { // Android libraries
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from android.sourceSets.main.java.srcDirs
+    }
+
+    task javadoc(type: Javadoc) {
+        source = android.sourceSets.main.java.srcDirs
+        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    }
+} else { // Java libraries
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+// Bintray
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+
+    configurations = ['archives']
+    pkg {
+        repo = bintrayRepo
+        name = bintrayName
+        desc = libraryDescription
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = allLicenses
+        publish = true
+        publicDownloadNumbers = true
+        version {
+            desc = libraryDescription
+            gpg {
+                sign = true //Determines whether to GPG sign the files. The default is false
+                passphrase = properties.getProperty("bintray.gpg.password")
+                //Optional. The passphrase for GPG signing'
+            }
+        }
+    }
+}
+```
+
+installv1.gradle
+```groovy
+apply plugin: 'com.github.dcendents.android-maven'
+
+// 这是上传JCenter前必要的打包脚本
+
+// Maven Group ID for the artifact
+group = publishedGroupId
+
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+                groupId publishedGroupId
+                artifactId artifact
+
+                // Add your description here
+                name libraryName
+                description libraryDescription
+                url siteUrl
+
+                // Set your license
+                licenses {
+                    license {
+                        name licenseName
+                        url licenseUrl
+                    }
+                }
+                developers {
+                    developer {
+                        id developerId
+                        name developerName
+                        email developerEmail
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+
+                }
+            }
+        }
+    }
+}
+```
+
+### 模块下加入模块信息
+`module`的根目录下加入配置信息文件
+
+publish.gradle
+```groovy
+ext {
+    // maven仓库的仓库名称（https://bintray.com/ 下
+    // 1. 注册账户
+    // 2. 创建Maven仓库（类型要选择maven）
+    // 3. 此处填写的是仓库名称
+    bintrayRepo = 'YourRepositoryName'
+    // library的group id
+    publishedGroupId = 'com.xxx.libraryName'
+    // library网站地址
+    siteUrl = ''
+    // library仓库地址
+    gitUrl = ''
+
+    // 注册时候的bintray username
+    developerId = ''
+    // 开发者名称
+    developerName = ''
+    // 开发者邮箱
+    developerEmail = ''
+
+    // 开源许可证（这里是Apache 2.0）
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+    
+    // library artifact（单个module一般就填写library name）
+    artifact = 'AAA'
+    libraryName = 'AAA'
+    libraryVersion = '1.0'
+    libraryDescription = ''
+    // bintrayName 是你在网页Repository页面能看到的名称，
+    // 可以使用上面的名称，也可以单独设置
+    bintrayName = artifact
+
+    // 最后，如果加入了JCenter，那么我们的引用就是这样
+    // implementation 'com.xxx.libraryName:AAA:1.0'
+}
+
+// 引入前面放入的打包脚本
+apply from: '../installv1.gradle'
+apply from: '../bintrayv1.gradle'
+
+```
+
+`module`的`build.gradle`中引入插件（用于打包）
+```groovy
+// 可以在文件前几行的apply的位置，接着加一行
+apply from: 'publish.gradle'
+```
+
+### `local.properties`中添加个人密钥
+```
+bintray.user=注册的用户名
+bintray.apikey=个人设置页面的api key
+```
+
+### 打包上传
+1. 可以选择`Android Studio`右上角的`Gradle`的tab，会打开一个窗口，以此选择：模块名 -> Tasks -> publishing
+最后打开目录后应该会有一个`bintrayUpload`的脚本，双击即可。
+
+2. 打开`Android Studio`的`终端`窗口，输入：
+```shell
+./gradlew moduleName:bU
+```
+`moduleName`就是你的模块名称了，注意区分大小写
+
+### 添加到JCenter
+打开 https://bintray.com/ 后，到自己的项目管理页面，找到刚刚上传的模块名称，点击进入后，会展示当前上传模块的描述信息，右下角的小方块右上角会有个`Add to JCenter`，点击，并且按照指示操作就OK👌了。
