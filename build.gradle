@@ -9,8 +9,9 @@ buildscript {
         classpath "com.android.tools.build:gradle:4.1.0"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        // Jcenter上传工具
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
     }
 }
 
@@ -19,6 +20,8 @@ allprojects {
         google()
         jcenter()
     }
+    // 不生成Java文档，因为kotlin的文档生成和Java有区别
+    tasks.withType(Javadoc).all { enabled = false }
 }
 
 task clean(type: Delete) {

@@ -1,0 +1,22 @@
+ext {
+    // maven仓库的仓库名称
+    bintrayRepo = 'maven'
+    // library的group id
+    publishedGroupId = 'com.lollipop.smartIconPack'
+    // library网站地址
+    siteUrl = 'https://lollipoppp.com/'
+    // library仓库地址
+    gitUrl = 'https://github.com/Mr-XiaoLiang/SmartIconPack'
+
+    // 注册时候的bintray username
+    developerId = 'lollipop'
+    // 开发者名称
+    developerName = 'Liang Lollipop'
+    // 开发者邮箱
+    developerEmail = '594liujian@gmail.com'
+
+    // 开源许可证（这里是LGPL 3.0）
+    licenseName = 'GNU LESSER GENERAL PUBLIC LICENSE, Version 3.0'
+    licenseUrl = 'https://www.gnu.org/licenses/lgpl-3.0.en.html'
+    allLicenses = ["LGPL-3.0"]
+}
