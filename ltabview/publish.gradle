@@ -1,0 +1,19 @@
+apply from: '../publish_info.gradle'
+ext {
+    // library的group id
+    publishedGroupId = 'com.lollipop.ltabview'
+    // library网站地址
+    siteUrl = 'https://lollipoppp.com/'
+    // library仓库地址
+    gitUrl = 'https://github.com/Mr-XiaoLiang/LTabView'
+    // library artifact（单个module一般就填写library name）
+    artifact = 'LTabView'
+    libraryName = 'LTabView'
+    libraryVersion = '1.0'
+    libraryDescription = 'provided by lollipop'
+    // Repository页面能看到的名称
+    bintrayName = artifact
+}
+
+apply from: '../installv1.gradle'
+apply from: '../bintrayv1.gradle'
