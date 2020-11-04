@@ -648,7 +648,8 @@ class IconHelper private constructor(
         }
 
         override fun getDrawableName(packageName: String, clsName: String): IntArray {
-            val cache = iconCache[packageName]
+            val token = packageName + clsName
+            val cache = iconCache[token]
             if (cache != null) {
                 return cache
             }
@@ -659,7 +660,7 @@ class IconHelper private constructor(
                 }
             }
             val idArray = IntArray(icons.size) { index -> icons[index].resId }
-            iconCache[packageName] = idArray
+            iconCache[token] = idArray
             return idArray
         }
 
