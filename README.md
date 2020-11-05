@@ -48,7 +48,7 @@
 
 使用Gradle接入：
 ```groovy
-implementation 'com.lollipop.smartIconPack:IconCore:1.0'
+implementation 'com.lollipop.smartIconPack:IconCore:1.0.1'
 ```
 
 当然，如果对现有`核心`不满意的同学，也可以直接clone来修改它。
@@ -96,6 +96,11 @@ implementation 'com.lollipop.smartIconPack:IconCore:1.0'
     对于不同的业务层场景，可能会有个各种小需求。这里提供了一些通用的小工具。比如异步线程与线程同步，日志打印输出，长度单位的转换，资源文件的查找等等。
 
 ### 基础套件(LIconKit)
+使用Gradle接入：
+```groovy
+implementation 'com.lollipop.smartIconPack:IconKit:1.0.2'
+```
+
 这是随`核心`一起产出的套件，也可以理解为`核心`的使用模板。
 它提供相对完整的图标包功能，以及开放的参数设定，同时，也为每个工具类提供了用例。
 如果你是第一次尝试接入`核心`，那么建议使用它来作为参考。
