@@ -48,7 +48,7 @@
 
 使用Gradle接入：
 ```groovy
-implementation 'com.lollipop.smartIconPack:IconCore:1.0.1'
+implementation 'com.lollipop.smartIconPack:IconCore:1.0.2'
 ```
 
 当然，如果对现有`核心`不满意的同学，也可以直接clone来修改它。
@@ -98,7 +98,7 @@ implementation 'com.lollipop.smartIconPack:IconCore:1.0.1'
 ### 基础套件(LIconKit)
 使用Gradle接入：
 ```groovy
-implementation 'com.lollipop.smartIconPack:IconKit:1.0.2'
+implementation 'com.lollipop.smartIconPack:IconKit:1.0.3'
 ```
 
 这是随`核心`一起产出的套件，也可以理解为`核心`的使用模板。

@@ -2,7 +2,7 @@ ext {
     // library artifact（单个module一般就填写library name）
     artifact = 'IconKit'
     libraryName = 'IconKit'
-    libraryVersion = '1.0.2'
+    libraryVersion = '1.0.3'
     libraryDescription = 'provided by lollipop'
     // Repository页面能看到的名称
     bintrayName = artifact
