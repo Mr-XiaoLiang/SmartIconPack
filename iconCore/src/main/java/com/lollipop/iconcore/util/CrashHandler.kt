@@ -94,6 +94,8 @@ object CrashHandler {
 
     /**
      * 获取崩溃信息的文件夹
+     * 它存储于缓存文件夹，用户清理缓存时，将会清理崩溃日志
+     * @param context 应用上下文
      */
     fun getCrashDir(context: Context): File {
         return File(context.cacheDir, CRASH_DIR_NAME)
@@ -183,6 +185,9 @@ object CrashHandler {
         }
     }
 
+    /**
+     * 清除所有的崩溃信息
+     */
     fun clean() {
         crashFileDir?.delete()
     }
