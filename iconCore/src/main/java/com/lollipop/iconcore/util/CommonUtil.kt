@@ -14,7 +14,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.core.content.ContextCompat
-import java.io.File
+import java.io.*
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
@@ -129,8 +129,8 @@ object CommonUtil {
         fun delay(time: Long) {
             delay(time, this)
         }
-
     }
+
 }
 
 /**
@@ -471,4 +471,34 @@ inline fun <reified T: Any> T.timeProfiler(): TimeProfiler {
     val profiler = TimeProfiler(this.javaClass.simpleName)
     profiler.punch()
     return profiler
+}
+
+fun String.writeTo(file: File) {
+    try {
+        if (file.exists()) {
+            file.delete()
+        } else {
+            file.parentFile?.mkdirs()
+        }
+        var inputStream: InputStream? = null
+        var outputStream: OutputStream? = null
+        val buffer = ByteArray(2048)
+        try {
+            inputStream = ByteArrayInputStream(this.toByteArray(Charsets.UTF_8))
+            outputStream = FileOutputStream(file)
+            var length = inputStream.read(buffer)
+            while (length >= 0) {
+                outputStream.write(buffer, 0, length)
+                length = inputStream.read(buffer)
+            }
+            outputStream.flush()
+        } catch (ee: Throwable) {
+            ee.printStackTrace()
+        } finally {
+            inputStream?.close()
+            outputStream?.close()
+        }
+    } catch (e: Throwable) {
+        e.printStackTrace()
+    }
 }

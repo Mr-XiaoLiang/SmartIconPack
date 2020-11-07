@@ -3,9 +3,7 @@ package com.lollipop.iconcore.util
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.PrintWriter
+import java.io.*
 import java.lang.reflect.Field
 import java.text.SimpleDateFormat
 import java.util.*
@@ -68,11 +66,16 @@ object CrashHandler {
     private const val CRASH_FILE_NAME = "yyyyMMddHHmmssSSS"
 
     /**
+     * 崩溃标示信息
+     */
+    private const val CRASH_FLAG = "CRASH_FLAG"
+
+    /**
      * 初始化崩溃信息的收集工具
      */
     fun init(context: Context,
-             uploadCallback: (File) -> Unit,
-             onAsync: Boolean = true) {
+             onAsync: Boolean = true,
+             uploadCallback: ((File) -> Boolean)?) {
         crashFileDir = getCrashDir(context)
         initDeviceInfo(context)
         //获取系统默认的UncaughtException处理器
@@ -127,7 +130,13 @@ object CrashHandler {
         for (field in fields) {
             try {
                 field.isAccessible = true
-                deviceInfo.addAttr(field.name, field.get(null)?.toString()?:"null")
+                val value = field.get(null)
+                val infoValue = if (value is Array<*>) {
+                    Arrays.toString(value)
+                } else {
+                    value?.toString()?:"null"
+                }
+                deviceInfo.addAttr(field.name, infoValue)
             } catch (e: Exception) {
             }
         }
@@ -155,41 +164,103 @@ object CrashHandler {
         val sdf = SimpleDateFormat(CRASH_FILE_NAME, Locale.getDefault())
         val name = sdf.format(Date(System.currentTimeMillis()))
         crashRoot.writeTo(File(dir, "$name.xml"))
+        updateCrashFlag()
         return true
+    }
+
+    private fun updateCrashFlag() {
+        val dir = crashFileDir?:return
+        val timeMillis = System.currentTimeMillis().toString()
+        val flagFile = File(dir, CRASH_FLAG)
+        timeMillis.writeTo(flagFile)
+    }
+
+    fun hasCrashFlag(context: Context): Boolean {
+        return File(getCrashDir(context), CRASH_FLAG).exists()
+    }
+
+    fun resetCrashFlag(context: Context) {
+        File(getCrashDir(context), CRASH_FLAG).delete()
     }
 
     private fun printError(error: Throwable): String {
         val out = ByteArrayOutputStream()
         val print = PrintWriter(out)
         error.printStackTrace(print)
+        print.flush()
         return out.toString(Charsets.UTF_8.displayName())
     }
 
-    private fun uploadCrash(uploadCallback: (File) -> Unit) {
+    private fun uploadCrash(uploadCallback: ((File) -> Boolean)?) {
+        val callback = uploadCallback?:return
         val fileDir = crashFileDir?:return
-        val listFiles = fileDir.listFiles()?:return
+        getCrashLog(fileDir, callback)
+    }
+
+    fun getCrashLog(context: Context, callback: (File) -> Unit): Boolean {
+        return getCrashLog(getCrashDir(context)) {
+            callback(it)
+            false
+        }
+    }
+
+    private fun getCrashLog(fileDir: File, callback: (File) -> Boolean): Boolean {
+        val listFiles = fileDir.listFiles()?:return false
         val zipHelper = ZipHelper.zipTo(fileDir, "crash")
+        if (listFiles.isEmpty()) {
+            return false
+        }
+        var fileSize = 0
         for (file in listFiles) {
             if (!file.exists()) {
                 continue
             }
             try {
                 zipHelper.addFile(file)
+                fileSize++
             } catch (e: Throwable) {
                 e.printStackTrace()
             }
         }
-        zipHelper.startUp {
-            uploadCallback(it)
-            it.delete()
+        if (fileSize == 0) {
+            return false
         }
+        zipHelper.startUp {
+            if (callback(it)) {
+                it.delete()
+            }
+        }
+        return true
     }
 
     /**
      * 清除所有的崩溃信息
      */
-    fun clean() {
-        crashFileDir?.delete()
+    fun clean(context: Context) {
+        removeFile(getCrashDir(context))
+    }
+
+    private fun removeFile(dir: File) {
+        val files = LinkedList<File>()
+        files.add(dir)
+        while (files.isNotEmpty()) {
+            val first = files.removeFirst()
+            if (first.isFile) {
+                first.delete()
+            } else if (first.isDirectory) {
+                val listFiles = first.listFiles()
+                if (listFiles != null && listFiles.isNotEmpty()) {
+                    // 放回自身，等待子文件删除后删除自身
+                    files.addFirst(first)
+                    for (file in listFiles) {
+                        // 将子文件放在最前，保证先删除子文件
+                        files.addFirst(file)
+                    }
+                } else {
+                    first.delete()
+                }
+            }
+        }
     }
 
     private class ExceptionHandler(

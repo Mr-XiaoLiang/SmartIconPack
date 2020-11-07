@@ -62,16 +62,18 @@ object AppInfoCore: BroadcastReceiver() {
     /**
      * 初始化
      */
-    fun init(context: Context, loadedCallback: AppLoadPendingTask) {
+    fun init(context: Context, loadedCallback: AppLoadPendingTask?) {
         if (isLoaded) {
-            loadedCallback.onAppLoaded()
+            loadedCallback?.onAppLoaded()
             while (appLoadedCallbackList.isNotEmpty()) {
                 val c = appLoadedCallbackList.removeFirst()
                 c.onAppLoaded()
             }
             return
         }
-        appLoadedCallbackList.addLast(loadedCallback)
+        if (loadedCallback != null) {
+            appLoadedCallbackList.addLast(loadedCallback)
+        }
         if (!isRegisterReceiver) {
             registerReceiver(context)
             isRegisterReceiver = true
