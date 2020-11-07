@@ -132,6 +132,16 @@ class XmlBuilder private constructor(private val tag: String) {
         }
 
     /**
+     * 清理本节点及其子节点的所有信息
+     */
+    fun clean() {
+        children.clear()
+        attributeList.clear()
+        commentList.clear()
+        text = ""
+    }
+
+    /**
      * 将当前节点及其子节点转换为字符串
      */
     override fun toString(): String {
