@@ -1,14 +1,11 @@
 package com.lollipop.iconkit.fragment
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.checkbox.MaterialCheckBox
@@ -150,21 +147,12 @@ class RequestFragment : BaseTabFragment() {
     }
 
     private fun emailTo(path: File){
-        // 必须明确使用mailto前缀来修饰邮件地址,如果使用
-        // intent.putExtra(Intent.EXTRA_EMAIL, email)，结果将匹配不到任何应用
-        val requireActivity = requireActivity()
-        val emailId = LIconKit.createMakerInfoProvider(requireActivity)?.email?:0
-        val email = resources.getString(emailId)
-        val uri = Uri.parse("mailto:$email")
-        val intent = Intent(Intent.ACTION_SEND, uri)
-        intent.type = "application/octet-stream"
-        intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
-        intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_request_subject)) // 主题
-        intent.putExtra(Intent.EXTRA_TEXT, requireActivity.packageName) // 正文
-        intent.putExtra(Intent.EXTRA_STREAM,
-            FileProvider.getUriForFile(requireActivity,
-                "${requireActivity.packageName}.provider", path))
-        startActivity(Intent.createChooser(intent, getString(R.string.title_choose_email)))
+        LIconKit.mailTo(
+            requireActivity(),
+            R.string.title_choose_email,
+            R.string.email_request_subject,
+            R.string.app_name,
+            path)
     }
 
     override fun onInsetsChange(root: View, left: Int, top: Int, right: Int, bottom: Int) {

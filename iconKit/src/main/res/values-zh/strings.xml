@@ -15,4 +15,9 @@
     <string name="request_title">适配申请</string>
     <string name="title_choose_email">请选择邮件类应用</string>
     <string name="email_request_subject">图标包适配申请</string>
+    <string name="title_crash_dialog">抱歉</string>
+    <string name="msg_crash_dialog">非常抱歉，发生了崩溃。\n对此造成的不好体验，向您表示由衷的歉意，同时也希望您能给予我们宽容。\n上传错误信息，将会有助于我们修复这些错误。\n感谢您的支持！</string>
+    <string name="clean_crash_log">清理日志</string>
+    <string name="ignore_crash">忽略</string>
+    <string name="send_crash">发送日志</string>
 </resources>

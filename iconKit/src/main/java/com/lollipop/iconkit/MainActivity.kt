@@ -10,7 +10,9 @@ import androidx.viewpager.widget.ViewPager
 import com.lollipop.iconcore.listener.WindowInsetsHelper
 import com.lollipop.iconcore.ui.IconPackActivity
 import com.lollipop.iconcore.ui.SimpleActivityRenderer
+import com.lollipop.iconcore.util.CrashHandler
 import com.lollipop.iconcore.util.log
+import com.lollipop.iconkit.dialog.CrashDialog
 import com.lollipop.iconkit.fragment.*
 import liang.lollipop.ltabview.LTabHelper
 import liang.lollipop.ltabview.LTabView
@@ -24,6 +26,8 @@ open class MainActivity: SimpleActivityRenderer() {
 
     private val fragmentList = ArrayList<BaseTabFragment>()
     private var tabGroupInsetsHelper: WindowInsetsHelper? = null
+
+    private var crashDialogShown = false
 
     override fun onCreate(target: IconPackActivity, savedInstanceState: Bundle?) {
         super.onCreate(target, savedInstanceState)
@@ -80,6 +84,18 @@ open class MainActivity: SimpleActivityRenderer() {
     override fun onInsetsChange(root: View, left: Int, top: Int, right: Int, bottom: Int) {
         tabGroupInsetsHelper?.updateByPadding(root, left, top, right, bottom)
         log("onInsetsChange: ", root, left, top, right, bottom)
+    }
+
+    override fun onResume(target: IconPackActivity) {
+        super.onResume(target)
+        if (!crashDialogShown) {
+            if (CrashHandler.hasCrashFlag(target)) {
+                CrashHandler.getCrashLog(target) {
+                    CrashDialog(it).show(target)
+                    crashDialogShown = true
+                }
+            }
+        }
     }
 
     private class FragmentAdapter(fragmentManager: FragmentManager,

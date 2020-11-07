@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/titleView"
+        android:layout_width="0px"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/title_size"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="@dimen/left_space"
+        android:layout_marginEnd="@dimen/right_space"
+        android:layout_marginTop="@dimen/top_space"
+        android:textColor="@color/curtainText"
+        android:text="@string/title_crash_dialog"/>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0px"
+        android:layout_height="0px"
+        app:layout_constraintTop_toBottomOf="@id/titleView"
+        app:layout_constraintLeft_toLeftOf="@id/titleView"
+        app:layout_constraintRight_toRightOf="@id/titleView"
+        app:layout_constraintBottom_toTopOf="@id/cleanBtn"
+        android:layout_marginTop="@dimen/top_space"
+        android:layout_marginBottom="@dimen/bottom_space">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/msg_crash_dialog"
+            android:textSize="@dimen/summary_size"
+            android:textColor="@color/curtainTextSecondary"/>
+    </androidx.core.widget.NestedScrollView>
+
+    <TextView
+        android:id="@+id/cleanBtn"
+        android:background="@drawable/bg_text_btn"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/ignoreBtn"
+        android:layout_width="0px"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/home_bottom"
+        android:text="@string/clean_crash_log"
+        android:textSize="@dimen/summary_size"
+        android:paddingLeft="@dimen/left_space"
+        android:paddingRight="@dimen/right_space"
+        android:paddingTop="@dimen/top_space"
+        android:paddingBottom="@dimen/bottom_space"
+        android:gravity="center"
+        android:textColor="@color/curtainTextSecondary"
+        android:layout_marginLeft="@dimen/left_space"
+        android:layout_marginRight="@dimen/right_space"/>
+
+    <TextView
+        android:id="@+id/ignoreBtn"
+        android:background="@drawable/bg_outline_btn"
+        app:layout_constraintBottom_toBottomOf="@id/cleanBtn"
+        app:layout_constraintLeft_toRightOf="@id/cleanBtn"
+        app:layout_constraintRight_toLeftOf="@id/sendBtn"
+        android:paddingLeft="@dimen/left_space"
+        android:paddingRight="@dimen/right_space"
+        android:paddingTop="@dimen/top_space"
+        android:paddingBottom="@dimen/bottom_space"
+        android:gravity="center"
+        android:layout_width="0px"
+        android:layout_height="wrap_content"
+        android:text="@string/ignore_crash"
+        android:textSize="@dimen/summary_size"
+        android:layout_marginLeft="@dimen/left_space"
+        android:layout_marginRight="@dimen/right_space"/>
+
+    <TextView
+        android:id="@+id/sendBtn"
+        android:background="@drawable/bg_full_btn"
+        android:elevation="3dp"
+        app:layout_constraintBottom_toBottomOf="@id/ignoreBtn"
+        app:layout_constraintLeft_toRightOf="@id/ignoreBtn"
+        app:layout_constraintRight_toRightOf="parent"
+        android:paddingLeft="@dimen/left_space"
+        android:paddingRight="@dimen/right_space"
+        android:paddingTop="@dimen/top_space"
+        android:paddingBottom="@dimen/bottom_space"
+        android:gravity="center"
+        android:layout_width="0px"
+        android:layout_height="wrap_content"
+        android:text="@string/send_crash"
+        android:textColor="@color/colorPrimaryText"
+        android:textSize="@dimen/summary_size"
+        android:layout_marginLeft="@dimen/left_space"
+        android:layout_marginRight="@dimen/right_space"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

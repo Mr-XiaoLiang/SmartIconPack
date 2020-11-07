@@ -14,4 +14,9 @@
     <string name="request_title">Request icon</string>
     <string name="title_choose_email">Please select mail application</string>
     <string name="email_request_subject">Icon package adaptation application</string>
+    <string name="title_crash_dialog">Sorry</string>
+    <string name="msg_crash_dialog">Sorry, a crash occurred. \nI sincerely apologize to you for the bad experience, and hope that you can give us tolerance. \nUploading error messages will help us fix these errors. \nthank you for your support!</string>
+    <string name="clean_crash_log">Clean All</string>
+    <string name="ignore_crash">Ignore</string>
+    <string name="send_crash">send</string>
 </resources>

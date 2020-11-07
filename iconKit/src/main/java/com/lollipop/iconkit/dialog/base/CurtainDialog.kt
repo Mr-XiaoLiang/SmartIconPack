@@ -151,6 +151,7 @@ class CurtainDialog private constructor(
             rootGroup.addView(dialogView)
             innerDialogProvider?.let { provider ->
                 if (contentView != null) {
+                    contentView.setOnClickListener {  }
                     provider.onViewCreated(contentView)
                 }
                 onWindowInsetsProvider?.addOnWindowInsetsProvider(provider)
