@@ -81,7 +81,7 @@ object CrashHandler {
         if (handler !is ExceptionHandler) {
             myExceptionHandler.setDefHandler(handler)
             //设置该CrashHandler为程序的默认处理器
-            Thread.setDefaultUncaughtExceptionHandler(myExceptionHandler);
+            Thread.setDefaultUncaughtExceptionHandler(myExceptionHandler)
         }
         if (onAsync) {
             doAsync {
@@ -205,6 +205,8 @@ object CrashHandler {
         override fun uncaughtException(t: Thread, e: Throwable) {
             if (!onCrash.invoke(t, e)) {
                 defHandler?.uncaughtException(t, e)
+            } else {
+                android.os.Process.killProcess(android.os.Process.myPid())
             }
         }
     }
