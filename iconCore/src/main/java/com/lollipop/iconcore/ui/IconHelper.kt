@@ -338,6 +338,27 @@ class IconHelper private constructor(
     private var autoFixCallback: AutoFixCallback? = null
 
     /**
+     * 已适配图标的应用集合序列化为字符串
+     */
+    fun supportedListToString(context: Context): String {
+        return serializeAppInfo(context, supportedList)
+    }
+
+    /**
+     * 未适配图标的应用集合序列化为字符串
+     */
+    fun unsupportedListToString(context: Context): String {
+        return serializeAppInfo(context, notSupportList)
+    }
+
+    /**
+     * 图标集合序列化未字符串
+     */
+    fun iconListToString(context: Context): String {
+        return serializeIconInfo(context, iconList)
+    }
+
+    /**
      * 比较已适配app中，相对目标而言新增的部分，并且返回新增的列表
      * @param target 用于比较的模板
      * @return 只会返回已适配app列表中，相对模板而言多出的部分，
