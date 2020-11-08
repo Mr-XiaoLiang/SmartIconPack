@@ -8,6 +8,8 @@ import com.lollipop.iconcore.util.AppInfoCore
 import com.lollipop.iconcore.util.TimeProfiler
 import com.lollipop.iconcore.util.findDrawableId
 import com.lollipop.iconcore.util.timeProfiler
+import org.json.JSONArray
+import org.json.JSONObject
 import org.xmlpull.v1.XmlPullParser
 import java.io.Closeable
 import java.lang.ref.WeakReference
@@ -81,6 +83,8 @@ class IconHelper private constructor(
         const val ATTR_COMPONENT = "component"
         const val ATTR_DRAWABLE = "drawable"
 
+        private const val KEY_COMPONENT_INFO = "ComponentInfo"
+
         private val EMPTY_ICON_ID = IntArray(0)
         private val EMPTY_COMPONENT = ComponentName("", "")
         private val EMPTY_ICON = IconInfo("", EMPTY_COMPONENT, 0)
@@ -124,7 +128,7 @@ class IconHelper private constructor(
          * 解析Component信息
          */
         fun parseComponent(info: String): ComponentName {
-            if (!info.startsWith("ComponentInfo")) {
+            if (!info.startsWith(KEY_COMPONENT_INFO)) {
                 return EMPTY_COMPONENT
             }
             val start = info.indexOf("{") + 1
@@ -175,6 +179,41 @@ class IconHelper private constructor(
          */
         fun getLabel(context: Context, name: ComponentName): CharSequence {
             return AppInfoCore.getLabel(context, name)
+        }
+
+        /**
+         * 序列化应用信息
+         */
+        private fun serializeAppInfo(context: Context, list: List<AppInfo>): String {
+            val jsonArray = JSONArray()
+            for (info in list) {
+                val obj = JSONObject()
+                val iconArray = JSONArray()
+                for (icon in info.iconPack) {
+                    iconArray.put(context.resources.getResourceName(icon))
+                }
+                obj.put(ATTR_DRAWABLE, iconArray)
+                obj.put(ATTR_COMPONENT,
+                    "$KEY_COMPONENT_INFO{${info.pkg.packageName}/${info.pkg.className}}")
+                jsonArray.put(obj)
+            }
+            return jsonArray.toString()
+        }
+
+        /**
+         * 序列化图标信息
+         */
+        private fun serializeIconInfo(context: Context, list: List<IconInfo>): String {
+            val jsonArray = JSONArray()
+            for (info in list) {
+                val obj = JSONObject()
+                obj.put(ATTR_DRAWABLE, context.resources.getResourceName(info.resId))
+                obj.put(ATTR_COMPONENT,
+                    "$KEY_COMPONENT_INFO{${info.pkg.packageName}/${info.pkg.className}}")
+                obj.put(ATTR_NAME, info.name)
+                jsonArray.put(obj)
+            }
+            return jsonArray.toString()
         }
 
     }
