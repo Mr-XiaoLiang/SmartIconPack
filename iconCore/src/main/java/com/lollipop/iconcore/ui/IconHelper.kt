@@ -4,10 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.Xml
-import com.lollipop.iconcore.util.AppInfoCore
-import com.lollipop.iconcore.util.TimeProfiler
-import com.lollipop.iconcore.util.findDrawableId
-import com.lollipop.iconcore.util.timeProfiler
+import com.lollipop.iconcore.util.*
 import org.json.JSONArray
 import org.json.JSONObject
 import org.xmlpull.v1.XmlPullParser
@@ -87,7 +84,7 @@ class IconHelper private constructor(
 
         private val EMPTY_ICON_ID = IntArray(0)
         private val EMPTY_COMPONENT = ComponentName("", "")
-        private val EMPTY_ICON = IconInfo("", EMPTY_COMPONENT, 0)
+        private val EMPTY_ICON = IconInfo("", EMPTY_COMPONENT, 0, "")
         private val EMPTY_APP_INFO = AppInfo(EMPTY_COMPONENT, EMPTY_ICON_ID)
 
         /**
@@ -184,13 +181,13 @@ class IconHelper private constructor(
         /**
          * 序列化应用信息
          */
-        private fun serializeAppInfo(context: Context, list: List<AppInfo>): String {
+        fun serializeAppInfo(context: Context, list: List<AppInfo>): String {
             val jsonArray = JSONArray()
             for (info in list) {
                 val obj = JSONObject()
                 val iconArray = JSONArray()
                 for (icon in info.iconPack) {
-                    iconArray.put(context.resources.getResourceName(icon))
+                    iconArray.put(context.findName(icon))
                 }
                 obj.put(ATTR_DRAWABLE, iconArray)
                 obj.put(ATTR_COMPONENT,
@@ -203,17 +200,77 @@ class IconHelper private constructor(
         /**
          * 序列化图标信息
          */
-        private fun serializeIconInfo(context: Context, list: List<IconInfo>): String {
+        fun serializeIconInfo(context: Context, list: List<IconInfo>): String {
             val jsonArray = JSONArray()
             for (info in list) {
                 val obj = JSONObject()
-                obj.put(ATTR_DRAWABLE, context.resources.getResourceName(info.resId))
+                obj.put(ATTR_DRAWABLE, context.findName(info.resId))
+                obj.put("iconName", info.iconName)
                 obj.put(ATTR_COMPONENT,
                     "$KEY_COMPONENT_INFO{${info.pkg.packageName}/${info.pkg.className}}")
                 obj.put(ATTR_NAME, info.name)
                 jsonArray.put(obj)
             }
             return jsonArray.toString()
+        }
+
+        /**
+         * 解析序列化之后的app信息
+         */
+        fun parseAppInfo(context: Context, info: String): List<AppInfo> {
+            val arrayList = ArrayList<AppInfo>()
+            try {
+                val jsonArray = JSONArray(info)
+                val tempList = ArrayList<Int>()
+                for (index in 0 until jsonArray.length()) {
+                    try {
+                        val obj = jsonArray.optJSONObject(index)
+                        val component = parseComponent(obj.optString(ATTR_COMPONENT))
+                        val iconArray = obj.optJSONArray(ATTR_DRAWABLE)
+                        tempList.clear()
+                        if (iconArray != null) {
+                            for (i in 0 .. iconArray.length()) {
+                                val id = context.findDrawableId(iconArray.optString(i)?:"")
+                                if (id != 0) {
+                                    tempList.add(id)
+                                }
+                            }
+                        }
+                        val icon = IntArray(tempList.size) { tempList[it] }
+                        arrayList.add(AppInfo(component, icon))
+                    } catch (ee: Throwable) {
+                        ee.printStackTrace()
+                    }
+                }
+            } catch (e: Throwable) {
+                e.printStackTrace()
+            }
+            return arrayList
+        }
+
+        /**
+         * 解析icon的序列化信息
+         */
+        fun parseIconInfo(context: Context, info: String): List<IconInfo> {
+            val arrayList = ArrayList<IconInfo>()
+            try {
+                val jsonArray = JSONArray(info)
+                for (index in 0 until jsonArray.length()) {
+                    try {
+                        val obj = jsonArray.optJSONObject(index)
+                        val component = parseComponent(obj.optString(ATTR_COMPONENT))
+                        val name = obj.optString(ATTR_NAME)
+                        val icon = obj.optInt(ATTR_DRAWABLE)
+                        val iconName = obj.optString("iconName")
+                        arrayList.add(IconInfo(name, component, icon, iconName))
+                    } catch (ee: Throwable) {
+                        ee.printStackTrace()
+                    }
+                }
+            } catch (e: Throwable) {
+                e.printStackTrace()
+            }
+            return arrayList
         }
 
     }
@@ -279,6 +336,130 @@ class IconHelper private constructor(
     private var onAppListChangeCallback: ((IconHelper) -> Unit)? = null
 
     private var autoFixCallback: AutoFixCallback? = null
+
+    /**
+     * 比较已适配app中，相对目标而言新增的部分，并且返回新增的列表
+     * @param target 用于比较的模板
+     * @return 只会返回已适配app列表中，相对模板而言多出的部分，
+     * 不会返回缺少的部分
+     */
+    fun supportedDiffUp(target: List<AppInfo>): List<AppInfo> {
+        return appInfoDiffUp(supportedList, target)
+    }
+
+    /**
+     * 比较已适配的app列表中，相对模板而言减少的APP
+     * @param target 用于比较的模板
+     * @return 只会返回已适配app列表中，相对模板而言缺少的部分，
+     * 不会返回多余的部分
+     */
+    fun supportedDiffDown(target: List<AppInfo>): List<AppInfo> {
+        return appInfoDiffDown(supportedList, target)
+    }
+
+    /**
+     * 比较未适配app中，相对目标而言新增的部分，并且返回新增的列表
+     * @param target 用于比较的模板
+     * @return 只会返回未适配app列表中，相对模板而言多出的部分，
+     * 不会返回缺少的部分
+     */
+    fun unsupportedDiffUp(target: List<AppInfo>): List<AppInfo> {
+        return appInfoDiffUp(notSupportList, target)
+    }
+
+    /**
+     * 比较未适配的app列表中，相对模板而言减少的APP
+     * @param target 用于比较的模板
+     * @return 只会返回未适配app列表中，相对模板而言缺少的部分，
+     * 不会返回多余的部分
+     */
+    fun unsupportedDiffDown(target: List<AppInfo>): List<AppInfo> {
+        return appInfoDiffDown(notSupportList, target)
+    }
+
+    private fun appInfoDiffUp(appList: List<AppInfo>, target: List<AppInfo>): List<AppInfo> {
+        val list = ArrayList<AppInfo>()
+        list.addAll(appList)
+        val iterator = list.iterator()
+        while ((iterator.hasNext())) {
+            val next = iterator.next()
+            if (hasAppInfo(next, target)) {
+                iterator.remove()
+            }
+        }
+        return list
+    }
+
+    private fun appInfoDiffDown(appList: List<AppInfo>, target: List<AppInfo>): List<AppInfo> {
+        val list = ArrayList<AppInfo>()
+        list.addAll(target)
+        val iterator = list.iterator()
+        while ((iterator.hasNext())) {
+            val next = iterator.next()
+            if (hasAppInfo(next, appList)) {
+                iterator.remove()
+            }
+        }
+        return list
+    }
+
+    /**
+     * 相对于对比模板，多出模板的图标信息
+     * @param target 用于比较的图标信息
+     * @return 它只会返回多出模板的部分，不会返回少于模板的部分
+     */
+    fun iconInfoDiffUp(target: List<IconInfo>): List<IconInfo> {
+        val list = ArrayList<IconInfo>()
+        list.addAll(iconList)
+        val iterator = list.iterator()
+        while ((iterator.hasNext())) {
+            val next = iterator.next()
+            if (hasIconInfo(next, target)) {
+                iterator.remove()
+            }
+        }
+        return list
+    }
+
+    /**
+     * 相对于对比模板，少于模板的图标信息
+     * @param target 用于比较的图标信息
+     * @return 它只会返回少于模板的部分，不会返回多出模板的部分
+     */
+    fun iconInfoDiffDown(target: List<IconInfo>): List<IconInfo> {
+        val list = ArrayList<IconInfo>()
+        list.addAll(target)
+        val iterator = list.iterator()
+        while ((iterator.hasNext())) {
+            val next = iterator.next()
+            if (hasIconInfo(next, iconList)) {
+                iterator.remove()
+            }
+        }
+        return list
+    }
+
+    private fun hasAppInfo(target: AppInfo, list: List<AppInfo>): Boolean {
+        val packageName = target.pkg.packageName
+        val className = target.pkg.className
+        for (info in list) {
+            if (packageName == info.pkg.packageName
+                && className == info.pkg.className) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun hasIconInfo(target: IconInfo, list: List<IconInfo>): Boolean {
+        val iconName = target.iconName
+        for (info in list) {
+            if (iconName == info.iconName) {
+                return true
+            }
+        }
+        return false
+    }
 
     /**
      * 按照序号获取图标信息
@@ -424,7 +605,8 @@ class IconHelper private constructor(
                     for (icon in iconPack) {
                         if (icon != 0 && deduplicationList.indexOf(icon) < 0) {
                             deduplicationList.add(icon)
-                            iconList.add(IconInfo(context, app, icon))
+                            iconList.add(IconInfo(
+                                context, app, icon, context.findName(icon)))
                         }
                     }
                 }
@@ -446,7 +628,8 @@ class IconHelper private constructor(
                     for (icon in iconPack) {
                         if (icon != 0 && deduplicationList.indexOf(icon) < 0) {
                             deduplicationList.add(icon)
-                            iconList.add(IconInfo(app.getLabel(context), app.pkg, icon))
+                            iconList.add(IconInfo(
+                                app.getLabel(context), app.pkg, icon, context.findName(icon)))
                         }
                     }
                 }
@@ -494,23 +677,27 @@ class IconHelper private constructor(
      * 图标包信息
      */
     class IconInfo private constructor(
-        val nameProvider: () -> CharSequence, component: ComponentName, id: Int) {
+        val nameProvider: () -> CharSequence,
+        component: ComponentName,
+        id: Int,
+        val iconName: String) {
 
         /**
          * @param label 图标名称
          * @param component 图标包对应的应用包名
          * @param id 图标对应的drawable id
          */
-        constructor(label: CharSequence, component: ComponentName, id: Int):
-                this({label}, component, id)
+        constructor(label: CharSequence, component: ComponentName, id: Int, iconName: String):
+                this({label}, component, id, iconName)
 
         /**
          * @param context 上下文
          * @param appInfo 应用信息
          * @param icon 图标对应的drawable id
+         * @param iconName 图标对应的名称
          */
-        constructor(context: Context, appInfo: AppInfo, icon: Int):
-                this({ getLabel(context, appInfo.pkg)}, appInfo.pkg, icon)
+        constructor(context: Context, appInfo: AppInfo, icon: Int, iconName: String):
+                this({ getLabel(context, appInfo.pkg)}, appInfo.pkg, icon, iconName)
 
         /**
          * 图标包的名称
@@ -668,7 +855,8 @@ class IconHelper private constructor(
                             val name = xml.getAttributeValue(null, ATTR_NAME) ?: ""
                             val pkg = xml.getAttributeValue(null, ATTR_COMPONENT) ?: ""
                             val icon = xml.getAttributeValue(null, ATTR_DRAWABLE) ?: ""
-                            val info = IconInfo(name, parseComponent(pkg), findDrawableId(context, icon))
+                            val info = IconInfo(
+                                name, parseComponent(pkg), findDrawableId(context, icon), icon)
                             iconGroup.add(info)
                             allIcon.add(info)
                         }

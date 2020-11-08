@@ -461,6 +461,13 @@ fun Context.findId(name: String, type: String): Int {
 }
 
 /**
+ * 尝试通过一个id获取对应的资源名
+ */
+fun Context.findName(id: Int): String {
+    return resources.getResourceName(id)
+}
+
+/**
  * 从context中获取当前应用的版本名称
  */
 fun Context.versionName(): String {
