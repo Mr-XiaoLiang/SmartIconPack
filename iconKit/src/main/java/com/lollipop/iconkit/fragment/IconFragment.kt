@@ -126,7 +126,7 @@ class IconFragment: BaseTabFragment() {
         }
 
         fun bind(iconInfo: IconHelper.IconInfo) {
-            iconView.loadIcon(iconInfo.resId)
+            iconView.load(iconInfo)
             nameView.text = iconInfo.name
         }
 

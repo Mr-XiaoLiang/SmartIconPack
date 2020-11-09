@@ -39,4 +39,7 @@
     <color name="maker_name">#353936</color>
     <color name="maker_signature">#353936</color>
     <color name="title_bar_background">#638798</color>
+    <color name="newSupportIcon">#E64369</color>
+    <color name="newIconIcon">#81C854</color>
+    <color name="linkItemBackground">#30dddddd</color>
 </resources>

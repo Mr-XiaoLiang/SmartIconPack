@@ -4,7 +4,6 @@ import com.lollipop.iconcore.IconPackCore
 import com.lollipop.iconcore.provider.MainPageProvider
 import com.lollipop.iconcore.provider.MainPageRenderer
 import com.lollipop.iconcore.ui.IconApplication
-import java.io.File
 
 /**
  * @author lollipop

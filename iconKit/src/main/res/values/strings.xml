@@ -19,4 +19,6 @@
     <string name="clean_crash_log">Clean All</string>
     <string name="ignore_crash">Ignore</string>
     <string name="send_crash">send</string>
+    <string name="new_support">New supported</string>
+    <string name="new_icon">New Icon</string>
 </resources>

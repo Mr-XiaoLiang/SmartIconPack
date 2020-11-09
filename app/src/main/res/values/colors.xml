@@ -12,7 +12,7 @@
     <color name="windowBackground">#546e7a</color>
     <color name="contentBackground">#ffffff</color>
     <color name="dialogBackground">#88000000</color>
-    <color name="tabBackground">#36464E</color>
+    <color name="tabBackground">#546e7a</color>
 
     <color name="toolbarIcon">#DDFFFFFF</color>
     <color name="toolbarTitle">#FFFFFF</color>
@@ -41,4 +41,7 @@
     <color name="maker_name">#353936</color>
     <color name="maker_signature">#353936</color>
     <color name="title_bar_background">#638798</color>
+    <color name="newSupportIcon">#E64369</color>
+    <color name="newIconIcon">#81C854</color>
+    <color name="linkItemBackground">#30dddddd</color>
 </resources>

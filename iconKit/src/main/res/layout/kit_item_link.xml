@@ -3,9 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingTop="@dimen/top_space"
-    android:paddingBottom="@dimen/bottom_space"
     android:background="?attr/selectableItemBackground">
+
+    <View
+        android:id="@+id/backgroundView"
+        android:layout_width="0px"
+        android:layout_height="0px"
+        android:background="@color/linkItemBackground"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
 
     <ImageView
         android:layout_width="48dp"
@@ -13,7 +21,10 @@
         android:id="@+id/iconView"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginLeft="@dimen/left_space"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="@dimen/top_space"
+        android:layout_marginBottom="@dimen/bottom_space"/>
 
     <TextView
         android:id="@+id/titleView"
@@ -25,7 +36,8 @@
         android:textSize="@dimen/link_title"
         android:textColor="@color/curtainText"
         android:layout_marginRight="@dimen/right_space"
-        android:layout_marginLeft="@dimen/left_space"/>
+        android:layout_marginLeft="@dimen/left_space"
+        android:layout_marginTop="@dimen/top_space"/>
 
     <TextView
         android:id="@+id/summaryView"
@@ -34,6 +46,8 @@
         app:layout_constraintLeft_toLeftOf="@id/titleView"
         app:layout_constraintRight_toRightOf="@id/titleView"
         app:layout_constraintTop_toBottomOf="@id/titleView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="@dimen/bottom_space"
         android:layout_marginTop="@dimen/mini_space"
         android:textSize="@dimen/link_summary"
         android:textColor="@color/curtainTextSecondary" />

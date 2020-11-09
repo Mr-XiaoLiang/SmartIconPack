@@ -3,7 +3,9 @@ package com.lollipop.iconkit.fragment
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.WallpaperManager
+import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,13 +14,20 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.PermissionChecker
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.lollipop.iconcore.listener.WindowInsetsHelper
 import com.lollipop.iconcore.ui.IconHelper
+import com.lollipop.iconcore.ui.IconImageView
 import com.lollipop.iconcore.ui.IconView
 import com.lollipop.iconcore.util.*
+import com.lollipop.iconcore.util.SharedPreferencesUtils.get
+import com.lollipop.iconcore.util.SharedPreferencesUtils.set
+import com.lollipop.iconkit.LApplication
 import com.lollipop.iconkit.LIconKit
 import com.lollipop.iconkit.R
+import com.lollipop.iconkit.dialog.NewIconDialog
 import com.lollipop.iconkit.dialog.UpdateInfoDialog
 import kotlinx.android.synthetic.main.kit_fragment_home.*
 
@@ -38,19 +47,56 @@ class HomeFragment: BaseTabFragment() {
 
     companion object {
         private const val REQUEST_READ_SDCARD = 996
+
+        private const val KEY_LAST_VERSION = "LAST_VERSION"
+        private const val KEY_LAST_SUPPORT = "LAST_SUPPORT"
+        private const val KEY_LAST_ICON = "LAST_ICON"
+
+        private const val KEY_THIS_SUPPORT = "THIS_SUPPORT"
+        private const val KEY_THIS_ICON = "THIS_ICON"
+
+        fun lastSupportInfo(context: Context): String {
+            return context[KEY_LAST_SUPPORT, ""]
+        }
+
+        fun lastIconInfo(context: Context): String {
+            return context[KEY_LAST_ICON, ""]
+        }
     }
 
-    private var iconHelper = IconHelper.supportedOnly {
-        LIconKit.createHomePageMap(it)
+    private var iconHelper = IconHelper.newHelper(IconHelper.FLAG_ALL_INFO) {
+        LIconKit.createMultipleIconMap(it)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+        // 先隐藏
+        checkNewIconItem(newSupportIcon, newSupportTitle,
+            newSupportCount, newSupportList, newSupportArrow, 0)
+        checkNewIconItem(newIconIcon, newIconTitle,
+            newIconCount, newIconList, newIconArrow, 0)
         doAsync {
-            iconHelper.loadAppInfo(view.context)
+            val ctx = view.context
+            iconHelper.loadAppInfo(ctx)
             onUI {
                 initIconView()
+            }
+            checkVersionUpdate(ctx)
+            val newSupport = iconHelper.supportedDiffUp(
+                IconHelper.parseAppInfo(
+                    ctx, lastSupportInfo(ctx)))
+            onUI {
+                initNewSupportList(
+                    newSupportIcon, newSupportTitle, newSupportCount, newSupportList,
+                    newSupportArrow, newSupport)
+            }
+            val newIcon = iconHelper.iconInfoDiffUp(
+                IconHelper.parseIconInfo(
+                    ctx, lastIconInfo(ctx)))
+            onUI {
+                initNewIconList(newIconIcon, newIconTitle, newIconCount, newIconList,
+                    newIconArrow, newIcon)
             }
         }
     }
@@ -109,6 +155,102 @@ class HomeFragment: BaseTabFragment() {
         }
 
         bindLinkInfo(linkGroup, ExternalLinkManager(LIconKit.createLinkInfoProvider(context!!)))
+    }
+
+    private fun initNewIconList(icon: View, title: View, count: TextView,
+                                listView: RecyclerView, arrow: View,
+                                data: List<IconHelper.IconInfo>) {
+        if (!checkNewIconItem(icon, title, count, listView, arrow, data.size)) {
+            return
+        }
+
+        val adapter = NewIconAdapter(data)
+        listView.layoutManager = LinearLayoutManager(
+            listView.context, RecyclerView.HORIZONTAL, false)
+        listView.adapter = adapter
+        adapter.notifyDataSetChanged()
+
+        val dialog = NewIconDialog(data)
+        arrow.setOnClickListener {
+            activity?.let {
+                dialog.show(it)
+            }
+        }
+    }
+
+
+    private fun initNewSupportList(icon: View, title: View, count: TextView,
+                                   listView: RecyclerView, arrow: View,
+                                   data: List<Any>) {
+        checkNewIconItem(icon, title, count, listView, arrow, data.size)
+
+        if (!checkNewIconItem(icon, title, count, listView, arrow, data.size)) {
+            return
+        }
+
+        val adapter = NewIconAdapter(data)
+        listView.layoutManager = LinearLayoutManager(
+            listView.context, RecyclerView.HORIZONTAL, false)
+        listView.adapter = adapter
+        adapter.notifyDataSetChanged()
+
+        val dialog = NewIconDialog(data)
+        arrow.setOnClickListener {
+            activity?.let {
+                dialog.show(it)
+            }
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun checkNewIconItem(icon: View, title: View, count: TextView,
+                                 listView: RecyclerView, arrow: View, dataCount: Int): Boolean {
+        if (dataCount == 0) {
+            icon.visibility = View.GONE
+            title.visibility = View.GONE
+            count.visibility = View.GONE
+            listView.visibility = View.GONE
+            arrow.visibility = View.GONE
+            return false
+        }
+        icon.visibility = View.VISIBLE
+        title.visibility = View.VISIBLE
+        count.visibility = View.VISIBLE
+        listView.visibility = View.VISIBLE
+        arrow.visibility = View.VISIBLE
+
+        count.text = "+${dataCount}"
+        return true
+    }
+
+    private fun checkVersionUpdate(context: Context) {
+        val iconHelper = IconHelper.newHelper(IconHelper.FLAG_ALL_INFO) {
+            LIconKit.createMultipleIconMap(it)
+        }
+        iconHelper.loadAppInfo(context)
+
+        val lastVersion = context[KEY_LAST_VERSION, 0L]
+        val thisVersion = context.versionCode()
+        val supportedValue = iconHelper.supportedListToString(context)
+        if (lastVersion != thisVersion) {
+            val iconValue = iconHelper.iconListToString(context)
+            context[KEY_LAST_SUPPORT] = context[KEY_THIS_SUPPORT, ""]
+            context[KEY_LAST_ICON] = context[KEY_THIS_ICON, ""]
+            context[KEY_THIS_ICON] = iconValue
+            context[KEY_LAST_VERSION] = thisVersion
+        }
+        context[KEY_THIS_SUPPORT] = supportedValue
+        iconHelper.onAppListChange {
+            updateSupportInfo(context, it)
+        }
+    }
+
+    private fun updateSupportInfo(context: Context, iconHelper: IconHelper) {
+        doAsync {
+            iconHelper.loadAppInfo(context, false)
+            val supportedValue = iconHelper.supportedListToString(context)
+            context[KEY_THIS_SUPPORT] = supportedValue
+        }
     }
 
     override fun onDestroy() {
@@ -205,7 +347,7 @@ class HomeFragment: BaseTabFragment() {
         }
         for (index in 0 until linkManager.linkCount) {
             val holder = LinkItemHolder.create(group)
-            holder.bind(linkManager.getLink(index))
+            holder.bind(linkManager.getLink(index), index % 2 == 1)
             group.addView(holder.itemView)
         }
     }
@@ -220,13 +362,15 @@ class HomeFragment: BaseTabFragment() {
             }
         }
 
-        fun bind(info: ExternalLinkManager.LinkInfo) {
+        fun bind(info: ExternalLinkManager.LinkInfo, showBackground: Boolean) {
             val titleView: TextView = itemView.findViewById(R.id.titleView)
             val summaryView: TextView = itemView.findViewById(R.id.summaryView)
             val iconView: ImageView = itemView.findViewById(R.id.iconView)
+            val backgroundView: View = itemView.findViewById(R.id.backgroundView)
 
             OvalOutlineProvider.bind(iconView)
 
+            backgroundView.visibility = if (showBackground) { View.VISIBLE } else { View.GONE }
             titleView.text = info.title
             summaryView.text = info.summary
             iconView.setImageResource(info.icon)
@@ -254,6 +398,48 @@ class HomeFragment: BaseTabFragment() {
                     Snackbar.make(it, R.string.open_link_error, Snackbar.LENGTH_SHORT).show()
                 }
             }
+        }
+
+    }
+
+    private class NewIconAdapter(private val data: List<Any>): RecyclerView.Adapter<NewIconHolder>() {
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewIconHolder {
+            return NewIconHolder.create(parent)
+        }
+
+        override fun onBindViewHolder(holder: NewIconHolder, position: Int) {
+            val any = data[position]
+            if (any is IconHelper.AppInfo) {
+                holder.bind(any)
+            } else if (any is IconHelper.IconInfo) {
+                holder.bind(any)
+            }
+        }
+
+        override fun getItemCount(): Int {
+            return data.size
+        }
+
+    }
+
+    private class NewIconHolder private constructor(view: View): RecyclerView.ViewHolder(view) {
+        companion object {
+            fun create(group: ViewGroup): NewIconHolder {
+                return NewIconHolder(
+                    LayoutInflater.from(group.context)
+                        .inflate(R.layout.kit_item_new, group, false))
+            }
+        }
+
+        private val iconView: IconImageView = itemView.findViewById(R.id.iconView)
+
+        fun bind(info: IconHelper.AppInfo) {
+            iconView.load(info)
+        }
+
+        fun bind(info: IconHelper.IconInfo) {
+            iconView.load(info)
         }
 
     }

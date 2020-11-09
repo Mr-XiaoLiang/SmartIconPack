@@ -1,6 +1,5 @@
 package com.lollipop.iconkit
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -45,6 +44,10 @@ object LIconKit {
 
     fun createMakerInfoProvider(context: Context): MakerInfoManager.MakerInfoProvider? {
         return iconMapCreator?.createMakerInfoProvider(context)
+    }
+
+    fun createMultipleIconMap(context: Context): IconHelper.DrawableMap {
+        return IconHelper.MultipleXmlMap(createRequestPageMap(context), createAppsPageMap(context))
     }
 
     interface IconMapCreator {
