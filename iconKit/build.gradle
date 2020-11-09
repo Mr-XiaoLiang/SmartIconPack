@@ -13,8 +13,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 4
-        versionName "1.0.3"
+        versionCode 5
+        versionName "1.0.4"
 
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -42,7 +42,6 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 //     compile project(path: ':iconCore')
-    compile 'com.lollipop.smartIconPack:IconCore:1.0.2'
-//    implementation project(path: ':ltabview')
+    compile 'com.lollipop.smartIconPack:IconCore:1.0.3'
     implementation 'com.lollipop.ltabview:LTabView:1.0'
 }
