@@ -474,12 +474,21 @@ fun Context.versionName(): String {
     return packageManager.getPackageInfo(packageName, 0).versionName
 }
 
+/**
+ * 创建一个时间性能工具
+ * 用于检测某些代码的运行时间
+ */
 inline fun <reified T: Any> T.timeProfiler(): TimeProfiler {
     val profiler = TimeProfiler(this.javaClass.simpleName)
     profiler.punch()
     return profiler
 }
 
+/**
+ * 将一段文本写入一个文件中
+ * 它属于IO操作，这是一个耗时的任务，
+ * 需要在子线程中执行
+ */
 fun String.writeTo(file: File) {
     try {
         if (file.exists()) {
