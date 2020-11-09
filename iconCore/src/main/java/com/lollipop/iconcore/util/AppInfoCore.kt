@@ -16,6 +16,8 @@ import kotlin.collections.ArrayList
  */
 object AppInfoCore: BroadcastReceiver() {
 
+    private const val LOCK_KEY = "AppInfoCore"
+
     /**
      * 应用原始信息
      */
@@ -102,39 +104,48 @@ object AppInfoCore: BroadcastReceiver() {
         }
     }
 
+    @JvmSynthetic
     fun getLabel(context: Context, name: ComponentName): CharSequence {
-        for (info in appResolveInfo) {
-            if (name.packageName == info.pkgName && name.className == info.clsName) {
-                if (TextUtils.isEmpty(info.label)) {
-                    val label = info.resolveInfo.loadLabel(context.packageManager)
-                    info.label = label
+        synchronized(LOCK_KEY) {
+            for (info in appResolveInfo) {
+                if (name.packageName == info.pkgName && name.className == info.clsName) {
+                    if (TextUtils.isEmpty(info.label)) {
+                        val label = info.resolveInfo.loadLabel(context.packageManager)
+                        info.label = label
+                    }
+                    return info.label
                 }
-                return info.label
             }
+            return EMPTY_LABEL
         }
-        return EMPTY_LABEL
     }
 
+    @JvmSynthetic
     fun getLabel(context: Context, app: ResolveInfo): CharSequence {
-        for (info in appResolveInfo) {
-            if (info.resolveInfo == app) {
-                if (TextUtils.isEmpty(info.label)) {
-                    val label = info.resolveInfo.loadLabel(context.packageManager)
-                    info.label = label
+        synchronized(LOCK_KEY) {
+            for (info in appResolveInfo) {
+                if (info.resolveInfo == app) {
+                    if (TextUtils.isEmpty(info.label)) {
+                        val label = info.resolveInfo.loadLabel(context.packageManager)
+                        info.label = label
+                    }
+                    return info.label
                 }
-                return info.label
             }
+            return EMPTY_LABEL
         }
-        return EMPTY_LABEL
     }
 
+    @JvmSynthetic
     fun loadIcon(context: Context, name: ComponentName): Drawable {
-        for (info in appResolveInfo) {
-            if (name.packageName == info.pkgName && name.className == info.clsName) {
-                return info.resolveInfo.loadIcon(context.packageManager)
+        synchronized(LOCK_KEY) {
+            for (info in appResolveInfo) {
+                if (name.packageName == info.pkgName && name.className == info.clsName) {
+                    return info.resolveInfo.loadIcon(context.packageManager)
+                }
             }
+            return EMPTY_ICON
         }
-        return EMPTY_ICON
     }
 
     operator fun get(index: Int): ResolveInfo {

@@ -3,6 +3,7 @@ package com.lollipop.iconcore.util
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
@@ -472,6 +473,17 @@ fun Context.findName(id: Int): String {
  */
 fun Context.versionName(): String {
     return packageManager.getPackageInfo(packageName, 0).versionName
+}
+
+/**
+ * 从context中获取当前应用的版本名称
+ */
+fun Context.versionCode(): Long {
+    val packageInfo = packageManager.getPackageInfo(packageName, 0)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        return packageInfo.longVersionCode
+    }
+    return packageInfo.versionCode.toLong()
 }
 
 /**

@@ -219,6 +219,9 @@ class IconHelper private constructor(
          */
         fun parseAppInfo(context: Context, info: String): List<AppInfo> {
             val arrayList = ArrayList<AppInfo>()
+            if (info.isBlank()) {
+                return arrayList
+            }
             try {
                 val jsonArray = JSONArray(info)
                 val tempList = ArrayList<Int>()
@@ -253,6 +256,9 @@ class IconHelper private constructor(
          */
         fun parseIconInfo(context: Context, info: String): List<IconInfo> {
             val arrayList = ArrayList<IconInfo>()
+            if (info.isBlank()) {
+                return arrayList
+            }
             try {
                 val jsonArray = JSONArray(info)
                 for (index in 0 until jsonArray.length()) {
@@ -938,6 +944,24 @@ class IconHelper private constructor(
             return iconMap[category]?.size?:0
         }
 
+    }
+
+    /**
+     * 组合式的图标包获取对象
+     * @param appFilter 当应用检索时，使用额外的字典，针对多包名适配场景
+     * @param iconMap 当icon遍历时，使用一个独立的字典，针对遍历时不重复场景
+     */
+    class MultipleXmlMap(private val appFilter: DrawableMap?, private val iconMap: DrawableMap?): DrawableMap {
+        override fun getDrawableName(packageName: String, clsName: String): IntArray {
+            return appFilter?.getDrawableName(packageName, clsName)?: EMPTY_ICON_ID
+        }
+
+        override val iconCount: Int
+            get() = iconMap?.iconCount?:0
+
+        override fun get(index: Int): IconInfo {
+            return iconMap?.get(index)?: EMPTY_ICON
+        }
     }
 
     /**
