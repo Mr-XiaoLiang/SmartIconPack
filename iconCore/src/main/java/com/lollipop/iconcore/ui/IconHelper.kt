@@ -3,8 +3,12 @@ package com.lollipop.iconcore.ui
 import android.content.ComponentName
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.util.Base64
 import android.util.Xml
-import com.lollipop.iconcore.util.*
+import com.lollipop.iconcore.util.AppInfoCore
+import com.lollipop.iconcore.util.findDrawableId
+import com.lollipop.iconcore.util.findName
+import com.lollipop.iconcore.util.timeProfiler
 import org.json.JSONArray
 import org.json.JSONObject
 import org.xmlpull.v1.XmlPullParser
@@ -13,6 +17,7 @@ import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+
 
 /**
  * @author lollipop
@@ -30,7 +35,8 @@ import kotlin.collections.HashMap
  */
 class IconHelper private constructor(
     private val flags: Int,
-    private val customizeMap: DrawableMapProvider? = null): AppInfoCore.AppChangeListener {
+    private val customizeMap: DrawableMapProvider? = null
+): AppInfoCore.AppChangeListener {
 
     companion object {
 
@@ -104,8 +110,10 @@ class IconHelper private constructor(
         /**
          * 以只记录图标包的形式创建
          */
-        fun iconPackOnly(skipAppInfo: Boolean = false,
-                         creator: (context: Context) -> DrawableMap?): IconHelper {
+        fun iconPackOnly(
+            skipAppInfo: Boolean = false,
+            creator: (context: Context) -> DrawableMap?
+        ): IconHelper {
             val flag = if (skipAppInfo) {
                 FLAG_ICON_PACK_INFO or FLAG_SKIP_APP_INFO
             } else {
@@ -125,23 +133,34 @@ class IconHelper private constructor(
          * 解析Component信息
          */
         fun parseComponent(info: String): ComponentName {
-            if (!info.startsWith(KEY_COMPONENT_INFO)) {
+            try {
+                if (!info.startsWith(KEY_COMPONENT_INFO)) {
+                    return EMPTY_COMPONENT
+                }
+                val start = info.indexOf("{") + 1
+                val end = info.indexOf("}")
+                if (start > end || start == end) {
+                    return EMPTY_COMPONENT
+                }
+                val infoContent = info.substring(start, end)
+                val split = infoContent.split("/")
+                if (split.size < 2) {
+                    return EMPTY_COMPONENT
+                }
+                val pkg = split[0]
+                val cls = split[1]
+                val fullName = if (cls[0] == '.') { pkg + cls } else { cls }
+                return ComponentName(pkg, fullName)
+            } catch (e: Throwable) {
                 return EMPTY_COMPONENT
             }
-            val start = info.indexOf("{") + 1
-            val end = info.indexOf("}")
-            if (start > end || start == end) {
-                return EMPTY_COMPONENT
-            }
-            val infoContent = info.substring(start, end)
-            val split = infoContent.split("/")
-            if (split.size < 2) {
-                return EMPTY_COMPONENT
-            }
-            val pkg = split[0]
-            val cls = split[1]
-            val fullName = if (cls[0] == '.') { pkg + cls } else { cls }
-            return ComponentName(pkg, fullName)
+        }
+
+        /**
+         * 序列化一个Component信息
+         */
+        fun serializeComponent(name: ComponentName): String {
+            return "$KEY_COMPONENT_INFO{${name.packageName}/${name.className}}"
         }
 
         private fun activityFullName(pkg: String, cls: String): String {
@@ -190,11 +209,13 @@ class IconHelper private constructor(
                     iconArray.put(context.findName(icon))
                 }
                 obj.put(ATTR_DRAWABLE, iconArray)
-                obj.put(ATTR_COMPONENT,
-                    "$KEY_COMPONENT_INFO{${info.pkg.packageName}/${info.pkg.className}}")
+                obj.put(
+                    ATTR_COMPONENT,
+                    "$KEY_COMPONENT_INFO{${info.pkg.packageName}/${info.pkg.className}}"
+                )
                 jsonArray.put(obj)
             }
-            return jsonArray.toString()
+            return encode(jsonArray.toString())
         }
 
         /**
@@ -206,12 +227,11 @@ class IconHelper private constructor(
                 val obj = JSONObject()
                 obj.put(ATTR_DRAWABLE, context.findName(info.resId))
                 obj.put("iconName", info.iconName)
-                obj.put(ATTR_COMPONENT,
-                    "$KEY_COMPONENT_INFO{${info.pkg.packageName}/${info.pkg.className}}")
+                obj.put(ATTR_COMPONENT, serializeComponent(info.pkg))
                 obj.put(ATTR_NAME, info.name)
                 jsonArray.put(obj)
             }
-            return jsonArray.toString()
+            return encode(jsonArray.toString())
         }
 
         /**
@@ -223,7 +243,7 @@ class IconHelper private constructor(
                 return arrayList
             }
             try {
-                val jsonArray = JSONArray(info)
+                val jsonArray = JSONArray(decode(info))
                 val tempList = ArrayList<Int>()
                 for (index in 0 until jsonArray.length()) {
                     try {
@@ -233,7 +253,7 @@ class IconHelper private constructor(
                         tempList.clear()
                         if (iconArray != null) {
                             for (i in 0 .. iconArray.length()) {
-                                val id = context.findDrawableId(iconArray.optString(i)?:"")
+                                val id = context.findDrawableId(iconArray.optString(i) ?: "")
                                 if (id != 0) {
                                     tempList.add(id)
                                 }
@@ -260,7 +280,7 @@ class IconHelper private constructor(
                 return arrayList
             }
             try {
-                val jsonArray = JSONArray(info)
+                val jsonArray = JSONArray(decode(info))
                 for (index in 0 until jsonArray.length()) {
                     try {
                         val obj = jsonArray.optJSONObject(index)
@@ -277,6 +297,16 @@ class IconHelper private constructor(
                 e.printStackTrace()
             }
             return arrayList
+        }
+
+        private fun encode(value: String): String {
+            return Base64.encodeToString(value.toByteArray(Charsets.UTF_8),
+                Base64.NO_PADDING or Base64.NO_WRAP or Base64.URL_SAFE)
+        }
+
+        private fun decode(value: String): String {
+            return String(Base64.decode(value,
+                Base64.NO_PADDING or Base64.NO_WRAP or Base64.URL_SAFE))
         }
 
     }
@@ -632,8 +662,11 @@ class IconHelper private constructor(
                     for (icon in iconPack) {
                         if (icon != 0 && deduplicationList.indexOf(icon) < 0) {
                             deduplicationList.add(icon)
-                            iconList.add(IconInfo(
-                                context, app, icon, context.findName(icon)))
+                            iconList.add(
+                                IconInfo(
+                                    context, app, icon, context.findName(icon)
+                                )
+                            )
                         }
                     }
                 }
@@ -655,8 +688,11 @@ class IconHelper private constructor(
                     for (icon in iconPack) {
                         if (icon != 0 && deduplicationList.indexOf(icon) < 0) {
                             deduplicationList.add(icon)
-                            iconList.add(IconInfo(
-                                app.getLabel(context), app.pkg, icon, context.findName(icon)))
+                            iconList.add(
+                                IconInfo(
+                                    app.getLabel(context), app.pkg, icon, context.findName(icon)
+                                )
+                            )
                         }
                     }
                 }
@@ -707,7 +743,8 @@ class IconHelper private constructor(
         val nameProvider: () -> CharSequence,
         component: ComponentName,
         id: Int,
-        val iconName: String) {
+        val iconName: String
+    ) {
 
         /**
          * @param label 图标名称
@@ -715,7 +752,7 @@ class IconHelper private constructor(
          * @param id 图标对应的drawable id
          */
         constructor(label: CharSequence, component: ComponentName, id: Int, iconName: String):
-                this({label}, component, id, iconName)
+                this({ label }, component, id, iconName)
 
         /**
          * @param context 上下文
@@ -724,7 +761,7 @@ class IconHelper private constructor(
          * @param iconName 图标对应的名称
          */
         constructor(context: Context, appInfo: AppInfo, icon: Int, iconName: String):
-                this({ getLabel(context, appInfo.pkg)}, appInfo.pkg, icon, iconName)
+                this({ getLabel(context, appInfo.pkg) }, appInfo.pkg, icon, iconName)
 
         /**
          * 图标包的名称
@@ -883,7 +920,8 @@ class IconHelper private constructor(
                             val pkg = xml.getAttributeValue(null, ATTR_COMPONENT) ?: ""
                             val icon = xml.getAttributeValue(null, ATTR_DRAWABLE) ?: ""
                             val info = IconInfo(
-                                name, parseComponent(pkg), findDrawableId(context, icon), icon)
+                                name, parseComponent(pkg), findDrawableId(context, icon), icon
+                            )
                             iconGroup.add(info)
                             allIcon.add(info)
                         }
