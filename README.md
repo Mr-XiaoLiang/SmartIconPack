@@ -50,6 +50,7 @@
 ```groovy
 implementation 'com.lollipop.smartIconPack:IconCore:1.0.3'
 ```
+[更新日志](https://github.com/Mr-XiaoLiang/SmartIconPack/blob/master/iconCore/update.md)
 
 当然，如果对现有`核心`不满意的同学，也可以直接clone来修改它。
 
@@ -100,6 +101,7 @@ implementation 'com.lollipop.smartIconPack:IconCore:1.0.3'
 ```groovy
 implementation 'com.lollipop.smartIconPack:IconKit:1.0.4'
 ```
+[更新日志](https://github.com/Mr-XiaoLiang/SmartIconPack/blob/master/iconKit/update.md)
 
 这是随`核心`一起产出的套件，也可以理解为`核心`的使用模板。
 它提供相对完整的图标包功能，以及开放的参数设定，同时，也为每个工具类提供了用例。
