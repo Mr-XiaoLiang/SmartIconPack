@@ -1,11 +1,15 @@
 # IconCore更新日志
 
+### 1.0.6（2020.11.30）
+* 增加`AppFilterMergeHelper`，用于`appfilter.xml`合并的工具，帮助开发者快速整理和合并适配清单
+* 调整AppFilter文件生成的属性顺序
+
 ### 1.0.3（2020.11.10）
 * 增加`Icon`信息的差异对比工具，简化新增图标信息的整理与展示
 * 优化线程同步造成的安全问题
 * 优化图标信息序列化时产生的字符转义问题
-* 新增`IconHelper.MultipleXmlMap`混合图标字典，可以为图标检索与图标遍历分别提供字典
-* 新增`SharedPreferencesUtils`持久化储存工具，简化本地参数存储过程
+* 增加`IconHelper.MultipleXmlMap`混合图标字典，可以为图标检索与图标遍历分别提供字典
+* 增加`SharedPreferencesUtils`持久化储存工具，简化本地参数存储过程
 * 修复内部细节问题，优化性能
 
 ### 1.0.2（2020.11.07）

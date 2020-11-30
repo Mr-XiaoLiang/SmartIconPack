@@ -49,9 +49,9 @@ class AppFilterMergeHelper {
         val values = hashMap.values
         for (app in values) {
             builder.addChild(ITEM)
-                .addAttr(ATTR_NAME, app.name)
                 .addAttr(ATTR_COMPONENT, app.component)
                 .addAttr(ATTR_DRAWABLE, app.drawable)
+                .addAttr(ATTR_NAME, app.name)
         }
         return builder.toString()
     }

@@ -50,9 +50,9 @@ class XmlBuilder private constructor(private val tag: String) {
             for (index in 0 until count) {
                 val info = infoProvider(index)
                 builder.addChild(ITEM)
-                    .addAttr(IconHelper.ATTR_NAME, info.getLabel(context).toString())
                     .addAttr(IconHelper.ATTR_COMPONENT, info.pkg.toString())
                     .addAttr(IconHelper.ATTR_DRAWABLE, info.drawableName)
+                    .addAttr(IconHelper.ATTR_NAME, info.getLabel(context).toString())
             }
             return builder
         }

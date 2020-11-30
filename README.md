@@ -48,7 +48,7 @@
 
 使用Gradle接入：
 ```groovy
-implementation 'com.lollipop.smartIconPack:IconCore:1.0.3'
+implementation 'com.lollipop.smartIconPack:IconCore:1.0.6'
 ```
 [更新日志](https://github.com/Mr-XiaoLiang/SmartIconPack/blob/master/iconCore/update.md)
 
