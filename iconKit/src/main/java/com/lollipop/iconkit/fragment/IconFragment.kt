@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.iconcore.listener.WindowInsetsHelper
@@ -13,11 +12,12 @@ import com.lollipop.iconcore.ui.IconHelper
 import com.lollipop.iconcore.ui.IconImageView
 import com.lollipop.iconcore.util.delay
 import com.lollipop.iconcore.util.doAsync
+import com.lollipop.iconcore.util.lazyBind
 import com.lollipop.iconcore.util.zeroTo
 import com.lollipop.iconkit.LIconKit
 import com.lollipop.iconkit.R
+import com.lollipop.iconkit.databinding.KitFragmentIconBinding
 import com.lollipop.iconkit.dialog.PreviewIconDialog
-import kotlinx.android.synthetic.main.kit_fragment_icon.*
 
 /**
  * @author lollipop
@@ -30,10 +30,10 @@ class IconFragment: BaseTabFragment() {
         get() = R.string.icon
     override val tabColorId: Int
         get() = R.color.tabIconSelectedColor
-    override val layoutId: Int
-        get() = R.layout.kit_fragment_icon
     override val isLightStatusBar: Boolean
         get() = true
+
+    private val viewBinding: KitFragmentIconBinding by lazyBind()
 
     private val iconHelper = IconHelper.iconPackOnly(true) {
         LIconKit.createAppsPageMap(it)
@@ -48,21 +48,29 @@ class IconFragment: BaseTabFragment() {
         addBackPressedListener(previewIconDialog)
     }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return viewBinding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val column = resources.getInteger(R.integer.app_list_column)
-        appList.layoutManager = GridLayoutManager(
+        viewBinding.appList.layoutManager = GridLayoutManager(
             view.context, column, RecyclerView.VERTICAL, false)
-        appList.adapter = IconAdapter(iconHelper) { view, icon ->
-            previewIconDialog.show(view, icon)
+        viewBinding.appList.adapter = IconAdapter(iconHelper) { v, icon ->
+            previewIconDialog.show(v, icon)
         }
         doAsync {
             iconHelper.loadAppInfo(context!!)
-            delay(appList.animate().duration) {
-                appList.adapter?.notifyDataSetChanged()
+            delay(viewBinding.appList.animate().duration) {
+                viewBinding.appList.adapter?.notifyDataSetChanged()
             }
         }
-        appListInsetsHelper = WindowInsetsHelper(appList, autoLayout = false)
+        appListInsetsHelper = WindowInsetsHelper(viewBinding.appList, autoLayout = false)
         view.post {
             previewIconDialog.attach(activity!!)
         }

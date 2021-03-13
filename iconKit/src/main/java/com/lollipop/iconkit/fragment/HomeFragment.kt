@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.app.WallpaperManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -24,12 +23,11 @@ import com.lollipop.iconcore.ui.IconView
 import com.lollipop.iconcore.util.*
 import com.lollipop.iconcore.util.SharedPreferencesUtils.get
 import com.lollipop.iconcore.util.SharedPreferencesUtils.set
-import com.lollipop.iconkit.LApplication
 import com.lollipop.iconkit.LIconKit
 import com.lollipop.iconkit.R
+import com.lollipop.iconkit.databinding.KitFragmentHomeBinding
 import com.lollipop.iconkit.dialog.NewIconDialog
 import com.lollipop.iconkit.dialog.UpdateInfoDialog
-import kotlinx.android.synthetic.main.kit_fragment_home.*
 
 /**
  * @author lollipop
@@ -42,8 +40,8 @@ class HomeFragment: BaseTabFragment() {
         get() = R.string.home
     override val tabColorId: Int
         get() = R.color.tabHomeSelectedColor
-    override val layoutId: Int
-        get() = R.layout.kit_fragment_home
+
+    private val viewBinding: KitFragmentHomeBinding by lazyBind()
 
     companion object {
         private const val REQUEST_READ_SDCARD = 996
@@ -68,14 +66,24 @@ class HomeFragment: BaseTabFragment() {
         LIconKit.createMultipleIconMap(it)
     }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return viewBinding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
         // 先隐藏
-        checkNewIconItem(newSupportIcon, newSupportTitle,
-            newSupportCount, newSupportList, newSupportArrow, 0)
-        checkNewIconItem(newIconIcon, newIconTitle,
-            newIconCount, newIconList, newIconArrow, 0)
+        checkNewIconItem(viewBinding.newSupportIcon, viewBinding.newSupportTitle,
+            viewBinding.newSupportCount, viewBinding.newSupportList,
+            viewBinding.newSupportArrow, 0)
+        checkNewIconItem(viewBinding.newIconIcon, viewBinding.newIconTitle,
+            viewBinding.newIconCount, viewBinding.newIconList,
+            viewBinding.newIconArrow, 0)
         doAsync {
             val ctx = view.context
             iconHelper.loadAppInfo(ctx)
@@ -88,15 +96,17 @@ class HomeFragment: BaseTabFragment() {
                     ctx, lastSupportInfo(ctx)))
             onUI {
                 initNewSupportList(
-                    newSupportIcon, newSupportTitle, newSupportCount, newSupportList,
-                    newSupportArrow, newSupport)
+                    viewBinding.newSupportIcon, viewBinding.newSupportTitle,
+                    viewBinding.newSupportCount, viewBinding.newSupportList,
+                    viewBinding.newSupportArrow, newSupport)
             }
             val newIcon = iconHelper.iconInfoDiffUp(
                 IconHelper.parseIconInfo(
                     ctx, lastIconInfo(ctx)))
             onUI {
-                initNewIconList(newIconIcon, newIconTitle, newIconCount, newIconList,
-                    newIconArrow, newIcon)
+                initNewIconList(viewBinding.newIconIcon, viewBinding.newIconTitle,
+                    viewBinding.newIconCount, viewBinding.newIconList,
+                    viewBinding.newIconArrow, newIcon)
             }
         }
     }
@@ -106,7 +116,7 @@ class HomeFragment: BaseTabFragment() {
         val supportedCount = iconHelper.supportedCount
         val allAppCount = iconHelper.allAppCount
 
-        val iconGroup = IconGroup(pageRoot)
+        val iconGroup = IconGroup(viewBinding.pageRoot)
         val fit: (icon: IconView, index: Int) -> Unit = { icon, index ->
             val iconPack = iconHelper.getAppInfo(index).iconPack
             if (iconPack.isEmpty()) {
@@ -126,8 +136,8 @@ class HomeFragment: BaseTabFragment() {
         }
 
 
-        supportQuantityValue.text = "$supportedCount/$allAppCount"
-        supportQuantityProgress.progress = (100F * supportedCount / allAppCount).toInt()
+        viewBinding.supportQuantityValue.text = "$supportedCount/$allAppCount"
+        viewBinding.supportQuantityProgress.progress = (100F * supportedCount / allAppCount).toInt()
     }
 
     private fun initView() {
@@ -144,8 +154,8 @@ class HomeFragment: BaseTabFragment() {
             setHeadWallpaper()
         }
 
-        versionTitle.text = context?.versionName()?: "Unknown"
-        versionBtn.setOnClickListener {
+        viewBinding.versionTitle.text = context?.versionName()?: "Unknown"
+        viewBinding.versionBtn.setOnClickListener {
             activity?.let { activity ->
                 val updateInfoProvider = LIconKit.createUpdateInfoProvider(activity)
                 if (updateInfoProvider != null) {
@@ -154,7 +164,7 @@ class HomeFragment: BaseTabFragment() {
             }
         }
 
-        bindLinkInfo(linkGroup, ExternalLinkManager(LIconKit.createLinkInfoProvider(context!!)))
+        bindLinkInfo(viewBinding.linkGroup, ExternalLinkManager(LIconKit.createLinkInfoProvider(context!!)))
     }
 
     private fun initNewIconList(icon: View, title: View, count: TextView,
@@ -332,13 +342,13 @@ class HomeFragment: BaseTabFragment() {
 
     private fun setHeadWallpaper() {
         val wallpaperManager = WallpaperManager.getInstance(context)
-        headerImageView.setImageDrawable(wallpaperManager.drawable)
+        viewBinding.headerImageView.setImageDrawable(wallpaperManager.drawable)
     }
 
     override fun onInsetsChange(root: View, left: Int, top: Int, right: Int, bottom: Int) {
         super.onInsetsChange(root, left, top, right, bottom)
-        WindowInsetsHelper.setMargin(previewIcon1, left, top, 0, bottom)
-        WindowInsetsHelper.setMargin(previewIcon4, 0, 0, right, 0)
+        WindowInsetsHelper.setMargin(viewBinding.previewIcon1, left, top, 0, bottom)
+        WindowInsetsHelper.setMargin(viewBinding.previewIcon4, 0, 0, right, 0)
     }
 
     private fun bindLinkInfo(group: ViewGroup, linkManager: ExternalLinkManager) {

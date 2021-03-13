@@ -6,10 +6,7 @@ import android.content.res.Resources
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
-import com.lollipop.iconcore.listener.BackPressedListener
-import com.lollipop.iconcore.listener.OnWindowInsetsListener
 import com.lollipop.iconcore.provider.MainPageRenderer
-import kotlinx.android.extensions.LayoutContainer
 
 /**
  * @author lollipop
@@ -17,12 +14,9 @@ import kotlinx.android.extensions.LayoutContainer
  * 简易的Activity呈现类实现，它提供了基础的方法实现
  * 可以更加简单的实现Activity的布局
  */
-open class SimpleActivityRenderer: MainPageRenderer, LayoutContainer {
+open class SimpleActivityRenderer: MainPageRenderer {
 
     private var activityView: View? = null
-
-    override val containerView: View?
-        get() = activityView
 
     /**
      * 为activty设置内容体的View

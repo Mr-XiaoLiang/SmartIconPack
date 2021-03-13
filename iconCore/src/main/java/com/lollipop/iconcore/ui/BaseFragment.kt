@@ -24,12 +24,6 @@ open class BaseFragment: Fragment(),
         OnWindowInsetsProvider,
         OnWindowInsetsListener {
 
-    /**
-     * 设置Layout的ID，以此来简化开发过程
-     * 在{@link #onCreateView}时，将会使用它来实例化View
-     */
-    open val layoutId = 0
-
     private var lifecycleHelper: FragmentLifecycleHelper = FragmentLifecycleHelper()
 
     private val windowInsetsProviderHelper: WindowInsetsProviderHelper by lazy {
@@ -66,14 +60,6 @@ open class BaseFragment: Fragment(),
         supportLifecycle(this)
         super.onCreate(savedInstanceState)
         lifecycleHelper.onCreate(this, savedInstanceState)
-    }
-
-    override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        if (layoutId != 0) {
-            return inflater.inflate(layoutId, container, false)
-        }
-        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

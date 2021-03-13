@@ -12,6 +12,7 @@ import com.lollipop.iconcore.ui.IconPackActivity
 import com.lollipop.iconcore.ui.SimpleActivityRenderer
 import com.lollipop.iconcore.util.CrashHandler
 import com.lollipop.iconcore.util.log
+import com.lollipop.iconkit.databinding.KitActivityMainBinding
 import com.lollipop.iconkit.dialog.CrashDialog
 import com.lollipop.iconkit.fragment.*
 import liang.lollipop.ltabview.LTabHelper
@@ -31,7 +32,7 @@ open class MainActivity: SimpleActivityRenderer() {
 
     override fun onCreate(target: IconPackActivity, savedInstanceState: Bundle?) {
         super.onCreate(target, savedInstanceState)
-        setContentView(target, R.layout.kit_activity_main)
+        setContentView(target, KitActivityMainBinding.inflate(target.layoutInflater).root)
         target.initWindowFlag()
         initView(target)
     }

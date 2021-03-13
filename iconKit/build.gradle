@@ -1,7 +1,6 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'kotlin-android-extensions'
 }
 
 apply from: 'publish.gradle'
@@ -32,6 +31,9 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
@@ -41,7 +43,8 @@ dependencies {
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-//     compile project(path: ':iconCore')
-    compile 'com.lollipop.smartIconPack:IconCore:1.0.3'
-    implementation 'com.lollipop.ltabview:LTabView:1.0'
+    compile project(path: ':iconCore')
+    compile project(path: ':ltabview')
+//    compile 'com.lollipop.smartIconPack:IconCore:1.0.3'
+//    implementation 'com.lollipop.ltabview:LTabView:1.0'
 }

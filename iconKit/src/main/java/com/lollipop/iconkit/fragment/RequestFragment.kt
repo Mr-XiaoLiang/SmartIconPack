@@ -15,8 +15,8 @@ import com.lollipop.iconcore.ui.IconImageView
 import com.lollipop.iconcore.util.*
 import com.lollipop.iconkit.LIconKit
 import com.lollipop.iconkit.R
+import com.lollipop.iconkit.databinding.KitFragmentRequestBinding
 import com.lollipop.iconkit.dialog.LoadingDialog
-import kotlinx.android.synthetic.main.kit_fragment_request.*
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
@@ -35,8 +35,6 @@ class RequestFragment : BaseTabFragment() {
         get() = R.string.request
     override val tabColorId: Int
         get() = R.color.tabRequestSelectedColor
-    override val layoutId: Int
-        get() = R.layout.kit_fragment_request
 
     private val appInfoList = ArrayList<RequestAppInfo>()
 
@@ -52,23 +50,36 @@ class RequestFragment : BaseTabFragment() {
         LoadingDialog(LoadIconProvider(appAdapter.selectedApp, appInfoList))
     }
 
+    private val viewBinding: KitFragmentRequestBinding by lazyBind()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return viewBinding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        toolBarInsetsHelper = WindowInsetsHelper(toolBar)
+        toolBarInsetsHelper = WindowInsetsHelper(viewBinding.toolBar)
 
-        appList.layoutManager = LinearLayoutManager(
-            view.context, RecyclerView.VERTICAL, false)
-        appList.adapter = appAdapter
-        appList.addOnScrollListener(FloatingTagHelper(
-            floatingPanel, floatingTextView, appAdapter::isShowTag, appAdapter::getTag))
+        viewBinding.appList.let { appList ->
+            appList.layoutManager = LinearLayoutManager(
+                view.context, RecyclerView.VERTICAL, false)
+            appList.adapter = appAdapter
+            appList.addOnScrollListener(FloatingTagHelper(
+                viewBinding.floatingPanel,
+                viewBinding.floatingTextView, appAdapter::isShowTag, appAdapter::getTag))
+        }
         appAdapter.notifyDataSetChanged()
 
-        selectAllBtn.setOnClickListener {
+        viewBinding.selectAllBtn.setOnClickListener {
             appAdapter.selectAll()
         }
 
-        sendRequestBtn.setOnClickListener {
+        viewBinding.sendRequestBtn.setOnClickListener {
             createRequest()
         }
 
@@ -82,18 +93,18 @@ class RequestFragment : BaseTabFragment() {
                     view.context, iconHelper.getNotSupportInfo(index)))
             }
             Collections.sort(appInfoList, RequestAppComparator())
-            delay(appList.animate().duration) {
+            delay(viewBinding.appList.animate().duration) {
                 appAdapter.notifyDataSetChanged()
             }
         }
     }
 
     private fun onSelectedChange(count: Int) {
-        subtitleView.text = String.format(getString(R.string.chosen), count)
+        viewBinding.subtitleView.text = String.format(getString(R.string.chosen), count)
         if (count == 0) {
-            sendRequestBtn.hide()
+            viewBinding.sendRequestBtn.hide()
         } else {
-            sendRequestBtn.show()
+            viewBinding.sendRequestBtn.show()
         }
     }
 

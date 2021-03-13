@@ -9,9 +9,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.iconcore.util.MakerInfoManager
 import com.lollipop.iconcore.util.OvalOutlineProvider
+import com.lollipop.iconcore.util.lazyBind
 import com.lollipop.iconkit.LIconKit
 import com.lollipop.iconkit.R
-import kotlinx.android.synthetic.main.kit_fragment_about.*
+import com.lollipop.iconkit.databinding.KitFragmentAboutBinding
 
 /**
  * @author lollipop
@@ -24,26 +25,34 @@ class AboutFragment: BaseTabFragment() {
         get() = R.string.about
     override val tabColorId: Int
         get() = R.color.tabAboutSelectedColor
-    override val layoutId: Int
-        get() = R.layout.kit_fragment_about
+
+    private val viewBinding: KitFragmentAboutBinding by lazyBind()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return viewBinding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        OvalOutlineProvider.bind(makerLogo)
+        OvalOutlineProvider.bind(viewBinding.makerLogo)
 
         val makerInfoManager = MakerInfoManager(LIconKit.createMakerInfoProvider(view.context))
-        makerLogo.setImageResource(makerInfoManager.icon)
-        makerName.setText(makerInfoManager.name)
-        makerSignature.setText(makerInfoManager.signature)
-        headerImageView.setImageResource(makerInfoManager.background)
+        viewBinding.makerLogo.setImageResource(makerInfoManager.icon)
+        viewBinding.makerName.setText(makerInfoManager.name)
+        viewBinding.makerSignature.setText(makerInfoManager.signature)
+        viewBinding.headerImageView.setImageResource(makerInfoManager.background)
 
         val mottoArray = makerInfoManager.mottoArray
         if (mottoArray != 0) {
             val stringArray = resources.getStringArray(mottoArray)
-            mottoList.layoutManager = LinearLayoutManager(
+            viewBinding.mottoList.layoutManager = LinearLayoutManager(
                 view.context, RecyclerView.VERTICAL, false)
-            mottoList.adapter = MottoAdapter(stringArray)
-            mottoList.adapter?.notifyDataSetChanged()
+            viewBinding.mottoList.adapter = MottoAdapter(stringArray)
+            viewBinding.mottoList.adapter?.notifyDataSetChanged()
         }
 
     }
