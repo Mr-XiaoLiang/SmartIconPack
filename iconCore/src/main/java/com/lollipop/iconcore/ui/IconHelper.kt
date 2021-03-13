@@ -86,6 +86,11 @@ class IconHelper private constructor(
         const val ATTR_COMPONENT = "component"
         const val ATTR_DRAWABLE = "drawable"
 
+        /**
+         * 仅用于icon信息导出的参数名称
+         */
+        const val ATTR_DRAWABLE_TYPE = "type"
+
         private const val KEY_COMPONENT_INFO = "ComponentInfo"
 
         private val EMPTY_ICON_ID = IntArray(0)

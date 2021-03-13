@@ -53,6 +53,8 @@ class XmlBuilder private constructor(private val tag: String) {
                     .addAttr(IconHelper.ATTR_COMPONENT, info.pkg.toString())
                     .addAttr(IconHelper.ATTR_DRAWABLE, info.drawableName)
                     .addAttr(IconHelper.ATTR_NAME, info.getLabel(context).toString())
+                    .addAttr(IconHelper.ATTR_DRAWABLE_TYPE,
+                        info.loadIcon(context).javaClass.simpleName)
             }
             return builder
         }
