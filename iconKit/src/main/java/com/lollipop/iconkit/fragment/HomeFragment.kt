@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -384,7 +385,6 @@ class HomeFragment: BaseTabFragment() {
             titleView.text = info.title
             summaryView.text = info.summary
             iconView.setImageResource(info.icon)
-            iconView.outlineProvider
             itemView.setOnClickListener {
                 try {
                     when(ExternalLinkManager.getLinkType(info.url)) {
