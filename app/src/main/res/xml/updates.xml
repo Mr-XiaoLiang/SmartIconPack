@@ -25,37 +25,44 @@
     -->
 
     <!--  版本  -->
+    <version name="1.1" code="6">
+        <!--  更新内容，数量不限   -->
+        <item>适配请求中增加原应用icon类型</item>
+        <item>提升Gradle版本</item>
+        <item>去掉过时的kotlin-android-extensions，使用ViewBinding</item>
+        <item>模板交流官方群：677026563</item>
+    </version>
     <version name="1.0" code="5">
         <!--  更新内容，数量不限   -->
         <item>增加基础的图标</item>
         <item>完成基础的图标包模板</item>
         <item>性能优化</item>
-        <item>开发者QQ：1982568737</item>
+        <item>模板交流官方群：677026563</item>
     </version>
 
     <version name="0.9" code="4">
         <item>移除不必要的Java代码</item>
         <item>增加主题色配置</item>
         <item>核心代码精简</item>
-        <item>开发者QQ：1982568737</item>
+        <item>模板交流官方群：677026563</item>
     </version>
 
     <version name="0.7" code="3">
         <item>增加文本内容配置</item>
         <item>增加图标解析文件的配置</item>
-        <item>开发者QQ：1982568737</item>
+        <item>模板交流官方群：677026563</item>
     </version>
 
     <version name="0.5" code="2">
         <item>增加文本内容配置</item>
         <item>增加图标解析文件的配置</item>
-        <item>开发者QQ：1982568737</item>
+        <item>模板交流官方群：677026563</item>
     </version>
 
     <version name="0.1" code="1">
         <item>基础项目搭建</item>
         <item>完成项目架构设计</item>
-        <item>开发者QQ：1982568737</item>
+        <item>模板交流官方群：677026563</item>
     </version>
 
 </updates>
