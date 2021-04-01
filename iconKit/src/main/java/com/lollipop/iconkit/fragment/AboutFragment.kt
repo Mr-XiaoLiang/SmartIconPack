@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.lollipop.iconcore.ui.BaseFragment
 import com.lollipop.iconcore.util.MakerInfoManager
 import com.lollipop.iconcore.util.OvalOutlineProvider
 import com.lollipop.iconcore.util.lazyBind
@@ -18,13 +19,7 @@ import com.lollipop.iconkit.databinding.KitFragmentAboutBinding
  * @author lollipop
  * @date 10/23/20 19:24
  */
-class AboutFragment: BaseTabFragment() {
-    override val tabIcon: Int
-        get() = R.drawable.ic_baseline_person_24
-    override val tabTitle: Int
-        get() = R.string.about
-    override val tabColorId: Int
-        get() = R.color.tabAboutSelectedColor
+class AboutFragment: BaseFragment() {
 
     private val viewBinding: KitFragmentAboutBinding by lazyBind()
 

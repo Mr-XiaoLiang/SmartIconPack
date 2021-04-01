@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.iconcore.listener.WindowInsetsHelper
+import com.lollipop.iconcore.ui.BaseFragment
 import com.lollipop.iconcore.ui.IconHelper
 import com.lollipop.iconcore.ui.IconImageView
 import com.lollipop.iconcore.util.delay
@@ -23,13 +24,8 @@ import com.lollipop.iconkit.dialog.PreviewIconDialog
  * @author lollipop
  * @date 10/23/20 19:24
  */
-class IconFragment: BaseTabFragment() {
-    override val tabIcon: Int
-        get() = R.drawable.ic_baseline_apps_24
-    override val tabTitle: Int
-        get() = R.string.icon
-    override val tabColorId: Int
-        get() = R.color.tabIconSelectedColor
+class IconFragment: BaseFragment() {
+
     override val isLightStatusBar: Boolean
         get() = true
 

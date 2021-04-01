@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.lollipop.iconcore.listener.WindowInsetsHelper
+import com.lollipop.iconcore.ui.BaseFragment
 import com.lollipop.iconcore.ui.IconHelper
 import com.lollipop.iconcore.ui.IconImageView
 import com.lollipop.iconcore.ui.IconView
@@ -34,13 +35,7 @@ import com.lollipop.iconkit.dialog.UpdateInfoDialog
  * @author lollipop
  * @date 10/23/20 19:24
  */
-class HomeFragment: BaseTabFragment() {
-    override val tabIcon: Int
-        get() = R.drawable.ic_baseline_home_24
-    override val tabTitle: Int
-        get() = R.string.home
-    override val tabColorId: Int
-        get() = R.color.tabHomeSelectedColor
+class HomeFragment: BaseFragment() {
 
     private val viewBinding: KitFragmentHomeBinding by lazyBind()
 

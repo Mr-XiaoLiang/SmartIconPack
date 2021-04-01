@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.lollipop.iconcore.listener.WindowInsetsHelper
+import com.lollipop.iconcore.ui.BaseFragment
 import com.lollipop.iconcore.ui.IconHelper
 import com.lollipop.iconcore.ui.IconImageView
 import com.lollipop.iconcore.util.*
@@ -23,18 +24,11 @@ import kotlin.collections.ArrayList
 import kotlin.math.max
 import kotlin.math.min
 
-class RequestFragment : BaseTabFragment() {
+class RequestFragment : BaseFragment() {
 
     companion object {
         private const val MIN_LOADING = LoadingDialog.ANIMATION_DURATION
     }
-
-    override val tabIcon: Int
-        get() = R.drawable.ic_baseline_architecture_24
-    override val tabTitle: Int
-        get() = R.string.request
-    override val tabColorId: Int
-        get() = R.color.tabRequestSelectedColor
 
     private val appInfoList = ArrayList<RequestAppInfo>()
 
