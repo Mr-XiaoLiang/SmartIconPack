@@ -1,5 +1,8 @@
 # IconCore更新日志
 
+### 1.0.7（2021.04.01）
+* 调整`Fragment`使用方式，增加`FragmentPageHelper`
+
 ### 1.0.6（2020.11.30）
 * 增加`AppFilterMergeHelper`，用于`appfilter.xml`合并的工具，帮助开发者快速整理和合并适配清单
 * 调整AppFilter文件生成的属性顺序
