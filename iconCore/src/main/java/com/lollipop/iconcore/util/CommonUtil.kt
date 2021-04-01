@@ -19,6 +19,7 @@ import androidx.viewbinding.ViewBinding
 import java.io.*
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+import kotlin.Throwable as Throwable
 
 
 /**
@@ -491,7 +492,7 @@ fun Context.versionCode(): Long {
  * 创建一个时间性能工具
  * 用于检测某些代码的运行时间
  */
-inline fun <reified T: Any> T.timeProfiler(): TimeProfiler {
+inline fun <reified T : Any> T.timeProfiler(): TimeProfiler {
     val profiler = TimeProfiler(this.javaClass.simpleName)
     profiler.punch()
     return profiler
@@ -589,4 +590,14 @@ inline fun <reified T : ViewBinding> View.withThis(inflate: Boolean = false): La
     throw InflateException("Cant inflate ViewBinding ${bindingClass.name}")
 }
 
+inline fun <T : Any> T.tryDo(
+    noinline error: ((Throwable) -> Unit)? = null,
+    run: T.() -> Unit,
+) {
+    try {
+        run()
+    } catch (e: Throwable) {
+        error?.invoke(e)
+    }
+}
 
